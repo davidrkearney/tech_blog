@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>tech_blog - Text Generation - LSTM</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tech_blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Text Generation - LSTM</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p><a href="https://colab.research.google.com/github/davidrkearney/colab-notebooks/blob/main/Text_Generation_LSTM_Dostoevsky.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a></p>
+<p>Credit: Code from https://github.com/jeffheaton/t81_558_deep_learning</p>
+<div class="cell" data-outputid="538651a9-c90d-4749-83dc-a617d4fdaf00" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">%</span>tensorflow_version <span class="fl">2.</span><span class="er">x</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    COLAB <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Note: using Google CoLab"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span>:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Note: not using Google CoLab"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    COLAB <span class="op">=</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Note: using Google CoLab</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> LambdaCallback</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.models <span class="im">import</span> Sequential</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers <span class="im">import</span> Dense</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers <span class="im">import</span> LSTM</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.optimizers <span class="im">import</span> RMSprop</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.utils <span class="im">import</span> get_file</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="28a318b5-79e5-4c88-bdf3-2f385552c081" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"https://www.gutenberg.org/cache/epub/600/pg600.txt"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>raw_text <span class="op">=</span> r.text</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(raw_text[<span class="dv">0</span>:<span class="dv">1000</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>﻿Project Gutenberg's Notes from the Underground, by Feodor Dostoevsky
+
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever.  You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.net
+
+
+Title: Notes from the Underground
+
+Author: Feodor Dostoevsky
+
+Posting Date: September 13, 2008 [EBook #600]
+Release Date: July, 1996
+
+Language: English
+
+
+*** START OF THIS PROJECT GUTENBERG EBOOK NOTES FROM THE UNDERGROUND ***
+
+
+
+
+Produced by Judith Boss.  HTML version by Al Haines.
+
+
+
+
+
+
+
+
+Notes from the Underground
+
+FYODOR DOSTOYEVSKY
+
+
+
+
+
+PART I
+
+Underground*
+
+     *The author of the diary and the diary itself
+     are, of course, imaginary.  Nevertheless it is clear
+     that such persons as the writer of these notes
+     not only may, but positively must, exist in our
+     society, when we consider the circumstances i</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>processed_text <span class="op">=</span> raw_text.lower()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>processed_text <span class="op">=</span> re.sub(<span class="vs">r'[^\x00-\x7f]'</span>,<span class="vs">r''</span>, processed_text) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="3d053e99-9fb4-4761-a936-8b5be000a808" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'corpus length:'</span>, <span class="bu">len</span>(processed_text))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>chars <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">list</span>(<span class="bu">set</span>(processed_text)))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'total chars:'</span>, <span class="bu">len</span>(chars))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>char_indices <span class="op">=</span> <span class="bu">dict</span>((c, i) <span class="cf">for</span> i, c <span class="kw">in</span> <span class="bu">enumerate</span>(chars))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>indices_char <span class="op">=</span> <span class="bu">dict</span>((i, c) <span class="cf">for</span> i, c <span class="kw">in</span> <span class="bu">enumerate</span>(chars))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>corpus length: 265582
+total chars: 58</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="a13e5974-2c7d-49c1-c224-9a3c7056869f" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cut the text in semi-redundant sequences of maxlen characters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>maxlen <span class="op">=</span> <span class="dv">40</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sentences <span class="op">=</span> []</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>next_chars <span class="op">=</span> []</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(processed_text) <span class="op">-</span> maxlen, step):</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    sentences.append(processed_text[i: i <span class="op">+</span> maxlen])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    next_chars.append(processed_text[i <span class="op">+</span> maxlen])</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'nb sequences:'</span>, <span class="bu">len</span>(sentences))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>nb sequences: 88514</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="2fd751b2-7b19-4835-c9ce-597dce0d92f0" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sentences</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>["project gutenberg's notes from the under",
+ "ject gutenberg's notes from the undergro",
+ "t gutenberg's notes from the underground",
+ "utenberg's notes from the underground, b",
+ "nberg's notes from the underground, by f",
+ "rg's notes from the underground, by feod",
+ 's notes from the underground, by feodor ',
+ 'otes from the underground, by feodor dos',
+ 's from the underground, by feodor dostoe',
+ 'rom the underground, by feodor dostoevsk',
+ ' the underground, by feodor dostoevsky\r\n',
+ 'e underground, by feodor dostoevsky\r\n\r\nt',
+ 'nderground, by feodor dostoevsky\r\n\r\nthis',
+ 'rground, by feodor dostoevsky\r\n\r\nthis eb',
+ 'ound, by feodor dostoevsky\r\n\r\nthis ebook',
+ 'd, by feodor dostoevsky\r\n\r\nthis ebook is',
+ 'by feodor dostoevsky\r\n\r\nthis ebook is fo',
+ 'feodor dostoevsky\r\n\r\nthis ebook is for t',
+ 'dor dostoevsky\r\n\r\nthis ebook is for the ',
+ ' dostoevsky\r\n\r\nthis ebook is for the use',
+ 'stoevsky\r\n\r\nthis ebook is for the use of',
+ 'evsky\r\n\r\nthis ebook is for the use of an',
+ 'ky\r\n\r\nthis ebook is for the use of anyon',
+ '\n\r\nthis ebook is for the use of anyone a',
+ 'this ebook is for the use of anyone anyw',
+ 's ebook is for the use of anyone anywher',
+ 'book is for the use of anyone anywhere a',
+ 'k is for the use of anyone anywhere at n',
+ 's for the use of anyone anywhere at no c',
+ 'or the use of anyone anywhere at no cost',
+ 'the use of anyone anywhere at no cost an',
+ ' use of anyone anywhere at no cost and w',
+ 'e of anyone anywhere at no cost and with',
+ 'f anyone anywhere at no cost and with\r\na',
+ 'nyone anywhere at no cost and with\r\nalmo',
+ 'ne anywhere at no cost and with\r\nalmost ',
+ 'anywhere at no cost and with\r\nalmost no ',
+ 'where at no cost and with\r\nalmost no res',
+ 're at no cost and with\r\nalmost no restri',
+ 'at no cost and with\r\nalmost no restricti',
+ 'no cost and with\r\nalmost no restrictions',
+ 'cost and with\r\nalmost no restrictions wh',
+ 't and with\r\nalmost no restrictions whats',
+ 'nd with\r\nalmost no restrictions whatsoev',
+ 'with\r\nalmost no restrictions whatsoever.',
+ 'h\r\nalmost no restrictions whatsoever.  y',
+ 'almost no restrictions whatsoever.  you ',
+ 'ost no restrictions whatsoever.  you may',
+ ' no restrictions whatsoever.  you may co',
+ ' restrictions whatsoever.  you may copy ',
+ 'strictions whatsoever.  you may copy it,',
+ 'ictions whatsoever.  you may copy it, gi',
+ 'ions whatsoever.  you may copy it, give ',
+ 's whatsoever.  you may copy it, give it ',
+ 'hatsoever.  you may copy it, give it awa',
+ 'soever.  you may copy it, give it away o',
+ 'ver.  you may copy it, give it away or\r\n',
+ '.  you may copy it, give it away or\r\nre-',
+ 'you may copy it, give it away or\r\nre-use',
+ ' may copy it, give it away or\r\nre-use it',
+ 'y copy it, give it away or\r\nre-use it un',
+ 'opy it, give it away or\r\nre-use it under',
+ ' it, give it away or\r\nre-use it under th',
+ ', give it away or\r\nre-use it under the t',
+ 'ive it away or\r\nre-use it under the term',
+ ' it away or\r\nre-use it under the terms o',
+ ' away or\r\nre-use it under the terms of t',
+ 'ay or\r\nre-use it under the terms of the ',
+ 'or\r\nre-use it under the terms of the pro',
+ '\nre-use it under the terms of the projec',
+ '-use it under the terms of the project g',
+ 'e it under the terms of the project gute',
+ 't under the terms of the project gutenbe',
+ 'nder the terms of the project gutenberg ',
+ 'r the terms of the project gutenberg lic',
+ 'he terms of the project gutenberg licens',
+ 'terms of the project gutenberg license i',
+ 'ms of the project gutenberg license incl',
+ 'of the project gutenberg license include',
+ 'the project gutenberg license included\r\n',
+ ' project gutenberg license included\r\nwit',
+ 'oject gutenberg license included\r\nwith t',
+ 'ct gutenberg license included\r\nwith this',
+ 'gutenberg license included\r\nwith this eb',
+ 'enberg license included\r\nwith this ebook',
+ 'erg license included\r\nwith this ebook or',
+ ' license included\r\nwith this ebook or on',
+ 'cense included\r\nwith this ebook or onlin',
+ 'se included\r\nwith this ebook or online a',
+ 'included\r\nwith this ebook or online at w',
+ 'luded\r\nwith this ebook or online at www.',
+ 'ed\r\nwith this ebook or online at www.gut',
+ '\nwith this ebook or online at www.gutenb',
+ 'th this ebook or online at www.gutenberg',
+ 'this ebook or online at www.gutenberg.ne',
+ 's ebook or online at www.gutenberg.net\r\n',
+ 'book or online at www.gutenberg.net\r\n\r\n\r',
+ 'k or online at www.gutenberg.net\r\n\r\n\r\nti',
+ 'r online at www.gutenberg.net\r\n\r\n\r\ntitle',
+ 'nline at www.gutenberg.net\r\n\r\n\r\ntitle: n',
+ 'ne at www.gutenberg.net\r\n\r\n\r\ntitle: note',
+ 'at www.gutenberg.net\r\n\r\n\r\ntitle: notes f',
+ 'www.gutenberg.net\r\n\r\n\r\ntitle: notes from',
+ '.gutenberg.net\r\n\r\n\r\ntitle: notes from th',
+ 'tenberg.net\r\n\r\n\r\ntitle: notes from the u',
+ 'berg.net\r\n\r\n\r\ntitle: notes from the unde',
+ 'g.net\r\n\r\n\r\ntitle: notes from the undergr',
+ 'et\r\n\r\n\r\ntitle: notes from the undergroun',
+ '\n\r\n\r\ntitle: notes from the underground\r\n',
+ '\r\ntitle: notes from the underground\r\n\r\na',
+ 'itle: notes from the underground\r\n\r\nauth',
+ 'e: notes from the underground\r\n\r\nauthor:',
+ 'notes from the underground\r\n\r\nauthor: fe',
+ 'es from the underground\r\n\r\nauthor: feodo',
+ 'from the underground\r\n\r\nauthor: feodor d',
+ 'm the underground\r\n\r\nauthor: feodor dost',
+ 'he underground\r\n\r\nauthor: feodor dostoev',
+ 'underground\r\n\r\nauthor: feodor dostoevsky',
+ 'erground\r\n\r\nauthor: feodor dostoevsky\r\n\r',
+ 'round\r\n\r\nauthor: feodor dostoevsky\r\n\r\npo',
+ 'nd\r\n\r\nauthor: feodor dostoevsky\r\n\r\nposti',
+ '\n\r\nauthor: feodor dostoevsky\r\n\r\nposting ',
+ 'author: feodor dostoevsky\r\n\r\nposting dat',
+ 'hor: feodor dostoevsky\r\n\r\nposting date: ',
+ ': feodor dostoevsky\r\n\r\nposting date: sep',
+ 'eodor dostoevsky\r\n\r\nposting date: septem',
+ 'or dostoevsky\r\n\r\nposting date: september',
+ 'dostoevsky\r\n\r\nposting date: september 13',
+ 'toevsky\r\n\r\nposting date: september 13, 2',
+ 'vsky\r\n\r\nposting date: september 13, 2008',
+ 'y\r\n\r\nposting date: september 13, 2008 [e',
+ '\r\nposting date: september 13, 2008 [eboo',
+ 'osting date: september 13, 2008 [ebook #',
+ 'ing date: september 13, 2008 [ebook #600',
+ ' date: september 13, 2008 [ebook #600]\r\n',
+ 'te: september 13, 2008 [ebook #600]\r\nrel',
+ ' september 13, 2008 [ebook #600]\r\nreleas',
+ 'ptember 13, 2008 [ebook #600]\r\nrelease d',
+ 'mber 13, 2008 [ebook #600]\r\nrelease date',
+ 'r 13, 2008 [ebook #600]\r\nrelease date: j',
+ '3, 2008 [ebook #600]\r\nrelease date: july',
+ '2008 [ebook #600]\r\nrelease date: july, 1',
+ '8 [ebook #600]\r\nrelease date: july, 1996',
+ 'ebook #600]\r\nrelease date: july, 1996\r\n\r',
+ 'ok #600]\r\nrelease date: july, 1996\r\n\r\nla',
+ '#600]\r\nrelease date: july, 1996\r\n\r\nlangu',
+ '0]\r\nrelease date: july, 1996\r\n\r\nlanguage',
+ '\nrelease date: july, 1996\r\n\r\nlanguage: e',
+ 'lease date: july, 1996\r\n\r\nlanguage: engl',
+ 'se date: july, 1996\r\n\r\nlanguage: english',
+ 'date: july, 1996\r\n\r\nlanguage: english\r\n\r',
+ 'e: july, 1996\r\n\r\nlanguage: english\r\n\r\n\r\n',
+ 'july, 1996\r\n\r\nlanguage: english\r\n\r\n\r\n***',
+ 'y, 1996\r\n\r\nlanguage: english\r\n\r\n\r\n*** st',
+ '1996\r\n\r\nlanguage: english\r\n\r\n\r\n*** start',
+ '6\r\n\r\nlanguage: english\r\n\r\n\r\n*** start of',
+ '\r\nlanguage: english\r\n\r\n\r\n*** start of th',
+ 'anguage: english\r\n\r\n\r\n*** start of this ',
+ 'uage: english\r\n\r\n\r\n*** start of this pro',
+ 'e: english\r\n\r\n\r\n*** start of this projec',
+ 'english\r\n\r\n\r\n*** start of this project g',
+ 'lish\r\n\r\n\r\n*** start of this project gute',
+ 'h\r\n\r\n\r\n*** start of this project gutenbe',
+ '\r\n\r\n*** start of this project gutenberg ',
+ '\n*** start of this project gutenberg ebo',
+ '* start of this project gutenberg ebook ',
+ 'tart of this project gutenberg ebook not',
+ 't of this project gutenberg ebook notes ',
+ 'f this project gutenberg ebook notes fro',
+ 'his project gutenberg ebook notes from t',
+ ' project gutenberg ebook notes from the ',
+ 'oject gutenberg ebook notes from the und',
+ 'ct gutenberg ebook notes from the underg',
+ 'gutenberg ebook notes from the undergrou',
+ 'enberg ebook notes from the underground ',
+ 'erg ebook notes from the underground ***',
+ ' ebook notes from the underground ***\r\n\r',
+ 'ook notes from the underground ***\r\n\r\n\r\n',
+ ' notes from the underground ***\r\n\r\n\r\n\r\n\r',
+ 'tes from the underground ***\r\n\r\n\r\n\r\n\r\npr',
+ ' from the underground ***\r\n\r\n\r\n\r\n\r\nprodu',
+ 'om the underground ***\r\n\r\n\r\n\r\n\r\nproduced',
+ 'the underground ***\r\n\r\n\r\n\r\n\r\nproduced by',
+ ' underground ***\r\n\r\n\r\n\r\n\r\nproduced by ju',
+ 'derground ***\r\n\r\n\r\n\r\n\r\nproduced by judit',
+ 'ground ***\r\n\r\n\r\n\r\n\r\nproduced by judith b',
+ 'und ***\r\n\r\n\r\n\r\n\r\nproduced by judith boss',
+ ' ***\r\n\r\n\r\n\r\n\r\nproduced by judith boss.  ',
+ '*\r\n\r\n\r\n\r\n\r\nproduced by judith boss.  htm',
+ '\r\n\r\n\r\n\r\nproduced by judith boss.  html v',
+ '\n\r\n\r\nproduced by judith boss.  html vers',
+ '\r\nproduced by judith boss.  html version',
+ 'roduced by judith boss.  html version by',
+ 'uced by judith boss.  html version by al',
+ 'd by judith boss.  html version by al ha',
+ 'y judith boss.  html version by al haine',
+ 'udith boss.  html version by al haines.\r',
+ 'th boss.  html version by al haines.\r\n\r\n',
+ 'boss.  html version by al haines.\r\n\r\n\r\n\r',
+ 's.  html version by al haines.\r\n\r\n\r\n\r\n\r\n',
+ ' html version by al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r',
+ 'ml version by al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n',
+ 'version by al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nn',
+ 'sion by al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnote',
+ 'n by al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes f',
+ 'y al haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from',
+ 'l haines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from th',
+ 'aines.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from the u',
+ 'es.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from the unde',
+ '\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from the undergr',
+ '\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nnotes from the undergroun',
+ '\r\n\r\n\r\n\r\n\r\n\r\nnotes from the underground\r\n',
+ '\n\r\n\r\n\r\n\r\nnotes from the underground\r\n\r\nf',
+ '\r\n\r\n\r\nnotes from the underground\r\n\r\nfyod',
+ '\n\r\nnotes from the underground\r\n\r\nfyodor ',
+ 'notes from the underground\r\n\r\nfyodor dos',
+ 'es from the underground\r\n\r\nfyodor dostoy',
+ 'from the underground\r\n\r\nfyodor dostoyevs',
+ 'm the underground\r\n\r\nfyodor dostoyevsky\r',
+ 'he underground\r\n\r\nfyodor dostoyevsky\r\n\r\n',
+ 'underground\r\n\r\nfyodor dostoyevsky\r\n\r\n\r\n\r',
+ 'erground\r\n\r\nfyodor dostoyevsky\r\n\r\n\r\n\r\n\r\n',
+ 'round\r\n\r\nfyodor dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\np',
+ 'nd\r\n\r\nfyodor dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart',
+ '\n\r\nfyodor dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r',
+ 'fyodor dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\n',
+ 'dor dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nund',
+ ' dostoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nunderg',
+ 'stoyevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nundergrou',
+ 'yevsky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nunderground*',
+ 'sky\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nunderground*\r\n\r',
+ '\r\n\r\n\r\n\r\n\r\n\r\npart i\r\n\r\nunderground*\r\n\r\n  ',
+ '\n\r\n\r\n\r\n\r\npart i\r\n\r\nunderground*\r\n\r\n     ',
+ '\r\n\r\n\r\npart i\r\n\r\nunderground*\r\n\r\n     *th',
+ '\n\r\npart i\r\n\r\nunderground*\r\n\r\n     *the a',
+ 'part i\r\n\r\nunderground*\r\n\r\n     *the auth',
+ 't i\r\n\r\nunderground*\r\n\r\n     *the author ',
+ '\r\n\r\nunderground*\r\n\r\n     *the author of ',
+ '\nunderground*\r\n\r\n     *the author of the',
+ 'derground*\r\n\r\n     *the author of the di',
+ 'ground*\r\n\r\n     *the author of the diary',
+ 'und*\r\n\r\n     *the author of the diary an',
+ '*\r\n\r\n     *the author of the diary and t',
+ '\r\n     *the author of the diary and the ',
+ '    *the author of the diary and the dia',
+ ' *the author of the diary and the diary ',
+ 'he author of the diary and the diary its',
+ 'author of the diary and the diary itself',
+ 'hor of the diary and the diary itself\r\n ',
+ ' of the diary and the diary itself\r\n    ',
+ ' the diary and the diary itself\r\n     ar',
+ 'e diary and the diary itself\r\n     are, ',
+ 'iary and the diary itself\r\n     are, of ',
+ 'y and the diary itself\r\n     are, of cou',
+ 'nd the diary itself\r\n     are, of course',
+ 'the diary itself\r\n     are, of course, i',
+ ' diary itself\r\n     are, of course, imag',
+ 'ary itself\r\n     are, of course, imagina',
+ ' itself\r\n     are, of course, imaginary.',
+ 'self\r\n     are, of course, imaginary.  n',
+ 'f\r\n     are, of course, imaginary.  neve',
+ '     are, of course, imaginary.  neverth',
+ '  are, of course, imaginary.  neverthele',
+ 're, of course, imaginary.  nevertheless ',
+ ' of course, imaginary.  nevertheless it ',
+ ' course, imaginary.  nevertheless it is ',
+ 'urse, imaginary.  nevertheless it is cle',
+ 'e, imaginary.  nevertheless it is clear\r',
+ 'imaginary.  nevertheless it is clear\r\n  ',
+ 'ginary.  nevertheless it is clear\r\n     ',
+ 'ary.  nevertheless it is clear\r\n     tha',
+ '.  nevertheless it is clear\r\n     that s',
+ 'nevertheless it is clear\r\n     that such',
+ 'ertheless it is clear\r\n     that such pe',
+ 'heless it is clear\r\n     that such perso',
+ 'ess it is clear\r\n     that such persons ',
+ ' it is clear\r\n     that such persons as ',
+ ' is clear\r\n     that such persons as the',
+ ' clear\r\n     that such persons as the wr',
+ 'ear\r\n     that such persons as the write',
+ '\r\n     that such persons as the writer o',
+ '    that such persons as the writer of t',
+ ' that such persons as the writer of thes',
+ 'at such persons as the writer of these n',
+ 'such persons as the writer of these note',
+ 'h persons as the writer of these notes\r\n',
+ 'ersons as the writer of these notes\r\n   ',
+ 'ons as the writer of these notes\r\n     n',
+ ' as the writer of these notes\r\n     not ',
+ ' the writer of these notes\r\n     not onl',
+ 'e writer of these notes\r\n     not only m',
+ 'riter of these notes\r\n     not only may,',
+ 'er of these notes\r\n     not only may, bu',
+ 'of these notes\r\n     not only may, but p',
+ 'these notes\r\n     not only may, but posi',
+ 'se notes\r\n     not only may, but positiv',
+ 'notes\r\n     not only may, but positively',
+ 'es\r\n     not only may, but positively mu',
+ '\n     not only may, but positively must,',
+ '   not only may, but positively must, ex',
+ 'not only may, but positively must, exist',
+ ' only may, but positively must, exist in',
+ 'ly may, but positively must, exist in ou',
+ 'may, but positively must, exist in our\r\n',
+ ', but positively must, exist in our\r\n   ',
+ 'ut positively must, exist in our\r\n     s',
+ 'positively must, exist in our\r\n     soci',
+ 'itively must, exist in our\r\n     society',
+ 'vely must, exist in our\r\n     society, w',
+ 'y must, exist in our\r\n     society, when',
+ 'ust, exist in our\r\n     society, when we',
+ ', exist in our\r\n     society, when we co',
+ 'xist in our\r\n     society, when we consi',
+ 't in our\r\n     society, when we consider',
+ 'n our\r\n     society, when we consider th',
+ 'ur\r\n     society, when we consider the c',
+ '\n     society, when we consider the circ',
+ '   society, when we consider the circums',
+ 'society, when we consider the circumstan',
+ 'iety, when we consider the circumstances',
+ 'y, when we consider the circumstances in',
+ 'when we consider the circumstances in\r\n ',
+ 'n we consider the circumstances in\r\n    ',
+ 'e consider the circumstances in\r\n     th',
+ 'onsider the circumstances in\r\n     the m',
+ 'ider the circumstances in\r\n     the mids',
+ 'r the circumstances in\r\n     the midst o',
+ 'he circumstances in\r\n     the midst of w',
+ 'circumstances in\r\n     the midst of whic',
+ 'cumstances in\r\n     the midst of which o',
+ 'stances in\r\n     the midst of which our ',
+ 'nces in\r\n     the midst of which our soc',
+ 's in\r\n     the midst of which our societ',
+ 'n\r\n     the midst of which our society i',
+ '     the midst of which our society is f',
+ '  the midst of which our society is form',
+ 'he midst of which our society is formed.',
+ 'midst of which our society is formed.  i',
+ 'st of which our society is formed.  i ha',
+ 'of which our society is formed.  i have\r',
+ 'which our society is formed.  i have\r\n  ',
+ 'ch our society is formed.  i have\r\n     ',
+ 'our society is formed.  i have\r\n     tri',
+ ' society is formed.  i have\r\n     tried ',
+ 'ciety is formed.  i have\r\n     tried to ',
+ 'ty is formed.  i have\r\n     tried to exp',
+ 'is formed.  i have\r\n     tried to expose',
+ 'formed.  i have\r\n     tried to expose to',
+ 'med.  i have\r\n     tried to expose to th',
+ '.  i have\r\n     tried to expose to the v',
+ 'i have\r\n     tried to expose to the view',
+ 'ave\r\n     tried to expose to the view of',
+ '\r\n     tried to expose to the view of th',
+ '    tried to expose to the view of the p',
+ ' tried to expose to the view of the publ',
+ 'ied to expose to the view of the public ',
+ ' to expose to the view of the public mor',
+ ' expose to the view of the public more\r\n',
+ 'pose to the view of the public more\r\n   ',
+ 'e to the view of the public more\r\n     d',
+ 'o the view of the public more\r\n     dist',
+ 'he view of the public more\r\n     distinc',
+ 'view of the public more\r\n     distinctly',
+ 'w of the public more\r\n     distinctly th',
+ 'f the public more\r\n     distinctly than ',
+ 'he public more\r\n     distinctly than is ',
+ 'public more\r\n     distinctly than is com',
+ 'lic more\r\n     distinctly than is common',
+ ' more\r\n     distinctly than is commonly ',
+ 're\r\n     distinctly than is commonly don',
+ '\n     distinctly than is commonly done, ',
+ '   distinctly than is commonly done, one',
+ 'distinctly than is commonly done, one of',
+ 'tinctly than is commonly done, one of th',
+ 'ctly than is commonly done, one of the\r\n',
+ 'y than is commonly done, one of the\r\n   ',
+ 'han is commonly done, one of the\r\n     c',
+ ' is commonly done, one of the\r\n     char',
+ ' commonly done, one of the\r\n     charact',
+ 'mmonly done, one of the\r\n     characters',
+ 'nly done, one of the\r\n     characters of',
+ ' done, one of the\r\n     characters of th',
+ 'ne, one of the\r\n     characters of the r',
+ ' one of the\r\n     characters of the rece',
+ 'e of the\r\n     characters of the recent ',
+ 'f the\r\n     characters of the recent pas',
+ 'he\r\n     characters of the recent past. ',
+ '\n     characters of the recent past.  he',
+ '   characters of the recent past.  he is',
+ 'characters of the recent past.  he is on',
+ 'racters of the recent past.  he is one o',
+ 'ters of the recent past.  he is one of t',
+ 's of the recent past.  he is one of the\r',
+ 'f the recent past.  he is one of the\r\n  ',
+ 'he recent past.  he is one of the\r\n     ',
+ 'recent past.  he is one of the\r\n     rep',
+ 'ent past.  he is one of the\r\n     repres',
+ ' past.  he is one of the\r\n     represent',
+ 'st.  he is one of the\r\n     representati',
+ '  he is one of the\r\n     representatives',
+ 'e is one of the\r\n     representatives of',
+ 's one of the\r\n     representatives of a ',
+ 'ne of the\r\n     representatives of a gen',
+ 'of the\r\n     representatives of a genera',
+ 'the\r\n     representatives of a generatio',
+ '\r\n     representatives of a generation s',
+ '    representatives of a generation stil',
+ ' representatives of a generation still l',
+ 'presentatives of a generation still livi',
+ 'sentatives of a generation still living.',
+ 'tatives of a generation still living.  i',
+ 'ives of a generation still living.  in t',
+ 's of a generation still living.  in this',
+ 'f a generation still living.  in this\r\n ',
+ ' generation still living.  in this\r\n    ',
+ 'neration still living.  in this\r\n     fr',
+ 'ation still living.  in this\r\n     fragm',
+ 'on still living.  in this\r\n     fragment',
+ 'still living.  in this\r\n     fragment, e',
+ 'll living.  in this\r\n     fragment, enti',
+ 'living.  in this\r\n     fragment, entitle',
+ 'ing.  in this\r\n     fragment, entitled "',
+ '.  in this\r\n     fragment, entitled "und',
+ 'in this\r\n     fragment, entitled "underg',
+ 'this\r\n     fragment, entitled "undergrou',
+ 's\r\n     fragment, entitled "underground,',
+ '     fragment, entitled "underground," t',
+ '  fragment, entitled "underground," this',
+ 'ragment, entitled "underground," this pe',
+ 'ment, entitled "underground," this perso',
+ 't, entitled "underground," this person\r\n',
+ 'entitled "underground," this person\r\n   ',
+ 'itled "underground," this person\r\n     i',
+ 'ed "underground," this person\r\n     intr',
+ '"underground," this person\r\n     introdu',
+ 'derground," this person\r\n     introduces',
+ 'ground," this person\r\n     introduces hi',
+ 'und," this person\r\n     introduces himse',
+ '," this person\r\n     introduces himself ',
+ 'this person\r\n     introduces himself and',
+ 's person\r\n     introduces himself and hi',
+ 'erson\r\n     introduces himself and his v',
+ 'on\r\n     introduces himself and his view',
+ '\n     introduces himself and his views, ',
+ '   introduces himself and his views, and',
+ 'introduces himself and his views, and, a',
+ 'roduces himself and his views, and, as i',
+ 'uces himself and his views, and, as it w',
+ 's himself and his views, and, as it were',
+ 'imself and his views, and, as it were,\r\n',
+ 'elf and his views, and, as it were,\r\n   ',
+ ' and his views, and, as it were,\r\n     t',
+ 'd his views, and, as it were,\r\n     trie',
+ 'is views, and, as it were,\r\n     tries t',
+ 'views, and, as it were,\r\n     tries to e',
+ 'ws, and, as it were,\r\n     tries to expl',
+ ' and, as it were,\r\n     tries to explain',
+ 'd, as it were,\r\n     tries to explain th',
+ 'as it were,\r\n     tries to explain the c',
+ 'it were,\r\n     tries to explain the caus',
+ 'were,\r\n     tries to explain the causes ',
+ 'e,\r\n     tries to explain the causes owi',
+ '\n     tries to explain the causes owing ',
+ '   tries to explain the causes owing to ',
+ 'tries to explain the causes owing to whi',
+ 'es to explain the causes owing to which ',
+ 'to explain the causes owing to which he ',
+ 'explain the causes owing to which he has',
+ 'lain the causes owing to which he has\r\n ',
+ 'n the causes owing to which he has\r\n    ',
+ 'he causes owing to which he has\r\n     ma',
+ 'causes owing to which he has\r\n     made ',
+ 'ses owing to which he has\r\n     made his',
+ ' owing to which he has\r\n     made his ap',
+ 'ing to which he has\r\n     made his appea',
+ ' to which he has\r\n     made his appearan',
+ ' which he has\r\n     made his appearance ',
+ 'ich he has\r\n     made his appearance and',
+ ' he has\r\n     made his appearance and wa',
+ ' has\r\n     made his appearance and was b',
+ 's\r\n     made his appearance and was boun',
+ '     made his appearance and was bound t',
+ '  made his appearance and was bound to m',
+ 'ade his appearance and was bound to make',
+ ' his appearance and was bound to make hi',
+ 's appearance and was bound to make his\r\n',
+ 'ppearance and was bound to make his\r\n   ',
+ 'arance and was bound to make his\r\n     a',
+ 'nce and was bound to make his\r\n     appe',
+ ' and was bound to make his\r\n     appeara',
+ 'd was bound to make his\r\n     appearance',
+ 'as bound to make his\r\n     appearance in',
+ 'bound to make his\r\n     appearance in ou',
+ 'nd to make his\r\n     appearance in our m',
+ 'to make his\r\n     appearance in our mids',
+ 'make his\r\n     appearance in our midst. ',
+ 'e his\r\n     appearance in our midst.  in',
+ 'is\r\n     appearance in our midst.  in th',
+ '\n     appearance in our midst.  in the s',
+ '   appearance in our midst.  in the seco',
+ 'appearance in our midst.  in the second ',
+ 'earance in our midst.  in the second fra',
+ 'ance in our midst.  in the second fragme',
+ 'e in our midst.  in the second fragment\r',
+ 'n our midst.  in the second fragment\r\n  ',
+ 'ur midst.  in the second fragment\r\n     ',
+ 'midst.  in the second fragment\r\n     the',
+ 'st.  in the second fragment\r\n     there ',
+ '  in the second fragment\r\n     there are',
+ 'n the second fragment\r\n     there are ad',
+ 'he second fragment\r\n     there are added',
+ 'second fragment\r\n     there are added th',
+ 'ond fragment\r\n     there are added the a',
+ ' fragment\r\n     there are added the actu',
+ 'agment\r\n     there are added the actual ',
+ 'ent\r\n     there are added the actual not',
+ '\r\n     there are added the actual notes ',
+ '    there are added the actual notes of ',
+ ' there are added the actual notes of thi',
+ 'ere are added the actual notes of this p',
+ ' are added the actual notes of this pers',
+ 'e added the actual notes of this person\r',
+ 'dded the actual notes of this person\r\n  ',
+ 'd the actual notes of this person\r\n     ',
+ 'he actual notes of this person\r\n     con',
+ 'actual notes of this person\r\n     concer',
+ 'ual notes of this person\r\n     concernin',
+ ' notes of this person\r\n     concerning c',
+ 'tes of this person\r\n     concerning cert',
+ ' of this person\r\n     concerning certain',
+ ' this person\r\n     concerning certain ev',
+ 'is person\r\n     concerning certain event',
+ 'person\r\n     concerning certain events i',
+ 'son\r\n     concerning certain events in h',
+ '\r\n     concerning certain events in his ',
+ '    concerning certain events in his lif',
+ ' concerning certain events in his life.-',
+ 'ncerning certain events in his life.--au',
+ 'rning certain events in his life.--autho',
+ "ng certain events in his life.--author's",
+ "certain events in his life.--author's no",
+ "tain events in his life.--author's note.",
+ "n events in his life.--author's note.\r\n\r",
+ "vents in his life.--author's note.\r\n\r\n\r\n",
+ "ts in his life.--author's note.\r\n\r\n\r\n\r\ni",
+ "in his life.--author's note.\r\n\r\n\r\n\r\ni\r\n\r",
+ "his life.--author's note.\r\n\r\n\r\n\r\ni\r\n\r\ni ",
+ " life.--author's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am ",
+ "fe.--author's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am a s",
+ "--author's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick",
+ "uthor's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick ma",
+ "or's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick man..",
+ 's note.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick man.... ',
+ 'ote.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick man....  i ',
+ '.\r\n\r\n\r\n\r\ni\r\n\r\ni am a sick man....  i am ',
+ '\r\n\r\n\r\ni\r\n\r\ni am a sick man....  i am a s',
+ '\n\r\ni\r\n\r\ni am a sick man....  i am a spit',
+ 'i\r\n\r\ni am a sick man....  i am a spitefu',
+ '\r\ni am a sick man....  i am a spiteful m',
+ ' am a sick man....  i am a spiteful man.',
+ ' a sick man....  i am a spiteful man.  i',
+ 'sick man....  i am a spiteful man.  i am',
+ 'k man....  i am a spiteful man.  i am an',
+ 'an....  i am a spiteful man.  i am an un',
+ '...  i am a spiteful man.  i am an unatt',
+ '  i am a spiteful man.  i am an unattrac',
+ ' am a spiteful man.  i am an unattractiv',
+ ' a spiteful man.  i am an unattractive m',
+ 'spiteful man.  i am an unattractive man.',
+ 'teful man.  i am an unattractive man.  i',
+ 'ul man.  i am an unattractive man.  i\r\nb',
+ 'man.  i am an unattractive man.  i\r\nbeli',
+ '.  i am an unattractive man.  i\r\nbelieve',
+ 'i am an unattractive man.  i\r\nbelieve my',
+ 'm an unattractive man.  i\r\nbelieve my li',
+ 'n unattractive man.  i\r\nbelieve my liver',
+ 'nattractive man.  i\r\nbelieve my liver is',
+ 'tractive man.  i\r\nbelieve my liver is di',
+ 'ctive man.  i\r\nbelieve my liver is disea',
+ 've man.  i\r\nbelieve my liver is diseased',
+ 'man.  i\r\nbelieve my liver is diseased.  ',
+ '.  i\r\nbelieve my liver is diseased.  how',
+ 'i\r\nbelieve my liver is diseased.  howeve',
+ 'believe my liver is diseased.  however, ',
+ 'ieve my liver is diseased.  however, i k',
+ 'e my liver is diseased.  however, i know',
+ 'y liver is diseased.  however, i know no',
+ 'iver is diseased.  however, i know nothi',
+ 'r is diseased.  however, i know nothing ',
+ 's diseased.  however, i know nothing at ',
+ 'iseased.  however, i know nothing at all',
+ 'ased.  however, i know nothing at all ab',
+ 'd.  however, i know nothing at all about',
+ ' however, i know nothing at all about my',
+ 'wever, i know nothing at all about my\r\nd',
+ 'er, i know nothing at all about my\r\ndise',
+ ' i know nothing at all about my\r\ndisease',
+ 'know nothing at all about my\r\ndisease, a',
+ 'w nothing at all about my\r\ndisease, and ',
+ 'othing at all about my\r\ndisease, and do ',
+ 'ing at all about my\r\ndisease, and do not',
+ ' at all about my\r\ndisease, and do not kn',
+ ' all about my\r\ndisease, and do not know ',
+ 'l about my\r\ndisease, and do not know for',
+ 'bout my\r\ndisease, and do not know for ce',
+ 't my\r\ndisease, and do not know for certa',
+ 'y\r\ndisease, and do not know for certain ',
+ 'disease, and do not know for certain wha',
+ 'ease, and do not know for certain what a',
+ 'e, and do not know for certain what ails',
+ 'and do not know for certain what ails me',
+ ' do not know for certain what ails me.  ',
+ ' not know for certain what ails me.  i d',
+ "t know for certain what ails me.  i don'",
+ "now for certain what ails me.  i don't c",
+ " for certain what ails me.  i don't cons",
+ "r certain what ails me.  i don't consult",
+ "ertain what ails me.  i don't consult a\r",
+ "ain what ails me.  i don't consult a\r\ndo",
+ " what ails me.  i don't consult a\r\ndocto",
+ "at ails me.  i don't consult a\r\ndoctor f",
+ "ails me.  i don't consult a\r\ndoctor for ",
+ "s me.  i don't consult a\r\ndoctor for it,",
+ "e.  i don't consult a\r\ndoctor for it, an",
+ " i don't consult a\r\ndoctor for it, and n",
+ "don't consult a\r\ndoctor for it, and neve",
+ "'t consult a\r\ndoctor for it, and never h",
+ 'consult a\r\ndoctor for it, and never have',
+ 'sult a\r\ndoctor for it, and never have, t',
+ 't a\r\ndoctor for it, and never have, thou',
+ '\r\ndoctor for it, and never have, though ',
+ 'octor for it, and never have, though i h',
+ 'or for it, and never have, though i have',
+ 'for it, and never have, though i have a ',
+ ' it, and never have, though i have a res',
+ ', and never have, though i have a respec',
+ 'nd never have, though i have a respect f',
+ 'never have, though i have a respect for ',
+ 'er have, though i have a respect for med',
+ 'have, though i have a respect for medici',
+ 'e, though i have a respect for medicine ',
+ 'though i have a respect for medicine and',
+ 'ugh i have a respect for medicine and\r\nd',
+ ' i have a respect for medicine and\r\ndoct',
+ 'have a respect for medicine and\r\ndoctors',
+ 'e a respect for medicine and\r\ndoctors. b',
+ ' respect for medicine and\r\ndoctors. besi',
+ 'spect for medicine and\r\ndoctors. besides',
+ 'ct for medicine and\r\ndoctors. besides, i',
+ 'for medicine and\r\ndoctors. besides, i am',
+ ' medicine and\r\ndoctors. besides, i am ex',
+ 'dicine and\r\ndoctors. besides, i am extre',
+ 'ine and\r\ndoctors. besides, i am extremel',
+ ' and\r\ndoctors. besides, i am extremely s',
+ 'd\r\ndoctors. besides, i am extremely supe',
+ 'doctors. besides, i am extremely superst',
+ 'tors. besides, i am extremely superstiti',
+ 's. besides, i am extremely superstitious',
+ 'besides, i am extremely superstitious, s',
+ 'ides, i am extremely superstitious, suff',
+ 's, i am extremely superstitious, suffici',
+ 'i am extremely superstitious, sufficient',
+ 'm extremely superstitious, sufficiently ',
+ 'xtremely superstitious, sufficiently so ',
+ 'emely superstitious, sufficiently so to\r',
+ 'ly superstitious, sufficiently so to\r\nre',
+ 'superstitious, sufficiently so to\r\nrespe',
+ 'erstitious, sufficiently so to\r\nrespect ',
+ 'titious, sufficiently so to\r\nrespect med',
+ 'ious, sufficiently so to\r\nrespect medici',
+ 's, sufficiently so to\r\nrespect medicine,',
+ 'sufficiently so to\r\nrespect medicine, an',
+ 'ficiently so to\r\nrespect medicine, anywa',
+ 'iently so to\r\nrespect medicine, anyway (',
+ 'tly so to\r\nrespect medicine, anyway (i a',
+ ' so to\r\nrespect medicine, anyway (i am w',
+ ' to\r\nrespect medicine, anyway (i am well',
+ '\r\nrespect medicine, anyway (i am well-ed',
+ 'espect medicine, anyway (i am well-educa',
+ 'ect medicine, anyway (i am well-educated',
+ ' medicine, anyway (i am well-educated en',
+ 'dicine, anyway (i am well-educated enoug',
+ 'ine, anyway (i am well-educated enough n',
+ ', anyway (i am well-educated enough not ',
+ 'nyway (i am well-educated enough not to ',
+ 'ay (i am well-educated enough not to be\r',
+ '(i am well-educated enough not to be\r\nsu',
+ 'am well-educated enough not to be\r\nsuper',
+ 'well-educated enough not to be\r\nsupersti',
+ 'l-educated enough not to be\r\nsuperstitio',
+ 'ducated enough not to be\r\nsuperstitious,',
+ 'ated enough not to be\r\nsuperstitious, bu',
+ 'd enough not to be\r\nsuperstitious, but i',
+ 'nough not to be\r\nsuperstitious, but i am',
+ 'gh not to be\r\nsuperstitious, but i am su',
+ 'not to be\r\nsuperstitious, but i am super',
+ ' to be\r\nsuperstitious, but i am supersti',
+ ' be\r\nsuperstitious, but i am superstitio',
+ '\r\nsuperstitious, but i am superstitious)',
+ 'uperstitious, but i am superstitious).  ',
+ 'rstitious, but i am superstitious).  no,',
+ 'itious, but i am superstitious).  no, i ',
+ 'ous, but i am superstitious).  no, i ref',
+ ', but i am superstitious).  no, i refuse',
+ 'ut i am superstitious).  no, i refuse to',
+ 'i am superstitious).  no, i refuse to co',
+ 'm superstitious).  no, i refuse to consu',
+ 'uperstitious).  no, i refuse to consult ',
+ 'rstitious).  no, i refuse to consult a\r\n',
+ 'itious).  no, i refuse to consult a\r\ndoc',
+ 'ous).  no, i refuse to consult a\r\ndoctor',
+ ').  no, i refuse to consult a\r\ndoctor fr',
+ ' no, i refuse to consult a\r\ndoctor from ',
+ ', i refuse to consult a\r\ndoctor from spi',
+ ' refuse to consult a\r\ndoctor from spite.',
+ 'fuse to consult a\r\ndoctor from spite.  t',
+ 'e to consult a\r\ndoctor from spite.  that',
+ 'o consult a\r\ndoctor from spite.  that yo',
+ 'onsult a\r\ndoctor from spite.  that you p',
+ 'ult a\r\ndoctor from spite.  that you prob',
+ ' a\r\ndoctor from spite.  that you probabl',
+ '\ndoctor from spite.  that you probably w',
+ 'ctor from spite.  that you probably will',
+ 'r from spite.  that you probably will no',
+ 'rom spite.  that you probably will not u',
+ ' spite.  that you probably will not unde',
+ 'ite.  that you probably will not underst',
+ '.  that you probably will not understand',
+ 'that you probably will not understand.  ',
+ 't you probably will not understand.  wel',
+ 'ou probably will not understand.  well, ',
+ 'probably will not understand.  well, i\r\n',
+ 'bably will not understand.  well, i\r\nund',
+ 'ly will not understand.  well, i\r\nunders',
+ 'will not understand.  well, i\r\nunderstan',
+ 'l not understand.  well, i\r\nunderstand i',
+ 'ot understand.  well, i\r\nunderstand it, ',
+ 'understand.  well, i\r\nunderstand it, tho',
+ 'erstand.  well, i\r\nunderstand it, though',
+ 'tand.  well, i\r\nunderstand it, though.  ',
+ 'd.  well, i\r\nunderstand it, though.  of ',
+ ' well, i\r\nunderstand it, though.  of cou',
+ 'll, i\r\nunderstand it, though.  of course',
+ ' i\r\nunderstand it, though.  of course, i',
+ '\nunderstand it, though.  of course, i ca',
+ "derstand it, though.  of course, i can't",
+ "stand it, though.  of course, i can't ex",
+ "nd it, though.  of course, i can't expla",
+ "it, though.  of course, i can't explain ",
+ " though.  of course, i can't explain who",
+ "ough.  of course, i can't explain who it",
+ "h.  of course, i can't explain who it is",
+ " of course, i can't explain who it is pr",
+ " course, i can't explain who it is preci",
+ "urse, i can't explain who it is precisel",
+ "e, i can't explain who it is precisely\r\n",
+ "i can't explain who it is precisely\r\ntha",
+ "an't explain who it is precisely\r\nthat i",
+ 't explain who it is precisely\r\nthat i am',
+ 'xplain who it is precisely\r\nthat i am mo',
+ 'ain who it is precisely\r\nthat i am morti',
+ ' who it is precisely\r\nthat i am mortifyi',
+ 'o it is precisely\r\nthat i am mortifying ',
+ 't is precisely\r\nthat i am mortifying in ',
+ 's precisely\r\nthat i am mortifying in thi',
+ 'recisely\r\nthat i am mortifying in this c',
+ 'isely\r\nthat i am mortifying in this case',
+ 'ly\r\nthat i am mortifying in this case by',
+ '\nthat i am mortifying in this case by my',
+ 'at i am mortifying in this case by my sp',
+ 'i am mortifying in this case by my spite',
+ 'm mortifying in this case by my spite: i',
+ 'ortifying in this case by my spite: i am',
+ 'ifying in this case by my spite: i am pe',
+ 'ing in this case by my spite: i am perfe',
+ ' in this case by my spite: i am perfectl',
+ ' this case by my spite: i am perfectly w',
+ 'is case by my spite: i am perfectly well',
+ 'case by my spite: i am perfectly well\r\na',
+ 'e by my spite: i am perfectly well\r\nawar',
+ 'y my spite: i am perfectly well\r\naware t',
+ 'y spite: i am perfectly well\r\naware that',
+ 'pite: i am perfectly well\r\naware that i ',
+ 'e: i am perfectly well\r\naware that i can',
+ 'i am perfectly well\r\naware that i cannot',
+ 'm perfectly well\r\naware that i cannot "p',
+ 'erfectly well\r\naware that i cannot "pay ',
+ 'ectly well\r\naware that i cannot "pay out',
+ 'ly well\r\naware that i cannot "pay out" t',
+ 'well\r\naware that i cannot "pay out" the ',
+ 'l\r\naware that i cannot "pay out" the doc',
+ 'aware that i cannot "pay out" the doctor',
+ 're that i cannot "pay out" the doctors b',
+ 'that i cannot "pay out" the doctors by n',
+ 't i cannot "pay out" the doctors by not ',
+ ' cannot "pay out" the doctors by not con',
+ 'nnot "pay out" the doctors by not consul',
+ 't "pay out" the doctors by not consultin',
+ 'pay out" the doctors by not consulting t',
+ ' out" the doctors by not consulting them',
+ 't" the doctors by not consulting them; i',
+ 'the doctors by not consulting them; i\r\nk',
+ ' doctors by not consulting them; i\r\nknow',
+ 'ctors by not consulting them; i\r\nknow be',
+ 'rs by not consulting them; i\r\nknow bette',
+ 'by not consulting them; i\r\nknow better t',
+ 'not consulting them; i\r\nknow better than',
+ ' consulting them; i\r\nknow better than an',
+ 'nsulting them; i\r\nknow better than anyon',
+ 'lting them; i\r\nknow better than anyone t',
+ 'ng them; i\r\nknow better than anyone that',
+ 'them; i\r\nknow better than anyone that by',
+ 'm; i\r\nknow better than anyone that by al',
+ 'i\r\nknow better than anyone that by all t',
+ 'know better than anyone that by all this',
+ 'w better than anyone that by all this i ',
+ 'etter than anyone that by all this i am ',
+ 'er than anyone that by all this i am onl',
+ 'than anyone that by all this i am only i',
+ 'n anyone that by all this i am only inju',
+ 'nyone that by all this i am only injurin',
+ 'ne that by all this i am only injuring m',
+ 'that by all this i am only injuring myse',
+ 't by all this i am only injuring myself ',
+ 'y all this i am only injuring myself and',
+ 'll this i am only injuring myself and\r\nn',
+ 'this i am only injuring myself and\r\nno o',
+ 's i am only injuring myself and\r\nno one ',
+ ' am only injuring myself and\r\nno one els',
+ ' only injuring myself and\r\nno one else. ',
+ 'ly injuring myself and\r\nno one else.  bu',
+ 'injuring myself and\r\nno one else.  but s',
+ 'uring myself and\r\nno one else.  but stil',
+ 'ng myself and\r\nno one else.  but still, ',
+ 'myself and\r\nno one else.  but still, if ',
+ 'elf and\r\nno one else.  but still, if i d',
+ " and\r\nno one else.  but still, if i don'",
+ "d\r\nno one else.  but still, if i don't c",
+ "no one else.  but still, if i don't cons",
+ "one else.  but still, if i don't consult",
+ " else.  but still, if i don't consult a ",
+ "se.  but still, if i don't consult a doc",
+ "  but still, if i don't consult a doctor",
+ "ut still, if i don't consult a doctor it",
+ "still, if i don't consult a doctor it is",
+ "ll, if i don't consult a doctor it is fr",
+ " if i don't consult a doctor it is from ",
+ " i don't consult a doctor it is from spi",
+ "don't consult a doctor it is from spite.",
+ "'t consult a doctor it is from spite.\r\nm",
+ 'consult a doctor it is from spite.\r\nmy l',
+ 'sult a doctor it is from spite.\r\nmy live',
+ 't a doctor it is from spite.\r\nmy liver i',
+ ' doctor it is from spite.\r\nmy liver is b',
+ 'ctor it is from spite.\r\nmy liver is bad,',
+ 'r it is from spite.\r\nmy liver is bad, we',
+ 't is from spite.\r\nmy liver is bad, well-',
+ 's from spite.\r\nmy liver is bad, well--le',
+ 'rom spite.\r\nmy liver is bad, well--let i',
+ ' spite.\r\nmy liver is bad, well--let it g',
+ 'ite.\r\nmy liver is bad, well--let it get ',
+ '.\r\nmy liver is bad, well--let it get wor',
+ 'my liver is bad, well--let it get worse!',
+ 'liver is bad, well--let it get worse!\r\n\r',
+ 'er is bad, well--let it get worse!\r\n\r\ni ',
+ 'is bad, well--let it get worse!\r\n\r\ni hav',
+ 'bad, well--let it get worse!\r\n\r\ni have b',
+ ', well--let it get worse!\r\n\r\ni have been',
+ 'ell--let it get worse!\r\n\r\ni have been go',
+ '--let it get worse!\r\n\r\ni have been going',
+ 'et it get worse!\r\n\r\ni have been going on',
+ 'it get worse!\r\n\r\ni have been going on li',
+ 'get worse!\r\n\r\ni have been going on like ',
+ ' worse!\r\n\r\ni have been going on like tha',
+ 'rse!\r\n\r\ni have been going on like that f',
+ '!\r\n\r\ni have been going on like that for ',
+ '\r\ni have been going on like that for a l',
+ ' have been going on like that for a long',
+ 've been going on like that for a long ti',
+ 'been going on like that for a long time-',
+ 'n going on like that for a long time--tw',
+ 'oing on like that for a long time--twent',
+ 'g on like that for a long time--twenty y',
+ 'n like that for a long time--twenty year',
+ 'ike that for a long time--twenty years. ',
+ ' that for a long time--twenty years.  no',
+ 'at for a long time--twenty years.  now i',
+ 'for a long time--twenty years.  now i am',
+ ' a long time--twenty years.  now i am\r\nf',
+ 'long time--twenty years.  now i am\r\nfort',
+ 'g time--twenty years.  now i am\r\nforty. ',
+ 'ime--twenty years.  now i am\r\nforty.  i ',
+ '--twenty years.  now i am\r\nforty.  i use',
+ 'wenty years.  now i am\r\nforty.  i used t',
+ 'ty years.  now i am\r\nforty.  i used to b',
+ 'years.  now i am\r\nforty.  i used to be i',
+ 'rs.  now i am\r\nforty.  i used to be in t',
+ '  now i am\r\nforty.  i used to be in the ',
+ 'ow i am\r\nforty.  i used to be in the gov',
+ 'i am\r\nforty.  i used to be in the govern',
+ 'm\r\nforty.  i used to be in the governmen',
+ 'forty.  i used to be in the government s',
+ 'ty.  i used to be in the government serv',
+ '  i used to be in the government service',
+ ' used to be in the government service, b',
+ 'ed to be in the government service, but ',
+ 'to be in the government service, but am ',
+ 'be in the government service, but am no ',
+ 'in the government service, but am no lon',
+ 'the government service, but am no longer',
+ ' government service, but am no longer.  ',
+ 'vernment service, but am no longer.  i\r\n',
+ 'nment service, but am no longer.  i\r\nwas',
+ 'nt service, but am no longer.  i\r\nwas a ',
+ 'service, but am no longer.  i\r\nwas a spi',
+ 'vice, but am no longer.  i\r\nwas a spitef',
+ 'e, but am no longer.  i\r\nwas a spiteful ',
+ 'but am no longer.  i\r\nwas a spiteful off',
+ ' am no longer.  i\r\nwas a spiteful offici',
+ ' no longer.  i\r\nwas a spiteful official.',
+ ' longer.  i\r\nwas a spiteful official.  i',
+ 'nger.  i\r\nwas a spiteful official.  i wa',
+ 'r.  i\r\nwas a spiteful official.  i was r',
+ ' i\r\nwas a spiteful official.  i was rude',
+ '\nwas a spiteful official.  i was rude an',
+ 's a spiteful official.  i was rude and t',
+ ' spiteful official.  i was rude and took',
+ 'iteful official.  i was rude and took pl',
+ 'ful official.  i was rude and took pleas',
+ ' official.  i was rude and took pleasure',
+ 'ficial.  i was rude and took pleasure in',
+ 'ial.  i was rude and took pleasure in be',
+ '.  i was rude and took pleasure in being',
+ 'i was rude and took pleasure in being so',
+ 'as rude and took pleasure in being so.  ',
+ 'rude and took pleasure in being so.  i\r\n',
+ 'e and took pleasure in being so.  i\r\ndid',
+ 'nd took pleasure in being so.  i\r\ndid no',
+ 'took pleasure in being so.  i\r\ndid not t',
+ 'k pleasure in being so.  i\r\ndid not take',
+ 'leasure in being so.  i\r\ndid not take br',
+ 'sure in being so.  i\r\ndid not take bribe',
+ 'e in being so.  i\r\ndid not take bribes, ',
+ 'n being so.  i\r\ndid not take bribes, you',
+ 'eing so.  i\r\ndid not take bribes, you se',
+ 'g so.  i\r\ndid not take bribes, you see, ',
+ 'o.  i\r\ndid not take bribes, you see, so ',
+ ' i\r\ndid not take bribes, you see, so i w',
+ '\ndid not take bribes, you see, so i was ',
+ 'd not take bribes, you see, so i was bou',
+ 'ot take bribes, you see, so i was bound ',
+ 'take bribes, you see, so i was bound to ',
+ 'e bribes, you see, so i was bound to fin',
+ 'ribes, you see, so i was bound to find a',
+ 'es, you see, so i was bound to find a re',
+ ' you see, so i was bound to find a recom',
+ 'u see, so i was bound to find a recompen',
+ 'ee, so i was bound to find a recompense ',
+ ' so i was bound to find a recompense in\r',
+ ' i was bound to find a recompense in\r\nth',
+ 'was bound to find a recompense in\r\nthat,',
+ ' bound to find a recompense in\r\nthat, at',
+ 'und to find a recompense in\r\nthat, at le',
+ ' to find a recompense in\r\nthat, at least',
+ ' find a recompense in\r\nthat, at least.  ',
+ 'nd a recompense in\r\nthat, at least.  (a ',
+ 'a recompense in\r\nthat, at least.  (a poo',
+ 'ecompense in\r\nthat, at least.  (a poor j',
+ 'mpense in\r\nthat, at least.  (a poor jest',
+ 'nse in\r\nthat, at least.  (a poor jest, b',
+ ' in\r\nthat, at least.  (a poor jest, but ',
+ '\r\nthat, at least.  (a poor jest, but i w',
+ 'hat, at least.  (a poor jest, but i will',
+ ', at least.  (a poor jest, but i will no',
+ 't least.  (a poor jest, but i will not s',
+ 'east.  (a poor jest, but i will not scra',
+ 't.  (a poor jest, but i will not scratch',
+ ' (a poor jest, but i will not scratch it',
+ ' poor jest, but i will not scratch it ou',
+ 'or jest, but i will not scratch it out. ',
+ 'jest, but i will not scratch it out.  i ',
+ 't, but i will not scratch it out.  i wro',
+ 'but i will not scratch it out.  i wrote\r',
+ ' i will not scratch it out.  i wrote\r\nit',
+ 'will not scratch it out.  i wrote\r\nit th',
+ 'l not scratch it out.  i wrote\r\nit think',
+ 'ot scratch it out.  i wrote\r\nit thinking',
+ 'scratch it out.  i wrote\r\nit thinking it',
+ 'atch it out.  i wrote\r\nit thinking it wo',
+ 'h it out.  i wrote\r\nit thinking it would',
+ 't out.  i wrote\r\nit thinking it would so',
+ 'ut.  i wrote\r\nit thinking it would sound',
+ '  i wrote\r\nit thinking it would sound ve',
+ ' wrote\r\nit thinking it would sound very ',
+ 'ote\r\nit thinking it would sound very wit',
+ '\r\nit thinking it would sound very witty;',
+ 't thinking it would sound very witty; bu',
+ 'hinking it would sound very witty; but n',
+ 'king it would sound very witty; but now ',
+ 'g it would sound very witty; but now tha',
+ ...]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="c6e871ee-6e9c-4bec-f619-1540aa19d21c" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Vectorization...'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.zeros((<span class="bu">len</span>(sentences), maxlen, <span class="bu">len</span>(chars)), dtype<span class="op">=</span>np.<span class="bu">bool</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.zeros((<span class="bu">len</span>(sentences), <span class="bu">len</span>(chars)), dtype<span class="op">=</span>np.<span class="bu">bool</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, sentence <span class="kw">in</span> <span class="bu">enumerate</span>(sentences):</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t, char <span class="kw">in</span> <span class="bu">enumerate</span>(sentence):</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        x[i, t, char_indices[char]] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    y[i, char_indices[next_chars[i]]] <span class="op">=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Vectorization...</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="5e9cca26-1a92-4515-d065-996365e4e7b8" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(88514, 40, 58)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="76fd69db-0f86-483b-bb73-1527ebd93161" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>y.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>(88514, 58)</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="3ebee4c0-33d8-4e1a-b085-750a96b83c97" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>y[<span class="dv">0</span>:<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>array([[False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False,  True, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False,  True, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False,  True, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False,  True, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+         True, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False,  True, False, False, False, False, False, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False,  True,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False,  True, False, False,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False,  True,
+        False, False, False, False],
+       [False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False, False, False, False, False, False, False, False,
+        False, False,  True, False]])</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="86aeaaab-2d43-47aa-99ea-c1cc9e51fe42" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># build the model: a single LSTM</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Build model...'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Sequential()</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>model.add(LSTM(<span class="dv">128</span>, input_shape<span class="op">=</span>(maxlen, <span class="bu">len</span>(chars))))</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="bu">len</span>(chars), activation<span class="op">=</span><span class="st">'softmax'</span>))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> RMSprop(lr<span class="op">=</span><span class="fl">0.01</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">'categorical_crossentropy'</span>, optimizer<span class="op">=</span>optimizer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Build model...</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="9ade0f62-b4ea-44d7-9ce2-21d07f866172" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>model.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm (LSTM)                  (None, 128)               95744     
+_________________________________________________________________
+dense (Dense)                (None, 58)                7482      
+=================================================================
+Total params: 103,226
+Trainable params: 103,226
+Non-trainable params: 0
+_________________________________________________________________</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sample(preds, temperature<span class="op">=</span><span class="fl">1.0</span>):</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># helper function to sample an index from a probability array</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    preds <span class="op">=</span> np.asarray(preds).astype(<span class="st">'float64'</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    preds <span class="op">=</span> np.log(preds) <span class="op">/</span> temperature</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    exp_preds <span class="op">=</span> np.exp(preds)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    preds <span class="op">=</span> exp_preds <span class="op">/</span> np.<span class="bu">sum</span>(exp_preds)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    probas <span class="op">=</span> np.random.multinomial(<span class="dv">1</span>, preds, <span class="dv">1</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.argmax(probas)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> on_epoch_end(epoch, _):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Function invoked at end of each epoch. Prints generated text.</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"******************************************************"</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'----- Generating text after Epoch: </span><span class="sc">%d</span><span class="st">'</span> <span class="op">%</span> epoch)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    start_index <span class="op">=</span> random.randint(<span class="dv">0</span>, <span class="bu">len</span>(processed_text) <span class="op">-</span> maxlen <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> temperature <span class="kw">in</span> [<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.2</span>]:</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'----- temperature:'</span>, temperature)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        generated <span class="op">=</span> <span class="st">''</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>        sentence <span class="op">=</span> processed_text[start_index: start_index <span class="op">+</span> maxlen]</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>        generated <span class="op">+=</span> sentence</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'----- Generating with seed: "'</span> <span class="op">+</span> sentence <span class="op">+</span> <span class="st">'"'</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>        sys.stdout.write(generated)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">400</span>):</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>            x_pred <span class="op">=</span> np.zeros((<span class="dv">1</span>, maxlen, <span class="bu">len</span>(chars)))</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> t, char <span class="kw">in</span> <span class="bu">enumerate</span>(sentence):</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>                x_pred[<span class="dv">0</span>, t, char_indices[char]] <span class="op">=</span> <span class="fl">1.</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>            preds <span class="op">=</span> model.predict(x_pred, verbose<span class="op">=</span><span class="dv">0</span>)[<span class="dv">0</span>]</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>            next_index <span class="op">=</span> sample(preds, temperature)</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>            next_char <span class="op">=</span> indices_char[next_index]</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>            generated <span class="op">+=</span> next_char</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>            sentence <span class="op">=</span> sentence[<span class="dv">1</span>:] <span class="op">+</span> next_char</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>            sys.stdout.write(next_char)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>            sys.stdout.flush()</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="ab6d5b0d-e7e9-4fc1-ee9c-792d07a84e76">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore useless W0819 warnings generated by TensorFlow 2.0.  Hopefully can remove this ignore in the future.</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># See https://github.com/tensorflow/tensorflow/issues/31308</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> logging, os</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>logging.disable(logging.WARNING)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TF_CPP_MIN_LOG_LEVEL"</span>] <span class="op">=</span> <span class="st">"3"</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>print_callback <span class="op">=</span> LambdaCallback(on_epoch_end<span class="op">=</span>on_epoch_end)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>model.fit(x, y,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>          batch_size<span class="op">=</span><span class="dv">128</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>          epochs<span class="op">=</span><span class="dv">60</span>,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>          callbacks<span class="op">=</span>[print_callback])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/60
+692/692 [==============================] - ETA: 0s - loss: 2.1576******************************************************
+----- Generating text after Epoch: 0
+----- temperature: 0.2
+----- Generating with seed: "cried.  "but i
+will make up for it or p"
+cried.  "but i
+will make up for it or pored the stine the derent of the dook and the stand to the store and the doon the sare the dong the dened to the dook the sare the stare the street of the seres at all the sall the deared the derent of the street in i am in the derent to the stan to the street the stine the sered to the dran that is all the stan the stare the dook the forest of the stan stand of the dook all the stand the streed t
+----- temperature: 0.5
+----- Generating with seed: "cried.  "but i
+will make up for it or p"
+cried.  "but i
+
+
+
+he know conse the lake the s
+----- temperature: 1.0
+----- Generating with seed: "cried.  "but i
+will make up for it or p"
+cried.  "but i
+
+
+
+
+
+
+
+"yes kle the lafine as the prosies netc
+----- temperature: 1.2
+----- Generating with seed: "cried.  "but i
+will make up for it or p"
+cried.  "but i
+
+
+
+
+
+
+
+
+
+
+
+
+anp, !
+692/692 [==============================] - 155s 224ms/step - loss: 2.1576
+Epoch 2/60
+572/692 [=======================&gt;......] - ETA: 13s - loss: 1.7386</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

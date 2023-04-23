@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>tech_blog - Poisson regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tech_blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Poisson regression</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#code from https://github.com/thomasjpfan/ml-workshop-advanced</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>sns.set_theme(font_scale<span class="op">=</span><span class="fl">1.5</span>, rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>: [<span class="dv">12</span>, <span class="dv">8</span>]})</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sklearn.set_config(display<span class="op">=</span><span class="st">'diagram'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="load-london-bike-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-london-bike-data">Load London Bike Data</h2>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data_path <span class="op">=</span> Path(<span class="st">"data"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>bikes_path <span class="op">=</span> data_path <span class="op">/</span> <span class="st">"london_bikes.csv"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>“timestamp” - timestamp field for grouping the data</li>
+<li>“cnt” - the count of a new bike shares</li>
+<li>“t1” - real temperature in C</li>
+<li>“t2” - temperature in C “feels like”</li>
+<li>“hum” - humidity in percentage</li>
+<li>“windspeed” - wind speed in km/h</li>
+<li>“weathercode” - category of the weather</li>
+<li>“isholiday” - boolean field - 1 holiday / 0 non holiday</li>
+<li>“isweekend” - boolean field - 1 if the day is weekend</li>
+<li>“season” - category field meteorological seasons: 0-spring ; 1-summer; 2-fall; 3-winter.</li>
+</ul>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>bikes <span class="op">=</span> pd.read_csv(bikes_path, parse_dates<span class="op">=</span>[<span class="st">'timestamp'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bikes.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">timestamp</th>
+<th data-quarto-table-cell-role="th">cnt</th>
+<th data-quarto-table-cell-role="th">t1</th>
+<th data-quarto-table-cell-role="th">t2</th>
+<th data-quarto-table-cell-role="th">hum</th>
+<th data-quarto-table-cell-role="th">wind_speed</th>
+<th data-quarto-table-cell-role="th">weather_code</th>
+<th data-quarto-table-cell-role="th">is_holiday</th>
+<th data-quarto-table-cell-role="th">is_weekend</th>
+<th data-quarto-table-cell-role="th">season</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2015-01-04 00:00:00</td>
+<td>182</td>
+<td>3.0</td>
+<td>2.0</td>
+<td>93.0</td>
+<td>6.0</td>
+<td>3.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2015-01-04 01:00:00</td>
+<td>138</td>
+<td>3.0</td>
+<td>2.5</td>
+<td>93.0</td>
+<td>5.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2015-01-04 02:00:00</td>
+<td>134</td>
+<td>2.5</td>
+<td>2.5</td>
+<td>96.5</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2015-01-04 03:00:00</td>
+<td>72</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>100.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2015-01-04 04:00:00</td>
+<td>47</td>
+<td>2.0</td>
+<td>0.0</td>
+<td>93.0</td>
+<td>6.5</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>bikes[<span class="st">'timestamp'</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>0   2015-01-04 00:00:00
+1   2015-01-04 01:00:00
+2   2015-01-04 02:00:00
+3   2015-01-04 03:00:00
+4   2015-01-04 04:00:00
+Name: timestamp, dtype: datetime64[ns]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bikes[<span class="st">'hr'</span>] <span class="op">=</span> bikes[<span class="st">'timestamp'</span>].dt.hour</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bikes[<span class="st">'weather_code'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>array([ 3.,  1.,  4.,  7.,  2., 26., 10.])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bikes[<span class="st">'season'</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array([3., 0., 1., 2.])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> bikes[[<span class="st">'t1'</span>, <span class="st">'t2'</span>, <span class="st">'hum'</span>, <span class="st">'wind_speed'</span>, <span class="st">'weather_code'</span>, <span class="st">'is_holiday'</span>, <span class="st">'is_weekend'</span>, <span class="st">'season'</span>, <span class="st">'hr'</span>]]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> bikes[<span class="st">'cnt'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="split-data" class="level3">
+<h3 class="anchored" data-anchor-id="split-data">Split data</h3>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="column-transformer" class="level3">
+<h3 class="anchored" data-anchor-id="column-transformer">Column Transformer</h3>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>numerical_featurse <span class="op">=</span> [<span class="st">'t1'</span>, <span class="st">'t2'</span>, <span class="st">'hum'</span>, <span class="st">'wind_speed'</span>, <span class="st">'is_holiday'</span>, <span class="st">'is_weekend'</span>, <span class="st">'hr'</span>]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>cat_features <span class="op">=</span> [<span class="st">'weather_code'</span>, <span class="st">'season'</span>]</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'numerical'</span>, <span class="st">'passthrough'</span>, numerical_featurse),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'categorical'</span>, OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>, handle_unknown<span class="op">=</span><span class="st">'ignore'</span>), cat_features)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline">Pipeline</h3>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> PoissonRegressor</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>pois_reg <span class="op">=</span> Pipeline([</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'prep'</span>, ct),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler()),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'reg'</span>, PoissonRegressor())</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>pois_reg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="2b54c3d6-d3f8-4f3a-8203-9e3d3e910a37" type="checkbox"><label class="sk-toggleable__label" for="2b54c3d6-d3f8-4f3a-8203-9e3d3e910a37">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('prep',
+                 ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                                  ['t1', 't2', 'hum',
+                                                   'wind_speed', 'is_holiday',
+                                                   'is_weekend', 'hr']),
+                                                 ('categorical',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False),
+                                                  ['weather_code',
+                                                   'season'])])),
+                ('scaler', StandardScaler()), ('reg', PoissonRegressor())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="b3fdb062-764c-49cc-aa80-1bc80ad875b7" type="checkbox"><label class="sk-toggleable__label" for="b3fdb062-764c-49cc-aa80-1bc80ad875b7">prep: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                 ['t1', 't2', 'hum', 'wind_speed', 'is_holiday',
+                                  'is_weekend', 'hr']),
+                                ('categorical',
+                                 OneHotEncoder(handle_unknown='ignore',
+                                               sparse=False),
+                                 ['weather_code', 'season'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="529d5bf1-3dab-4aad-8c62-c658fe3ebc08" type="checkbox"><label class="sk-toggleable__label" for="529d5bf1-3dab-4aad-8c62-c658fe3ebc08">numerical</label><div class="sk-toggleable__content"><pre>['t1', 't2', 'hum', 'wind_speed', 'is_holiday', 'is_weekend', 'hr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="89ac99a6-2eb8-4c15-902d-2243ce0d8764" type="checkbox"><label class="sk-toggleable__label" for="89ac99a6-2eb8-4c15-902d-2243ce0d8764">passthrough</label><div class="sk-toggleable__content"><pre>passthrough</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="d315651a-1dc2-459c-9c17-545c0036fb75" type="checkbox"><label class="sk-toggleable__label" for="d315651a-1dc2-459c-9c17-545c0036fb75">categorical</label><div class="sk-toggleable__content"><pre>['weather_code', 'season']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="709c9efe-cbf7-457b-88db-cf53f5ac600f" type="checkbox"><label class="sk-toggleable__label" for="709c9efe-cbf7-457b-88db-cf53f5ac600f">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="5da22d5a-5d4e-4984-aecc-69b146819cb0" type="checkbox"><label class="sk-toggleable__label" for="5da22d5a-5d4e-4984-aecc-69b146819cb0">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4f7b5477-f8ad-4784-b39d-df5a3a8bbadf" type="checkbox"><label class="sk-toggleable__label" for="4f7b5477-f8ad-4784-b39d-df5a3a8bbadf">PoissonRegressor</label><div class="sk-toggleable__content"><pre>PoissonRegressor()</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pois_reg.fit(X_train, y_train)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pois_reg.score(X_test, y_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>0.331281167666172</code></pre>
+</div>
+</div>
+</section>
+<section id="this-seems-low-what-can-we-change" class="level3">
+<h3 class="anchored" data-anchor-id="this-seems-low-what-can-we-change">This seems low what can we change?</h3>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>numerical_featurse <span class="op">=</span> [<span class="st">'t1'</span>, <span class="st">'t2'</span>, <span class="st">'hum'</span>, <span class="st">'wind_speed'</span>, <span class="st">'is_holiday'</span>, <span class="st">'is_weekend'</span>]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>cat_features <span class="op">=</span> [<span class="st">'weather_code'</span>, <span class="st">'season'</span>, <span class="st">'hr'</span>]</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'numerical'</span>, <span class="st">'passthrough'</span>, numerical_featurse),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'categorical'</span>, OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>, handle_unknown<span class="op">=</span><span class="st">'ignore'</span>), cat_features)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>pois_reg <span class="op">=</span> Pipeline([</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'prep'</span>, ct),</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scalar'</span>, StandardScaler()),</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'reg'</span>, PoissonRegressor())</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>pois_reg.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="97f983f9-9744-4f49-a109-f988bc16d79a" type="checkbox"><label class="sk-toggleable__label" for="97f983f9-9744-4f49-a109-f988bc16d79a">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('prep',
+                 ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                                  ['t1', 't2', 'hum',
+                                                   'wind_speed', 'is_holiday',
+                                                   'is_weekend']),
+                                                 ('categorical',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False),
+                                                  ['weather_code', 'season',
+                                                   'hr'])])),
+                ('scalar', StandardScaler()), ('reg', PoissonRegressor())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="8ba7b8df-7bd8-4500-9ba0-397ed8fea537" type="checkbox"><label class="sk-toggleable__label" for="8ba7b8df-7bd8-4500-9ba0-397ed8fea537">prep: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                 ['t1', 't2', 'hum', 'wind_speed', 'is_holiday',
+                                  'is_weekend']),
+                                ('categorical',
+                                 OneHotEncoder(handle_unknown='ignore',
+                                               sparse=False),
+                                 ['weather_code', 'season', 'hr'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="ba22337e-adf2-4d15-b148-6f0109fa1976" type="checkbox"><label class="sk-toggleable__label" for="ba22337e-adf2-4d15-b148-6f0109fa1976">numerical</label><div class="sk-toggleable__content"><pre>['t1', 't2', 'hum', 'wind_speed', 'is_holiday', 'is_weekend']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="3f826836-4112-4e8f-86c7-50a704a903c3" type="checkbox"><label class="sk-toggleable__label" for="3f826836-4112-4e8f-86c7-50a704a903c3">passthrough</label><div class="sk-toggleable__content"><pre>passthrough</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="b2a7e79c-52ff-457a-99e6-5e2040cfb6f9" type="checkbox"><label class="sk-toggleable__label" for="b2a7e79c-52ff-457a-99e6-5e2040cfb6f9">categorical</label><div class="sk-toggleable__content"><pre>['weather_code', 'season', 'hr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="e68c1df3-d184-489e-8bc1-2e4f6742b6f3" type="checkbox"><label class="sk-toggleable__label" for="e68c1df3-d184-489e-8bc1-2e4f6742b6f3">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="cacfa431-6961-4cff-8fab-e617d1570258" type="checkbox"><label class="sk-toggleable__label" for="cacfa431-6961-4cff-8fab-e617d1570258">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="669b39e0-dd07-43f3-bf52-e24f97f1449d" type="checkbox"><label class="sk-toggleable__label" for="669b39e0-dd07-43f3-bf52-e24f97f1449d">PoissonRegressor</label><div class="sk-toggleable__content"><pre>PoissonRegressor()</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pois_reg.score(X_test, y_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>0.8156604730601431</code></pre>
+</div>
+</div>
+</section>
+<section id="what-about-ridge" class="level3">
+<h3 class="anchored" data-anchor-id="what-about-ridge">What about ridge?</h3>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'numerical'</span>, <span class="st">'passthrough'</span>, numerical_featurse),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'categorical'</span>, OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>, handle_unknown<span class="op">=</span><span class="st">'ignore'</span>), cat_features)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>ridge <span class="op">=</span> Pipeline([</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'prep'</span>, ct),</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scalar'</span>, StandardScaler()),</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'reg'</span>, Ridge(random_state<span class="op">=</span><span class="dv">42</span>))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>ridge.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="231ca7ee-b744-4bfe-b8fa-2d1856c57322" type="checkbox"><label class="sk-toggleable__label" for="231ca7ee-b744-4bfe-b8fa-2d1856c57322">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('prep',
+                 ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                                  ['t1', 't2', 'hum',
+                                                   'wind_speed', 'is_holiday',
+                                                   'is_weekend']),
+                                                 ('categorical',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False),
+                                                  ['weather_code', 'season',
+                                                   'hr'])])),
+                ('scalar', StandardScaler()), ('reg', Ridge(random_state=42))])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="38cc5453-80a1-4219-9c92-328302c53426" type="checkbox"><label class="sk-toggleable__label" for="38cc5453-80a1-4219-9c92-328302c53426">prep: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical', 'passthrough',
+                                 ['t1', 't2', 'hum', 'wind_speed', 'is_holiday',
+                                  'is_weekend']),
+                                ('categorical',
+                                 OneHotEncoder(handle_unknown='ignore',
+                                               sparse=False),
+                                 ['weather_code', 'season', 'hr'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="96b7adbf-0782-415a-a3c8-1af84a66d98b" type="checkbox"><label class="sk-toggleable__label" for="96b7adbf-0782-415a-a3c8-1af84a66d98b">numerical</label><div class="sk-toggleable__content"><pre>['t1', 't2', 'hum', 'wind_speed', 'is_holiday', 'is_weekend']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="e40e0fcb-721a-4b14-98b2-0ffc1f3bbb76" type="checkbox"><label class="sk-toggleable__label" for="e40e0fcb-721a-4b14-98b2-0ffc1f3bbb76">passthrough</label><div class="sk-toggleable__content"><pre>passthrough</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="ac735733-781c-4dfc-b7be-18a114addcf8" type="checkbox"><label class="sk-toggleable__label" for="ac735733-781c-4dfc-b7be-18a114addcf8">categorical</label><div class="sk-toggleable__content"><pre>['weather_code', 'season', 'hr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="eec97881-bec7-40d3-920c-701fa8d547ce" type="checkbox"><label class="sk-toggleable__label" for="eec97881-bec7-40d3-920c-701fa8d547ce">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="805ba819-3f6e-4471-98c4-13f7a80a4e7f" type="checkbox"><label class="sk-toggleable__label" for="805ba819-3f6e-4471-98c4-13f7a80a4e7f">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="963afb99-2500-4b07-adbe-4f751e707eb0" type="checkbox"><label class="sk-toggleable__label" for="963afb99-2500-4b07-adbe-4f751e707eb0">Ridge</label><div class="sk-toggleable__content"><pre>Ridge(random_state=42)</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ridge.score(X_test, y_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>0.7264287681524049</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_poisson_deviance</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_metrics(y_true, y_pred, sample_weight<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> y_pred <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="op">~</span>mask).<span class="bu">any</span>():</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        n_masked, n_samples <span class="op">=</span> (<span class="op">~</span>mask).<span class="bu">sum</span>(), mask.shape[<span class="dv">0</span>]</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"WARNING: Estimator yields invalid, non-positive predictions "</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f" for </span><span class="sc">{</span>n_masked<span class="sc">}</span><span class="ss"> samples out of </span><span class="sc">{</span>n_samples<span class="sc">}</span><span class="ss">. These predictions "</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f"are ignored when computing the Poisson deviance."</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>        y_true <span class="op">=</span> y_true[mask]</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> y_pred[mask]</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> sample_weight <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>            sample_weight <span class="op">=</span> sample_weight[mask]</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">'mse'</span>: mean_squared_error(y_true, y_pred, sample_weight<span class="op">=</span>sample_weight),</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">'mean poisson deviance'</span>: mean_poisson_deviance(y_true, y_pred, sample_weight<span class="op">=</span>sample_weight)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="compute-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="compute-metrics">Compute metrics</h3>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ridge_pred <span class="op">=</span> ridge.predict(X_test)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, ridge_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>WARNING: Estimator yields invalid, non-positive predictions  for 403 samples out of 4354. These predictions are ignored when computing the Poisson deviance.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>{'mse': 347993.3878355729, 'mean poisson deviance': 254.31140084177204}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>poisson_pred <span class="op">=</span> pois_reg.predict(X_test)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, poisson_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>{'mse': 273873.6171595357, 'mean poisson deviance': 181.15334073868877}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="plotting-the-prediction-distrubutions" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-the-prediction-distrubutions">Plotting the prediction distrubutions</h2>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2, ax3) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">6</span>), sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>ax1.hist(y_test, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Test data"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>ax2.hist(poisson_pred, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Poisson predictions"</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>ax3.hist(ridge_pred, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>ax3.set_title(<span class="st">"Ridge predictions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>Text(0.5, 1.0, 'Ridge predictions')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-24-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %load solutions/03-ex01-solutions.py</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.experimental <span class="im">import</span> enable_hist_gradient_boosting</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> HistGradientBoostingRegressor</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>hist <span class="op">=</span> HistGradientBoostingRegressor(random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>hist.fit(X_train, y_train)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>hist_pred <span class="op">=</span> hist.predict(X_test)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, hist_pred)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>hist_poisson <span class="op">=</span> HistGradientBoostingRegressor(loss<span class="op">=</span><span class="st">'poisson'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>hist_poisson.fit(X_train, y_train)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>hist_poisson_pred <span class="op">=</span> hist_poisson.predict(X_test)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, hist_poisson_pred)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2, ax3) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">6</span>), sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>ax1.hist(y_test, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Test data"</span>)</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>ax2.hist(hist_pred, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Default Hist"</span>)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>ax3.hist(hist_poisson_pred, bins<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>ax3.set_title(<span class="st">"Poisson Hist"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>WARNING: Estimator yields invalid, non-positive predictions  for 22 samples out of 4354. These predictions are ignored when computing the Poisson deviance.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-25-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="calibration" class="level2">
+<h2 class="anchored" data-anchor-id="calibration">Calibration</h2>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.utils <span class="im">import</span> gen_even_slices</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _calibration_curve_weighted(y_true, y_pred, n_bins<span class="op">=</span><span class="dv">10</span>, sample_weight<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    y_true <span class="op">=</span> np.asarray(y_true)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> np.asarray(y_pred)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    idx_sort <span class="op">=</span> np.argsort(y_pred)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    y_pred_bin <span class="op">=</span> np.zeros(n_bins)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    y_true_bin <span class="op">=</span> np.zeros(n_bins)</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sample_weight <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        sample_weight <span class="op">=</span> np.asarray(sample_weight)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, sl <span class="kw">in</span> <span class="bu">enumerate</span>(gen_even_slices(<span class="bu">len</span>(y_true), n_bins)):</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> sample_weight <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>            y_pred_bin[i] <span class="op">=</span> np.average(y_pred[idx_sort][sl])</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>            y_true_bin[i] <span class="op">=</span> np.average(y_true[idx_sort][sl])</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>            weights <span class="op">=</span> sample_weight[idx_sort][sl]</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>            y_pred_bin[i] <span class="op">=</span> np.average(y_pred[idx_sort][sl], weights<span class="op">=</span>weights)</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>            y_true_bin[i] <span class="op">=</span> np.average(y_true[idx_sort][sl], weights<span class="op">=</span>weights)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y_pred_bin, y_true_bin</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_calibration_curve_weights(y_true, y_pred, n_bins<span class="op">=</span><span class="dv">10</span>, ax<span class="op">=</span><span class="va">None</span>, title<span class="op">=</span><span class="st">""</span>, sample_weight<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ax <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>        fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>    y_pred_bin, y_true_bin <span class="op">=</span> _calibration_curve_weighted(y_test, y_pred, sample_weight<span class="op">=</span>sample_weight)</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>    bin_centers <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="bu">len</span>(y_pred_bin) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>    ax.plot(bin_centers, y_pred_bin, marker<span class="op">=</span><span class="st">'x'</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"predictions"</span>)</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>    ax.plot(bin_centers, y_true_bin, marker<span class="op">=</span><span class="st">'o'</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"observations"</span>)</span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>    ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Bin number"</span>, xticks<span class="op">=</span>bin_centers, title<span class="op">=</span>title)</span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>    ax.legend()</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ax</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2, ax3) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">8</span>))</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, ridge_pred, ax<span class="op">=</span>ax1, title<span class="op">=</span><span class="st">"Ridge"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, poisson_pred, ax<span class="op">=</span>ax2, title<span class="op">=</span><span class="st">"Poisson Regression"</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, hist_poisson_pred, ax<span class="op">=</span>ax3, title<span class="op">=</span><span class="st">"Hist Poisson"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-27-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="claims-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="claims-dataset">Claims dataset</h2>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>claims_path <span class="op">=</span> data_path <span class="op">/</span> <span class="st">"claims.csv"</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>claims <span class="op">=</span> pd.read_csv(claims_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>ClaimNb: number of claims on the given policy;</li>
+<li>Exposure: total exposure in yearly units;</li>
+<li>Area: area code (categorical, ordinal);</li>
+<li>VehPower: power of the car (categorical, ordinal);</li>
+<li>VehAge: age of the car in years;</li>
+<li>DrivAge: age of the (most common) driver in years;</li>
+<li>BonusMalus: bonus-malus level between 50 and 230 (with reference level 100);</li>
+<li>VehBrand: car brand (categorical, nominal);</li>
+<li>VehGas: diesel or regular fuel car (binary);</li>
+<li>Density: density of inhabitants per km2 in the city of the living place of the driver;</li>
+<li>Region: regions in France (prior to 2016)</li>
+</ul>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>claims.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ClaimNb</th>
+<th data-quarto-table-cell-role="th">Exposure</th>
+<th data-quarto-table-cell-role="th">Area</th>
+<th data-quarto-table-cell-role="th">VehPower</th>
+<th data-quarto-table-cell-role="th">VehAge</th>
+<th data-quarto-table-cell-role="th">DrivAge</th>
+<th data-quarto-table-cell-role="th">BonusMalus</th>
+<th data-quarto-table-cell-role="th">VehBrand</th>
+<th data-quarto-table-cell-role="th">VehGas</th>
+<th data-quarto-table-cell-role="th">Density</th>
+<th data-quarto-table-cell-role="th">Region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.0</td>
+<td>1.00</td>
+<td>D</td>
+<td>4.0</td>
+<td>11.0</td>
+<td>42.0</td>
+<td>64.0</td>
+<td>B2</td>
+<td>Regular</td>
+<td>856.0</td>
+<td>R24</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.0</td>
+<td>0.18</td>
+<td>E</td>
+<td>10.0</td>
+<td>12.0</td>
+<td>35.0</td>
+<td>100.0</td>
+<td>B1</td>
+<td>Regular</td>
+<td>4762.0</td>
+<td>R93</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0.0</td>
+<td>0.08</td>
+<td>E</td>
+<td>6.0</td>
+<td>4.0</td>
+<td>53.0</td>
+<td>50.0</td>
+<td>B1</td>
+<td>Diesel</td>
+<td>3317.0</td>
+<td>R93</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.0</td>
+<td>0.36</td>
+<td>A</td>
+<td>5.0</td>
+<td>2.0</td>
+<td>44.0</td>
+<td>50.0</td>
+<td>B2</td>
+<td>Diesel</td>
+<td>35.0</td>
+<td>R52</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0.0</td>
+<td>0.60</td>
+<td>C</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>32.0</td>
+<td>85.0</td>
+<td>B12</td>
+<td>Diesel</td>
+<td>200.0</td>
+<td>R73</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>exposure <span class="op">=</span> claims[<span class="st">'Exposure'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> claims[<span class="st">"ClaimNb"</span>] <span class="op">/</span> exposure</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> claims.drop([<span class="st">"Exposure"</span>, <span class="st">"ClaimNb"</span>], axis<span class="op">=</span><span class="st">"columns"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>X.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Area</th>
+<th data-quarto-table-cell-role="th">VehPower</th>
+<th data-quarto-table-cell-role="th">VehAge</th>
+<th data-quarto-table-cell-role="th">DrivAge</th>
+<th data-quarto-table-cell-role="th">BonusMalus</th>
+<th data-quarto-table-cell-role="th">VehBrand</th>
+<th data-quarto-table-cell-role="th">VehGas</th>
+<th data-quarto-table-cell-role="th">Density</th>
+<th data-quarto-table-cell-role="th">Region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>D</td>
+<td>4.0</td>
+<td>11.0</td>
+<td>42.0</td>
+<td>64.0</td>
+<td>B2</td>
+<td>Regular</td>
+<td>856.0</td>
+<td>R24</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>E</td>
+<td>10.0</td>
+<td>12.0</td>
+<td>35.0</td>
+<td>100.0</td>
+<td>B1</td>
+<td>Regular</td>
+<td>4762.0</td>
+<td>R93</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>E</td>
+<td>6.0</td>
+<td>4.0</td>
+<td>53.0</td>
+<td>50.0</td>
+<td>B1</td>
+<td>Diesel</td>
+<td>3317.0</td>
+<td>R93</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>A</td>
+<td>5.0</td>
+<td>2.0</td>
+<td>44.0</td>
+<td>50.0</td>
+<td>B2</td>
+<td>Diesel</td>
+<td>35.0</td>
+<td>R52</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>C</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>32.0</td>
+<td>85.0</td>
+<td>B12</td>
+<td>Diesel</td>
+<td>200.0</td>
+<td>R73</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="split-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="split-data-1">Split data</h3>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test, exposure_train, exposure_test <span class="op">=</span> train_test_split(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    X, y, exposure, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="train-simple-dummy-regresor" class="level3">
+<h3 class="anchored" data-anchor-id="train-simple-dummy-regresor">Train simple dummy regresor</h3>
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.dummy <span class="im">import</span> DummyRegressor</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>dummy <span class="op">=</span> DummyRegressor()</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>dummy.fit(X_train, y_train, sample_weight<span class="op">=</span>exposure_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="fe0ee2a5-0262-4a62-88ae-819366e20798" type="checkbox" checked=""><label class="sk-toggleable__label" for="fe0ee2a5-0262-4a62-88ae-819366e20798">DummyRegressor</label><div class="sk-toggleable__content"><pre>DummyRegressor()</pre></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>dummy_pred <span class="op">=</span> dummy.predict(X_test)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, dummy_pred, sample_weight<span class="op">=</span>exposure_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<pre><code>{'mse': 0.5307356741415867, 'mean poisson deviance': 0.6308647534621802}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>dummy_pred[:<span class="dv">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="40">
+<pre><code>array([0.10038206, 0.10038206, 0.10038206, 0.10038206, 0.10038206,
+       0.10038206, 0.10038206, 0.10038206, 0.10038206, 0.10038206])</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="ridge" class="level2">
+<h2 class="anchored" data-anchor-id="ridge">Ridge</h2>
+<div class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>X[<span class="st">'Density'</span>].hist(bins<span class="op">=</span><span class="dv">20</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-38-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> FunctionTransformer, OneHotEncoder</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> KBinsDiscretizer</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>linear_model_preprocessor <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"passthrough_numeric"</span>, <span class="st">"passthrough"</span>,</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"BonusMalus"</span>]),</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"binned_numeric"</span>, KBinsDiscretizer(n_bins<span class="op">=</span><span class="dv">10</span>),</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"VehAge"</span>, <span class="st">"DrivAge"</span>]),</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"log_scaled_numeric"</span>, FunctionTransformer(np.log, validate<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"Density"</span>]),</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"onehot_categorical"</span>, OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">'ignore'</span>),</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"VehBrand"</span>, <span class="st">"VehPower"</span>, <span class="st">"VehGas"</span>, <span class="st">"Region"</span>, <span class="st">"Area"</span>]),</span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>linear_model_preprocessor.fit_transform(X_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<pre><code>&lt;254254x75 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+    with 2288282 stored elements in Compressed Sparse Row format&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MaxAbsScaler</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>ridge <span class="op">=</span> Pipeline([</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"preprocessor"</span>, linear_model_preprocessor),</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"scaler"</span>, MaxAbsScaler()),</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"reg"</span>, Ridge(alpha<span class="op">=</span><span class="fl">1e-6</span>))])</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>ridge.fit(X_train, y_train, reg__sample_weight<span class="op">=</span>exposure_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="44">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4eac0560-6fa4-4527-b666-244c3406e9b4" type="checkbox"><label class="sk-toggleable__label" for="4eac0560-6fa4-4527-b666-244c3406e9b4">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('preprocessor',
+                 ColumnTransformer(transformers=[('passthrough_numeric',
+                                                  'passthrough',
+                                                  ['BonusMalus']),
+                                                 ('binned_numeric',
+                                                  KBinsDiscretizer(n_bins=10),
+                                                  ['VehAge', 'DrivAge']),
+                                                 ('log_scaled_numeric',
+                                                  FunctionTransformer(func=<ufunc 'log'="">),
+                                                  ['Density']),
+                                                 ('onehot_categorical',
+                                                  OneHotEncoder(handle_unknown='ignore'),
+                                                  ['VehBrand', 'VehPower',
+                                                   'VehGas', 'Region',
+                                                   'Area'])])),
+                ('scaler', MaxAbsScaler()), ('reg', Ridge(alpha=1e-06))])</ufunc></pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="ec67d36e-ffe2-4957-9614-0b815e0a77fb" type="checkbox"><label class="sk-toggleable__label" for="ec67d36e-ffe2-4957-9614-0b815e0a77fb">preprocessor: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('passthrough_numeric', 'passthrough',
+                                 ['BonusMalus']),
+                                ('binned_numeric', KBinsDiscretizer(n_bins=10),
+                                 ['VehAge', 'DrivAge']),
+                                ('log_scaled_numeric',
+                                 FunctionTransformer(func=<ufunc 'log'="">),
+                                 ['Density']),
+                                ('onehot_categorical',
+                                 OneHotEncoder(handle_unknown='ignore'),
+                                 ['VehBrand', 'VehPower', 'VehGas', 'Region',
+                                  'Area'])])</ufunc></pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="d1ee350b-987b-4b83-be76-93bc6ee92297" type="checkbox"><label class="sk-toggleable__label" for="d1ee350b-987b-4b83-be76-93bc6ee92297">passthrough_numeric</label><div class="sk-toggleable__content"><pre>['BonusMalus']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="24ebe534-cf90-4d2e-8e8c-43d35dc373bf" type="checkbox"><label class="sk-toggleable__label" for="24ebe534-cf90-4d2e-8e8c-43d35dc373bf">passthrough</label><div class="sk-toggleable__content"><pre>passthrough</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="62c183f0-a0b3-4826-b667-dce6713f212d" type="checkbox"><label class="sk-toggleable__label" for="62c183f0-a0b3-4826-b667-dce6713f212d">binned_numeric</label><div class="sk-toggleable__content"><pre>['VehAge', 'DrivAge']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="f75f6a47-0569-4ed3-b94a-388cef7e5612" type="checkbox"><label class="sk-toggleable__label" for="f75f6a47-0569-4ed3-b94a-388cef7e5612">KBinsDiscretizer</label><div class="sk-toggleable__content"><pre>KBinsDiscretizer(n_bins=10)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="67f12aca-3e74-4b07-98c0-6a9437f49e15" type="checkbox"><label class="sk-toggleable__label" for="67f12aca-3e74-4b07-98c0-6a9437f49e15">log_scaled_numeric</label><div class="sk-toggleable__content"><pre>['Density']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="be7203eb-6812-4c76-b40f-8668372b857c" type="checkbox"><label class="sk-toggleable__label" for="be7203eb-6812-4c76-b40f-8668372b857c">FunctionTransformer</label><div class="sk-toggleable__content"><pre>FunctionTransformer(func=<ufunc 'log'="">)</ufunc></pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="9000e180-b252-4fc0-b095-e5fb0f92b38f" type="checkbox"><label class="sk-toggleable__label" for="9000e180-b252-4fc0-b095-e5fb0f92b38f">onehot_categorical</label><div class="sk-toggleable__content"><pre>['VehBrand', 'VehPower', 'VehGas', 'Region', 'Area']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="43f0c9fe-518c-4947-a448-ca313ea67f40" type="checkbox"><label class="sk-toggleable__label" for="43f0c9fe-518c-4947-a448-ca313ea67f40">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore')</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="3a190ee6-d8c8-40fd-8964-72fe04be285f" type="checkbox"><label class="sk-toggleable__label" for="3a190ee6-d8c8-40fd-8964-72fe04be285f">MaxAbsScaler</label><div class="sk-toggleable__content"><pre>MaxAbsScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="c26e53b5-de41-4bfe-9d43-743917d806a4" type="checkbox"><label class="sk-toggleable__label" for="c26e53b5-de41-4bfe-9d43-743917d806a4">Ridge</label><div class="sk-toggleable__content"><pre>Ridge(alpha=1e-06)</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>ridge_pred <span class="op">=</span> ridge.predict(X_test)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, ridge_pred, sample_weight<span class="op">=</span>exposure_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>WARNING: Estimator yields invalid, non-positive predictions  for 866 samples out of 84752. These predictions are ignored when computing the Poisson deviance.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="45">
+<pre><code>{'mse': 0.5306782259705353, 'mean poisson deviance': 0.6051468688331222}</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, ridge_pred, ax<span class="op">=</span>ax, title<span class="op">=</span><span class="st">"Ridge"</span>, sample_weight<span class="op">=</span>exposure_test)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-43-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %load solutions/03-ex02-solutions.py</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>poission_reg <span class="op">=</span> Pipeline([</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"preprocessor"</span>, linear_model_preprocessor),</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"scaler"</span>, MaxAbsScaler()),</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"reg"</span>, PoissonRegressor(alpha<span class="op">=</span><span class="fl">1e-12</span>))])</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>poission_reg.fit(X_train, y_train, reg__sample_weight<span class="op">=</span>exposure_train)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>poisson_pred <span class="op">=</span> poission_reg.predict(X_test)</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, poisson_pred, sample_weight<span class="op">=</span>exposure_test)</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, poisson_pred, ax<span class="op">=</span>ax, title<span class="op">=</span><span class="st">"Poisson"</span>, sample_weight<span class="op">=</span>exposure_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="47">
+<pre><code>&lt;AxesSubplot:title={'center':'Poisson'}, xlabel='Bin number'&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-44-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="48">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># %load solutions/03-ex03-solutions.py</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OrdinalEncoder</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>tree_preprocessor <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"categorical"</span>, OrdinalEncoder(),</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"VehBrand"</span>, <span class="st">"VehPower"</span>, <span class="st">"VehGas"</span>, <span class="st">"Region"</span>, <span class="st">"Area"</span>]),</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"numeric"</span>, <span class="st">"passthrough"</span>,</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"VehAge"</span>, <span class="st">"DrivAge"</span>, <span class="st">"BonusMalus"</span>, <span class="st">"Density"</span>]),</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>hist_poisson <span class="op">=</span> Pipeline([</span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"preprocessor"</span>, tree_preprocessor),</span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"reg"</span>, HistGradientBoostingRegressor(loss<span class="op">=</span><span class="st">"poisson"</span>, random_state<span class="op">=</span><span class="dv">0</span>))</span>
+<span id="cb61-16"><a href="#cb61-16" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb61-17"><a href="#cb61-17" aria-hidden="true" tabindex="-1"></a>hist_poisson.fit(X_train, y_train, reg__sample_weight<span class="op">=</span>exposure_train)</span>
+<span id="cb61-18"><a href="#cb61-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-19"><a href="#cb61-19" aria-hidden="true" tabindex="-1"></a>hist_poisson_pred <span class="op">=</span> hist_poisson.predict(X_test)</span>
+<span id="cb61-20"><a href="#cb61-20" aria-hidden="true" tabindex="-1"></a>compute_metrics(y_test, hist_poisson_pred, sample_weight<span class="op">=</span>exposure_test)</span>
+<span id="cb61-21"><a href="#cb61-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-22"><a href="#cb61-22" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb61-23"><a href="#cb61-23" aria-hidden="true" tabindex="-1"></a>plot_calibration_curve_weights(y_test, hist_poisson_pred, ax<span class="op">=</span>ax, title<span class="op">=</span><span class="st">"Hist Poisson"</span>, sample_weight<span class="op">=</span>exposure_test)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-04-02-poisson-regression_files/figure-html/cell-45-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

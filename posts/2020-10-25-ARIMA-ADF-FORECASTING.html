@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>tech_blog - Stock Market Analysis of the S&amp;P 500 Index using ARIMA and Seasonal ARIMA for forecasting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">tech_blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Stock Market Analysis of the S&amp;P 500 Index using ARIMA and Seasonal ARIMA for forecasting</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>This post includes code and notes from <a href="https://udemy.com/python-for-finance-and-trading-algorithms/">python for finance and trading algorithms udemy course</a> and <a href="https://github.com/theoneandonlywoj/Python-for-Financial-Analysis-and-Algorithmic-Trading">python for finance and trading algorithms udemy course notebooks</a>.</p>
+<div class="cell" data-execution_count="106">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas_datareader</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas_datareader.data <span class="im">as</span> web</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> quandl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="107">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> datetime.datetime(<span class="dv">1960</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>end <span class="op">=</span> pd.to_datetime(<span class="st">'today'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="108">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SP500 <span class="op">=</span> quandl.get(<span class="st">"MULTPL/SP500_REAL_PRICE_MONTH"</span>,start_date <span class="op">=</span> start,end_date <span class="op">=</span> end)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>SP500</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="108">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-08-01</td>
+<td>3391.71</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-08-31</td>
+<td>3500.31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-09-01</td>
+<td>3526.65</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-09-30</td>
+<td>3363.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-10-01</td>
+<td>3380.80</td>
+</tr>
+</tbody>
+</table>
+
+<p>740 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> SP500</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="110">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="111">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df.tail()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="111">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-08-01</td>
+<td>3391.71</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-08-31</td>
+<td>3500.31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-09-01</td>
+<td>3526.65</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-09-30</td>
+<td>3363.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-10-01</td>
+<td>3380.80</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="112">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="st">'Value'</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="112">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="113">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="113">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="114">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df.describe().transpose()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="114">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Value</td>
+<td>740.0</td>
+<td>761.732932</td>
+<td>834.566138</td>
+<td>53.73</td>
+<td>100.9</td>
+<td>349.425</td>
+<td>1239.415</td>
+<td>3526.65</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="step-2-visualize-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-visualize-the-data">Step 2: Visualize the Data</h2>
+<p>Let’s visualize this data with a few methods.</p>
+<div class="cell" data-execution_count="115">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="115">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8873251b38&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-11-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="116">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>timeseries <span class="op">=</span> df[<span class="st">'Value'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="117">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>timeseries.rolling(<span class="dv">12</span>).mean().plot(label<span class="op">=</span><span class="st">'12 Month Rolling Mean'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>timeseries.rolling(<span class="dv">12</span>).std().plot(label<span class="op">=</span><span class="st">'12 Month Rolling Std'</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>timeseries.plot()</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="117">
+<pre><code>&lt;matplotlib.legend.Legend at 0x7f88731e22e8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-13-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="118">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>timeseries.rolling(<span class="dv">12</span>).mean().plot(label<span class="op">=</span><span class="st">'12 Month Rolling Mean'</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>timeseries.plot()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="118">
+<pre><code>&lt;matplotlib.legend.Legend at 0x7f887315f630&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-14-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="decomposition">Decomposition</h2>
+<p>ETS decomposition allows us to see the individual parts!</p>
+<div class="cell" data-execution_count="119">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> seasonal_decompose</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>decomposition <span class="op">=</span> seasonal_decompose(df[<span class="st">'Value'</span>], freq<span class="op">=</span><span class="dv">12</span>)  </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure()  </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> decomposition.plot()  </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>fig.set_size_inches(<span class="dv">15</span>, <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 432x288 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-15-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="testing-for-stationarity" class="level2">
+<h2 class="anchored" data-anchor-id="testing-for-stationarity">Testing for Stationarity</h2>
+<div class="cell" data-execution_count="120">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="120">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="121">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="122">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> adfuller(df[<span class="st">'Value'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="123">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Augmented Dickey-Fuller Test:'</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="st">'ADF Test Statistic'</span>,<span class="st">'p-value'</span>,<span class="st">'#Lags Used'</span>,<span class="st">'Number of Observations Used'</span>]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> value,label <span class="kw">in</span> <span class="bu">zip</span>(result,labels):</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(label<span class="op">+</span><span class="st">' : '</span><span class="op">+</span><span class="bu">str</span>(value) )</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> result[<span class="dv">1</span>] <span class="op">&lt;=</span> <span class="fl">0.05</span>:</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary"</span>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"weak evidence against null hypothesis, time series has a unit root, indicating it is non-stationary "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test:
+ADF Test Statistic : 1.7247353245135
+p-value : 0.9981874531215522
+#Lags Used : 20
+Number of Observations Used : 719
+weak evidence against null hypothesis, time series has a unit root, indicating it is non-stationary </code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="124">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adf_check(time_series):</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Pass in a time series, returns ADF report</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> adfuller(time_series)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Augmented Dickey-Fuller Test:'</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> [<span class="st">'ADF Test Statistic'</span>,<span class="st">'p-value'</span>,<span class="st">'#Lags Used'</span>,<span class="st">'Number of Observations Used'</span>]</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> value,label <span class="kw">in</span> <span class="bu">zip</span>(result,labels):</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(label<span class="op">+</span><span class="st">' : '</span><span class="op">+</span><span class="bu">str</span>(value) )</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> result[<span class="dv">1</span>] <span class="op">&lt;=</span> <span class="fl">0.05</span>:</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary"</span>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"weak evidence against null hypothesis, time series has a unit root, indicating it is non-stationary "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>** First Difference **</p>
+<div class="cell" data-execution_count="125">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Value First Difference'</span>] <span class="op">=</span> df[<span class="st">'Value'</span>] <span class="op">-</span> df[<span class="st">'Value'</span>].shift(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="126">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>adf_check(df[<span class="st">'Value First Difference'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test:
+ADF Test Statistic : -4.267790128581322
+p-value : 0.0005048563860225925
+#Lags Used : 20
+Number of Observations Used : 718
+strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Value First Difference'</span>].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="127">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f886d63feb8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-23-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>** Second Difference **</p>
+<div class="cell" data-execution_count="128">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Value Second Difference'</span>] <span class="op">=</span> df[<span class="st">'Value First Difference'</span>] <span class="op">-</span> df[<span class="st">'Value First Difference'</span>].shift(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="129">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>adf_check(df[<span class="st">'Value Second Difference'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test:
+ADF Test Statistic : -12.29955077642857
+p-value : 7.504260735615441e-23
+#Lags Used : 18
+Number of Observations Used : 719
+strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="130">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Value Second Difference'</span>].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="130">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8877f726d8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-26-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>** Seasonal Difference **</p>
+<div class="cell" data-execution_count="131">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Seasonal Difference'</span>] <span class="op">=</span> df[<span class="st">'Value'</span>] <span class="op">-</span> df[<span class="st">'Value'</span>].shift(<span class="dv">12</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Seasonal Difference'</span>].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="131">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8877fb79e8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-27-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="132">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>adf_check(df[<span class="st">'Seasonal Difference'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test:
+ADF Test Statistic : -5.239903673260254
+p-value : 7.284266188346342e-06
+#Lags Used : 20
+Number of Observations Used : 707
+strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary</code></pre>
+</div>
+</div>
+<p>** Seasonal First Difference **</p>
+<div class="cell" data-execution_count="133">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Seasonal First Difference'</span>] <span class="op">=</span> df[<span class="st">'Value First Difference'</span>] <span class="op">-</span> df[<span class="st">'Value First Difference'</span>].shift(<span class="dv">12</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Seasonal First Difference'</span>].plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="133">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f88acb0c2b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-29-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="134">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>adf_check(df[<span class="st">'Seasonal First Difference'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Augmented Dickey-Fuller Test:
+ADF Test Statistic : -6.196739887980032
+p-value : 5.940155101037563e-08
+#Lags Used : 20
+Number of Observations Used : 706
+strong evidence against the null hypothesis, reject the null hypothesis. Data has no unit root and is stationary</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="135">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf,plot_pacf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="136">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check out: https://stackoverflow.com/questions/21788593/statsmodels-duplicate-charts</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co"># https://github.com/statsmodels/statsmodels/issues/1265</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>fig_first <span class="op">=</span> plot_acf(df[<span class="st">"Value First Difference"</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-32-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="137">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>fig_seasonal_first <span class="op">=</span> plot_acf(df[<span class="st">"Seasonal First Difference"</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-33-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Pandas also has this functionality built in, but only for ACF, not PACF. So I recommend using statsmodels, as ACF and PACF is more core to its functionality than it is to pandas’ functionality.</p>
+<div class="cell" data-execution_count="138">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas.plotting <span class="im">import</span> autocorrelation_plot</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>autocorrelation_plot(df[<span class="st">'Seasonal First Difference'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="138">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f886d660358&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-34-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can then plot this relationship:</p>
+<div class="cell" data-execution_count="139">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> plot_pacf(df[<span class="st">"Seasonal First Difference"</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-35-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="140">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">8</span>))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>ax1 <span class="op">=</span> fig.add_subplot(<span class="dv">211</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sm.graphics.tsa.plot_acf(df[<span class="st">'Seasonal First Difference'</span>].iloc[<span class="dv">13</span>:], lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax1)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> fig.add_subplot(<span class="dv">212</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sm.graphics.tsa.plot_pacf(df[<span class="st">'Seasonal First Difference'</span>].iloc[<span class="dv">13</span>:], lags<span class="op">=</span><span class="dv">40</span>, ax<span class="op">=</span>ax2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-36-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="141">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.arima_model <span class="im">import</span> ARIMA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="142">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="bu">help</span>(ARIMA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Help on class ARIMA in module statsmodels.tsa.arima_model:
+
+class ARIMA(ARMA)
+ |  ARIMA(endog, order, exog=None, dates=None, freq=None, missing='none')
+ |  
+ |  Autoregressive Integrated Moving Average ARIMA(p,d,q) Model
+ |  
+ |  Parameters
+ |  ----------
+ |  endog : array-like
+ |      The endogenous variable.
+ |  order : iterable
+ |      The (p,d,q) order of the model for the number of AR parameters,
+ |      differences, and MA parameters to use.
+ |  exog : array-like, optional
+ |      An optional array of exogenous variables. This should *not* include a
+ |      constant or trend. You can specify this in the `fit` method.
+ |  dates : array-like of datetime, optional
+ |      An array-like object of datetime objects. If a pandas object is given
+ |      for endog or exog, it is assumed to have a DateIndex.
+ |  freq : str, optional
+ |      The frequency of the time-series. A Pandas offset or 'B', 'D', 'W',
+ |      'M', 'A', or 'Q'. This is optional if dates are given.
+ |  
+ |  
+ |  Notes
+ |  -----
+ |  If exogenous variables are given, then the model that is fit is
+ |  
+ |  .. math::
+ |  
+ |     \phi(L)(y_t - X_t\beta) = \theta(L)\epsilon_t
+ |  
+ |  where :math:`\phi` and :math:`\theta` are polynomials in the lag
+ |  operator, :math:`L`. This is the regression model with ARMA errors,
+ |  or ARMAX model. This specification is used, whether or not the model
+ |  is fit using conditional sum of square or maximum-likelihood, using
+ |  the `method` argument in
+ |  :meth:`statsmodels.tsa.arima_model.ARIMA.fit`. Therefore, for
+ |  now, `css` and `mle` refer to estimation methods only. This may
+ |  change for the case of the `css` model in future versions.
+ |  
+ |  Method resolution order:
+ |      ARIMA
+ |      ARMA
+ |      statsmodels.tsa.base.tsa_model.TimeSeriesModel
+ |      statsmodels.base.model.LikelihoodModel
+ |      statsmodels.base.model.Model
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __getnewargs__(self)
+ |  
+ |  __init__(self, endog, order, exog=None, dates=None, freq=None, missing='none')
+ |      Initialize self.  See help(type(self)) for accurate signature.
+ |  
+ |  fit(self, start_params=None, trend='c', method='css-mle', transparams=True, solver='lbfgs', maxiter=500, full_output=1, disp=5, callback=None, start_ar_lags=None, **kwargs)
+ |      Fits ARIMA(p,d,q) model by exact maximum likelihood via Kalman filter.
+ |      
+ |      Parameters
+ |      ----------
+ |      start_params : array-like, optional
+ |          Starting parameters for ARMA(p,q).  If None, the default is given
+ |          by ARMA._fit_start_params.  See there for more information.
+ |      transparams : bool, optional
+ |          Whehter or not to transform the parameters to ensure stationarity.
+ |          Uses the transformation suggested in Jones (1980).  If False,
+ |          no checking for stationarity or invertibility is done.
+ |      method : str {'css-mle','mle','css'}
+ |          This is the loglikelihood to maximize.  If "css-mle", the
+ |          conditional sum of squares likelihood is maximized and its values
+ |          are used as starting values for the computation of the exact
+ |          likelihood via the Kalman filter.  If "mle", the exact likelihood
+ |          is maximized via the Kalman Filter.  If "css" the conditional sum
+ |          of squares likelihood is maximized.  All three methods use
+ |          `start_params` as starting parameters.  See above for more
+ |          information.
+ |      trend : str {'c','nc'}
+ |          Whether to include a constant or not.  'c' includes constant,
+ |          'nc' no constant.
+ |      solver : str or None, optional
+ |          Solver to be used.  The default is 'lbfgs' (limited memory
+ |          Broyden-Fletcher-Goldfarb-Shanno).  Other choices are 'bfgs',
+ |          'newton' (Newton-Raphson), 'nm' (Nelder-Mead), 'cg' -
+ |          (conjugate gradient), 'ncg' (non-conjugate gradient), and
+ |          'powell'. By default, the limited memory BFGS uses m=12 to
+ |          approximate the Hessian, projected gradient tolerance of 1e-8 and
+ |          factr = 1e2. You can change these by using kwargs.
+ |      maxiter : int, optional
+ |          The maximum number of function evaluations. Default is 500.
+ |      tol : float
+ |          The convergence tolerance.  Default is 1e-08.
+ |      full_output : bool, optional
+ |          If True, all output from solver will be available in
+ |          the Results object's mle_retvals attribute.  Output is dependent
+ |          on the solver.  See Notes for more information.
+ |      disp : int, optional
+ |          If True, convergence information is printed.  For the default
+ |          l_bfgs_b solver, disp controls the frequency of the output during
+ |          the iterations. disp &lt; 0 means no output in this case.
+ |      callback : function, optional
+ |          Called after each iteration as callback(xk) where xk is the current
+ |          parameter vector.
+ |      start_ar_lags : int, optional
+ |          Parameter for fitting start_params. When fitting start_params,
+ |          residuals are obtained from an AR fit, then an ARMA(p,q) model is
+ |          fit via OLS using these residuals. If start_ar_lags is None, fit
+ |          an AR process according to best BIC. If start_ar_lags is not None,
+ |          fits an AR process with a lag length equal to start_ar_lags.
+ |          See ARMA._fit_start_params_hr for more information.
+ |      kwargs
+ |          See Notes for keyword arguments that can be passed to fit.
+ |      
+ |      Returns
+ |      -------
+ |      `statsmodels.tsa.arima.ARIMAResults` class
+ |      
+ |      See Also
+ |      --------
+ |      statsmodels.base.model.LikelihoodModel.fit : for more information
+ |          on using the solvers.
+ |      ARIMAResults : results class returned by fit
+ |      
+ |      Notes
+ |      -----
+ |      If fit by 'mle', it is assumed for the Kalman Filter that the initial
+ |      unknown state is zero, and that the initial variance is
+ |      P = dot(inv(identity(m**2)-kron(T,T)),dot(R,R.T).ravel('F')).reshape(r,
+ |      r, order = 'F')
+ |  
+ |  predict(self, params, start=None, end=None, exog=None, typ='linear', dynamic=False)
+ |      ARIMA model in-sample and out-of-sample prediction
+ |      
+ |      Parameters
+ |      ----------
+ |      params : array-like
+ |          The fitted parameters of the model.
+ |      start : int, str, or datetime
+ |          Zero-indexed observation number at which to start forecasting, ie.,
+ |          the first forecast is start. Can also be a date string to
+ |          parse or a datetime type.
+ |      end : int, str, or datetime
+ |          Zero-indexed observation number at which to end forecasting, ie.,
+ |          the first forecast is start. Can also be a date string to
+ |          parse or a datetime type. However, if the dates index does not
+ |          have a fixed frequency, end must be an integer index if you
+ |          want out of sample prediction.
+ |      exog : array-like, optional
+ |          If the model is an ARMAX and out-of-sample forecasting is
+ |          requested, exog must be given. Note that you'll need to pass
+ |          `k_ar` additional lags for any exogenous variables. E.g., if you
+ |          fit an ARMAX(2, q) model and want to predict 5 steps, you need 7
+ |          observations to do this.
+ |      dynamic : bool, optional
+ |          The `dynamic` keyword affects in-sample prediction. If dynamic
+ |          is False, then the in-sample lagged values are used for
+ |          prediction. If `dynamic` is True, then in-sample forecasts are
+ |          used in place of lagged dependent variables. The first forecasted
+ |          value is `start`.
+ |      typ : str {'linear', 'levels'}
+ |      
+ |          - 'linear' : Linear prediction in terms of the differenced
+ |            endogenous variables.
+ |          - 'levels' : Predict the levels of the original endogenous
+ |            variables.
+ |      
+ |      
+ |      Returns
+ |      -------
+ |      predict : array
+ |          The predicted values.
+ |      
+ |      
+ |      
+ |      Notes
+ |      -----
+ |      Use the results predict method instead.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Static methods defined here:
+ |  
+ |  __new__(cls, endog, order, exog=None, dates=None, freq=None, missing='none')
+ |      Create and return a new object.  See help(type) for accurate signature.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from ARMA:
+ |  
+ |  geterrors(self, params)
+ |      Get the errors of the ARMA process.
+ |      
+ |      Parameters
+ |      ----------
+ |      params : array-like
+ |          The fitted ARMA parameters
+ |      order : array-like
+ |          3 item iterable, with the number of AR, MA, and exogenous
+ |          parameters, including the trend
+ |  
+ |  hessian(self, params)
+ |      Compute the Hessian at params,
+ |      
+ |      Notes
+ |      -----
+ |      This is a numerical approximation.
+ |  
+ |  loglike(self, params, set_sigma2=True)
+ |      Compute the log-likelihood for ARMA(p,q) model
+ |      
+ |      Notes
+ |      -----
+ |      Likelihood used depends on the method set in fit
+ |  
+ |  loglike_css(self, params, set_sigma2=True)
+ |      Conditional Sum of Squares likelihood function.
+ |  
+ |  loglike_kalman(self, params, set_sigma2=True)
+ |      Compute exact loglikelihood for ARMA(p,q) model by the Kalman Filter.
+ |  
+ |  score(self, params)
+ |      Compute the score function at params.
+ |      
+ |      Notes
+ |      -----
+ |      This is a numerical approximation.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Class methods inherited from ARMA:
+ |  
+ |  from_formula(formula, data, subset=None, drop_cols=None, *args, **kwargs) from builtins.type
+ |      Create a Model from a formula and dataframe.
+ |      
+ |      Parameters
+ |      ----------
+ |      formula : str or generic Formula object
+ |          The formula specifying the model
+ |      data : array-like
+ |          The data for the model. See Notes.
+ |      subset : array-like
+ |          An array-like object of booleans, integers, or index values that
+ |          indicate the subset of df to use in the model. Assumes df is a
+ |          `pandas.DataFrame`
+ |      drop_cols : array-like
+ |          Columns to drop from the design matrix.  Cannot be used to
+ |          drop terms involving categoricals.
+ |      args : extra arguments
+ |          These are passed to the model
+ |      kwargs : extra keyword arguments
+ |          These are passed to the model with one exception. The
+ |          ``eval_env`` keyword is passed to patsy. It can be either a
+ |          :class:`patsy:patsy.EvalEnvironment` object or an integer
+ |          indicating the depth of the namespace to use. For example, the
+ |          default ``eval_env=0`` uses the calling namespace. If you wish
+ |          to use a "clean" environment set ``eval_env=-1``.
+ |      
+ |      Returns
+ |      -------
+ |      model : Model instance
+ |      
+ |      Notes
+ |      -----
+ |      data must define __getitem__ with the keys in the formula terms
+ |      args and kwargs are passed on to the model instantiation. E.g.,
+ |      a numpy structured or rec array, a dictionary, or a pandas DataFrame.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from statsmodels.tsa.base.tsa_model.TimeSeriesModel:
+ |  
+ |  exog_names
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from statsmodels.base.model.LikelihoodModel:
+ |  
+ |  information(self, params)
+ |      Fisher information matrix of model
+ |      
+ |      Returns -Hessian of loglike evaluated at params.
+ |  
+ |  initialize(self)
+ |      Initialize (possibly re-initialize) a Model instance. For
+ |      instance, the design matrix of a linear model may change
+ |      and some things must be recomputed.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from statsmodels.base.model.Model:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  endog_names
+ |      Names of endogenous variables
+</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="143">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> sm.tsa.statespace.SARIMAX(df[<span class="st">'Value'</span>],order<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), seasonal_order<span class="op">=</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">12</span>))</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> model.fit()</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(results.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/home/gao/anaconda3/lib/python3.7/site-packages/statsmodels/tsa/base/tsa_model.py:219: ValueWarning: A date index has been provided, but it has no associated frequency information and so will be ignored when e.g. forecasting.
+  ' ignored when e.g. forecasting.', ValueWarning)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                 Statespace Model Results                                 
+==========================================================================================
+Dep. Variable:                              Value   No. Observations:                  740
+Model:             SARIMAX(0, 1, 0)x(1, 1, 1, 12)   Log Likelihood               -3719.108
+Date:                            Fri, 23 Oct 2020   AIC                           7444.215
+Time:                                    09:03:22   BIC                           7457.982
+Sample:                                         0   HQIC                          7449.528
+                                            - 740                                         
+Covariance Type:                              opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.S.L12       0.0043      0.021      0.201      0.840      -0.037       0.046
+ma.S.L12      -0.9513      0.018    -53.297      0.000      -0.986      -0.916
+sigma2      1563.8216     30.663     51.001      0.000    1503.724    1623.919
+===================================================================================
+Ljung-Box (Q):                      116.83   Jarque-Bera (JB):              9251.13
+Prob(Q):                              0.00   Prob(JB):                         0.00
+Heteroskedasticity (H):             410.23   Skew:                            -1.86
+Prob(H) (two-sided):                  0.00   Kurtosis:                        20.08
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="144">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>results.resid.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="144">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8872daf940&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-40-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="145">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>results.resid.plot(kind<span class="op">=</span><span class="st">'kde'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="145">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8872d863c8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-41-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="prediction-of-future-values" class="level2">
+<h2 class="anchored" data-anchor-id="prediction-of-future-values">Prediction of Future Values</h2>
+<p>Firts we can get an idea of how well our model performs by just predicting for values that we actually already know:</p>
+<div class="cell" data-execution_count="166">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'forecast'</span>] <span class="op">=</span> results.predict(start <span class="op">=</span> <span class="dv">1</span>, end<span class="op">=</span> <span class="dv">720</span>, dynamic<span class="op">=</span> <span class="va">True</span>)  </span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">'Value'</span>,<span class="st">'forecast'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="166">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f88ace0d7b8&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-42-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<section id="forecasting" class="level3">
+<h3 class="anchored" data-anchor-id="forecasting">Forecasting</h3>
+<div class="cell" data-execution_count="167">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>df.tail()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="167">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+<th data-quarto-table-cell-role="th">Value First Difference</th>
+<th data-quarto-table-cell-role="th">Value Second Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal First Difference</th>
+<th data-quarto-table-cell-role="th">forecast</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-08-01</td>
+<td>3391.71</td>
+<td>120.59</td>
+<td>57.09</td>
+<td>166.67</td>
+<td>173.75</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-08-31</td>
+<td>3500.31</td>
+<td>108.60</td>
+<td>-11.99</td>
+<td>223.00</td>
+<td>56.33</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-09-01</td>
+<td>3526.65</td>
+<td>26.34</td>
+<td>-82.26</td>
+<td>571.84</td>
+<td>348.84</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2020-09-30</td>
+<td>3363.00</td>
+<td>-163.65</td>
+<td>-189.99</td>
+<td>710.61</td>
+<td>138.77</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2020-10-01</td>
+<td>3380.80</td>
+<td>17.80</td>
+<td>181.45</td>
+<td>796.21</td>
+<td>85.60</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="168">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas.tseries.offsets <span class="im">import</span> DateOffset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="169">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>future_dates <span class="op">=</span> [df.index[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> DateOffset(months<span class="op">=</span>x) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="dv">24</span>) ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="150">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>future_dates</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="150">
+<pre><code>[Timestamp('2020-10-01 00:00:00'),
+ Timestamp('2020-11-01 00:00:00'),
+ Timestamp('2020-12-01 00:00:00'),
+ Timestamp('2021-01-01 00:00:00'),
+ Timestamp('2021-02-01 00:00:00'),
+ Timestamp('2021-03-01 00:00:00'),
+ Timestamp('2021-04-01 00:00:00'),
+ Timestamp('2021-05-01 00:00:00'),
+ Timestamp('2021-06-01 00:00:00'),
+ Timestamp('2021-07-01 00:00:00'),
+ Timestamp('2021-08-01 00:00:00'),
+ Timestamp('2021-09-01 00:00:00'),
+ Timestamp('2021-10-01 00:00:00'),
+ Timestamp('2021-11-01 00:00:00'),
+ Timestamp('2021-12-01 00:00:00'),
+ Timestamp('2022-01-01 00:00:00'),
+ Timestamp('2022-02-01 00:00:00'),
+ Timestamp('2022-03-01 00:00:00'),
+ Timestamp('2022-04-01 00:00:00'),
+ Timestamp('2022-05-01 00:00:00'),
+ Timestamp('2022-06-01 00:00:00'),
+ Timestamp('2022-07-01 00:00:00'),
+ Timestamp('2022-08-01 00:00:00'),
+ Timestamp('2022-09-01 00:00:00')]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="170">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>future_dates_df <span class="op">=</span> pd.DataFrame(index<span class="op">=</span>future_dates[<span class="dv">1</span>:],columns<span class="op">=</span>df.columns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="171">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>future_df <span class="op">=</span> pd.concat([df,future_dates_df])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="172">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>future_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="172">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+<th data-quarto-table-cell-role="th">Value First Difference</th>
+<th data-quarto-table-cell-role="th">Value Second Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal First Difference</th>
+<th data-quarto-table-cell-role="th">forecast</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>58.03</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-02-01</td>
+<td>55.78</td>
+<td>-2.25</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>58.03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-03-01</td>
+<td>55.02</td>
+<td>-0.76</td>
+<td>1.49</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>58.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1960-04-01</td>
+<td>55.73</td>
+<td>0.71</td>
+<td>1.47</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>58.03</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-05-01</td>
+<td>55.22</td>
+<td>-0.51</td>
+<td>-1.22</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>58.03</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="173">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>future_df.tail()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="173">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Value</th>
+<th data-quarto-table-cell-role="th">Value First Difference</th>
+<th data-quarto-table-cell-role="th">Value Second Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal Difference</th>
+<th data-quarto-table-cell-role="th">Seasonal First Difference</th>
+<th data-quarto-table-cell-role="th">forecast</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-05-01</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2022-06-01</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-07-01</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2022-08-01</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2022-09-01</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="177">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>future_df[<span class="st">'forecast'</span>] <span class="op">=</span> results.predict(start <span class="op">=</span> <span class="dv">1</span>, end <span class="op">=</span> <span class="dv">720</span>, dynamic<span class="op">=</span> <span class="va">True</span>)  </span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>future_df[[<span class="st">'Value'</span>, <span class="st">'forecast'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="177">
+<pre><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8872997fd0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-10-25-ARIMA-ADF-FORECASTING_files/figure-html/cell-51-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
