@@ -1,0 +1,2637 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - Pandas Interoperability</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Pandas Interoperability</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell" data-execution_count="238">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#code adapted from https://github.com/thomasjpfan/ml-workshop-intermediate-1-of-2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="183">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://raw.githubusercontent.com/davidrkearney/Kearney_Data_Science/master/_notebooks/df_panel_fix.csv'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(url, error_bad_lines<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> fetch_openml</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>df.columns</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>sklearn.set_config(display<span class="op">=</span><span class="st">'diagram'</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>df.dropna()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>df.isnull().<span class="bu">sum</span>()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> df.drop([<span class="st">'specific'</span>, <span class="st">'Unnamed: 0'</span>], axis <span class="op">=</span> <span class="dv">1</span>), df[<span class="st">'specific'</span>]</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>X</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>_ <span class="op">=</span> X.hist(figsize<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">15</span>), layout<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-05-31-pandas-interoperability_files/figure-html/cell-3-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="184">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sklearn</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sklearn.set_config(display<span class="op">=</span><span class="st">'diagram'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="categorical-data" class="level2">
+<h2 class="anchored" data-anchor-id="categorical-data">Categorical Data</h2>
+<section id="oridinalencoder" class="level3">
+<h3 class="anchored" data-anchor-id="oridinalencoder">OridinalEncoder</h3>
+<div class="cell" data-execution_count="185">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OrdinalEncoder</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="186">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ord_encoder <span class="op">=</span> OrdinalEncoder()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ord_encoder.fit_transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="186">
+<pre><code>array([[  0.,   0.,  17., ...,  24.,   0.,  28.],
+       [  1.,   0.,  48., ...,  29.,   0.,  60.],
+       [  2.,   0.,  64., ...,  40.,   0.,  67.],
+       ...,
+       [115.,  27.,  44., ...,  97.,   0.,  53.],
+       [116.,  27.,  84., ...,   4.,   0.,  64.],
+       [117.,  27.,  78., ...,  25.,   0.,  71.]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="187">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ord_encoder.categories_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="187">
+<pre><code>[array([  4,   6,   7,  10,  11,  16,  18,  19,  22,  23,  34,  35,  40,
+         42,  43,  46,  47,  52,  54,  58,  64,  66,  67,  70,  71,  76,
+         78,  79,  82,  83,  88,  90,  91,  94,  95, 107, 112, 119, 124,
+        126, 127, 130, 131, 136, 138, 139, 142, 143, 148, 150, 151, 154,
+        155, 160, 162, 163, 166, 167, 172, 174, 175, 178, 179, 184, 186,
+        187, 190, 191, 196, 198, 199, 202, 203, 220, 222, 223, 226, 227,
+        232, 234, 235, 239, 244, 246, 247, 250, 251, 258, 259, 262, 263,
+        280, 282, 283, 292, 294, 295, 298, 310, 316, 318, 319, 322, 323,
+        328, 330, 331, 334, 335, 340, 342, 343, 346, 347, 354, 355, 358,
+        359]),
+ array(['Anhui', 'Beijing', 'Chongqing', 'Fujian', 'Gansu', 'Guangdong',
+        'Guangxi', 'Guizhou', 'Hainan', 'Hebei', 'Heilongjiang', 'Henan',
+        'Hubei', 'Hunan', 'Jiangsu', 'Jiangxi', 'Jilin', 'Ningxia',
+        'Qinghai', 'Shaanxi', 'Shandong', 'Shanxi', 'Sichuan', 'Tianjin',
+        'Tibet', 'Xinjiang', 'Yunnan', 'Zhejiang'], dtype=object),
+ array([  72939.,   91405.,   96825.,  103041.,  107046.,  107687.,
+         119536.,  127819.,  133858.,  137190.,  142650.,  144839.,
+         147749.,  148812.,  160637.,  179235.,  181409.,  195580.,
+         207615.,  217707.,  223984.,  228043.,  237948.,  248903.,
+         251539.,  254002.,  262197.,  265770.,  271297.,  271499.,
+         281769.,  295133.,  319710.,  331999.,  337894.,  340372.,
+         353776.,  354775.,  359275.,  365437.,  367568.,  369552.,
+         370049.,  379186.,  391292.,  395775.,  397517.,  430577.,
+         434149.,  436189.,  447709.,  458201.,  469514.,  472786.,
+         484715.,  487155.,  510656.,  518022.,  531994.,  558569.,
+         575550.,  591088.,  601485.,  615593.,  619201.,  642581.,
+         675931.,  681676.,  684767.,  685732.,  688887.,  714572.,
+         752279.,  753552.,  761081.,  821750.,  833423.,  833430.,
+         844647.,  859482.,  875877.,  909559.,  978069.,  985851.,
+        1017303., 1035872., 1097470., 1188989., 1204547., 1207353.,
+        1224179., 1235386., 1246484., 1315102., 1331590., 1358528.,
+        1388043., 1457872., 1550764., 1562694., 1791403., 1890650.,
+        1897575., 1956261., 2018158., 2022957., 2045869., 2121243.,
+        2213991., 2225220., 2482173., 2663667., 2669238., 2922784.,
+        2981235., 3156087., 3847672., 3860764.]),
+ array([      0.,    2990.,    8115.,   11755.,   11767.,   17400.,
+          20842.,   26300.,   27302.,   27387.,   29646.,   30705.,
+          32100.,   32119.,   32868.,   34842.,   36670.,   36946.,
+          40604.,   44623.,   45683.,   50097.,   52108.,   53900.,
+          56070.,   58533.,   59263.,   60560.,   60906.,   62000.,
+          66100.,   66529.,   68142.,   71807.,   80361.,   80609.,
+          81879.,   86256.,   88007.,   93323.,   95648.,  100000.,
+         100900.,  107658.,  108624.,  112137.,  113000.,  114418.,
+         116000.,  119658.,  123317.,  123546.,  124582.,  124647.,
+         129791.,  135765.,  143800.,  145000.,  149549.,  150000.,
+         153640.,  154364.,  165071.,  173552.,  173556.,  178705.,
+         179252.,  188633.,  197539.,  229895.,  241282.,  260313.,
+         264185.,  269596.,  279052.,  280277.,  302600.,  309582.,
+         317700.,  320627.,  321686.,  363054.,  394795.,  400000.,
+         405966.,  423049.,  429591.,  434318.,  447900.,  460668.,
+         498913.,  516342.,  527300.,  540479.,  564400.,  570723.,
+         581800.,  605400.,  655919.,  659400.,  694400.,  763953.,
+        1016400., 1023453., 1046700., 1081000., 1131615., 1187958.,
+        1197400., 1214100., 1239200., 1263500., 1272600., 1329200.,
+        1737800.]),
+ array([2000, 2002, 2003, 2006, 2007]),
+ array([  117.8 ,   162.04,   185.09,   263.68,   290.76,   295.02,
+          340.65,   341.43,   377.16,   390.2 ,   445.36,   725.9 ,
+          797.35,   919.11,  1029.92,  1052.88,  1232.03,  1243.43,
+         1254.17,  1363.56,  1426.34,  1612.65,  1672.96,  1804.  ,
+         1845.72,  1853.65,  1886.35,  2011.19,  2080.04,  2120.35,
+         2175.68,  2253.39,  2277.35,  2312.82,  2324.8 ,  2338.98,
+         2348.54,  2450.48,  2523.73,  2556.02,  2587.72,  2821.11,
+         2855.23,  2884.11,  2902.09,  3045.26,  3151.4 ,  3161.66,
+         3519.72,  3523.16,  3545.39,  3551.49,  3620.27,  3637.2 ,
+         3764.54,  3907.23,  3923.11,  3928.2 ,  3988.14,  4056.76,
+         4057.4 ,  4151.54,  4212.82,  4275.12,  4315.  ,  4462.74,
+         4467.55,  4659.99,  4676.13,  4725.01,  4743.61,  4746.16,
+         4757.45,  4772.52,  4820.53,  4983.67,  5007.21,  5043.96,
+         5052.99,  5333.09,  5757.29,  5823.41,  6035.48,  6112.5 ,
+         6211.8 ,  6867.7 ,  7104.  ,  7360.92,  7583.85,  7617.47,
+         7688.67,  7697.82,  8003.67,  8117.78,  8690.24,  9248.53,
+         9333.4 ,  9439.6 ,  9456.84,  9705.02,  9846.81, 10275.5 ,
+        10606.85, 10741.25, 12078.15, 12362.79, 13502.42, 13607.32,
+        15012.46, 15718.47, 15844.64, 18598.69, 18753.73, 21742.05,
+        21900.19, 25776.91, 26587.76, 31777.01]),
+ array([      2,     293,     467,    1522,    1534,    1741,    1743,
+           1899,    1911,    2200,    2418,    2501,    2522,    2954,
+           3718,    3821,    4521,    4726,    5047,    6121,    6235,
+           8384,    9384,   10366,   11020,   11169,   12484,   12651,
+          12812,   21164,   21361,   22472,   24468,   28842,   30086,
+          30120,   30234,   31000,   31847,   32080,   32180,   33190,
+          33766,   35511,   36005,   36720,   38375,   39453,   39575,
+          40463,   41231,   41726,   41856,   43694,   44740,   52466,
+          53903,   55583,   56403,   66100,   67833,   67923,   68396,
+          69595,   76064,   90022,   92489,   94368,  101835,  108197,
+         108534,  112001,  119516,  120819,  139354,  142665,  156886,
+         168368,  170801,  172464,  184526,  208508,  219126,  241621,
+         242000,  244853,  259335,  259903,  276622,  280657,  299892,
+         306162,  307610,  322047,  327051,  343191,  383837,  406058,
+         413077,  455191,  473404,  498055,  506572,  601617,  607756,
+         691482,  782294,  888935, 1000069, 1018960, 1036576, 1101159,
+        1128091, 1133400, 1318339, 1451065, 1712603, 1743140]),
+ array([0.        , 0.02702703, 0.03      , 0.03125   , 0.04761905,
+        0.09677419, 0.20512821, 0.22      , 0.4       , 1.21428571]),
+ array([0.        , 0.03      , 0.03571429, 0.10869565, 0.11111111,
+        0.13      , 0.13888889, 0.15384615, 0.16      , 0.24      ,
+        0.27027027, 0.3       , 0.31      , 0.4       , 0.41025641,
+        0.4375    , 0.5       , 0.7948718 ]),
+ array([0.        , 0.03571429, 0.05128205, 0.12820513, 0.13      ,
+        0.21621622, 0.22222222, 0.23076923, 0.27586207, 0.3       ,
+        0.32432432, 0.4       , 0.40625   , 0.47      , 0.51612903,
+        0.53      , 0.55      , 0.71052632, 0.8125    ]),
+ array(['1060812', '1082935', '1089674', '1108348', '11537149', '1163113',
+        '11673659', '118013', '1212843', '123888', '1292604', '1310512',
+        '1321004', '1389153', '1443753', '147235', '14740022', '14926380',
+        '1514364', '1514799', '1543658', '1548155', '157652', '1600475',
+        '1601508', '16494981', '1667114', '16753980', '1675757', '1677840',
+        '16804703', '169770', '1710605', '1723026', '1755299', '1762409',
+        '1802055', '1807967', '1841592', '1851377', '1896479', '1913563',
+        '1925862', '1938812', '201412', '2018672', '2024337', '202761',
+        '2110577', '2125369', '2195820', '22377276', '2308652', '2329505',
+        '233299', '2373047', '2419708', '2450874', '2511249', '2523352',
+        '2525301', '2567976', '2648861', '27858007', '2823366', '2823413',
+        '2851375', '2858600', '2972212', '3206892', '3434548', '3444533',
+        '3816261', '3898510', '4032810', '4188265', '4247403', '4404689',
+        '4427000', '4468640', '447643', '4752398', '4830320', '4830392',
+        '4867146', '4958329', '505196', '50819', '5145006', '5596906',
+        '567083', '5903552', '597159', '59841', '6065508', '6166904',
+        '6212824', '6217715', '6879383', '693750', '6994577', '70048',
+        '7071605', '740947', '776120', '7891198', '800312', '830159',
+        '8620804', '8818088', '919235', '924080', '932549', '960708',
+        '966606', '971485', '974325', '9898522'], dtype=object),
+ array(['East China', 'North China', 'Northeast China', 'Northwest China',
+        'South Central China', 'Southwest China'], dtype=object),
+ array([  475184,   546541,   632880,   736165,   757990,   819028,
+          866691,   948521,   976396,  1047698,  1078754,  1109537,
+         1174622,  1184990,  1210637,  1216605,  1228569,  1258100,
+         1308445,  1333133,  1364344,  1364980,  1423771,  1426600,
+         1428990,  1440939,  1472622,  1492835,  1499110,  1554999,
+         1648826,  1658350,  1742585,  1782317,  1845611,  1873822,
+         1898911,  1927102,  1962192,  1962633,  1986738,  2017594,
+         2023674,  2047192,  2052220,  2053980,  2072426,  2135224,
+         2138158,  2138758,  2143190,  2150325,  2254281,  2261631,
+         2268499,  2339769,  2347862,  2355164,  2376983,  2378616,
+         2404936,  2444270,  2455900,  2545841,  2553268,  2649011,
+         2764053,  2815820,  2867525,  2907301,  2926542,  2939778,
+         2940367,  2977880,  3035767,  3051103,  3101537,  3114638,
+         3124234,  3343228,  3388449,  3545004,  3557071,  3586373,
+         3847158,  3893879,  3923569,  4039036,  4062020,  4073606,
+         4133488,  4229821,  4390259,  4559252,  4607955,  4613724,
+         4686125,  4947824,  5046865,  5167300,  5304833,  5502470,
+         5639838,  6003791,  6033279,  6185600,  6308151,  6349262,
+         6357869,  6832541,  7040099,  7537692,  7601825,  7646885,
+         7666512,  7968319,  8340692, 10533312])]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="188">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ord_encoder.transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="188">
+<pre><code>array([[  0.,   0.,  17., ...,  24.,   0.,  28.],
+       [  1.,   0.,  48., ...,  29.,   0.,  60.],
+       [  2.,   0.,  64., ...,  40.,   0.,  67.],
+       ...,
+       [115.,  27.,  44., ...,  97.,   0.,  53.],
+       [116.,  27.,  84., ...,   4.,   0.,  64.],
+       [117.,  27.,  78., ...,  25.,   0.,  71.]])</code></pre>
+</div>
+</div>
+</section>
+<section id="categories-that-are-unknown-during-fit" class="level3">
+<h3 class="anchored" data-anchor-id="categories-that-are-unknown-during-fit">Categories that are unknown during <code>fit</code></h3>
+</section>
+<section id="how-to-handle-unknown-categories-in-oridinalencoder" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-handle-unknown-categories-in-oridinalencoder">How to handle unknown categories in OridinalEncoder?</h3>
+</section>
+<section id="provide-all-the-categories-in-the-constructor" class="level3">
+<h3 class="anchored" data-anchor-id="provide-all-the-categories-in-the-constructor">Provide all the categories in the constructor</h3>
+</section>
+</section>
+<section id="onehotencoder" class="level2">
+<h2 class="anchored" data-anchor-id="onehotencoder">OneHotEncoder</h2>
+<div class="cell" data-execution_count="189">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ohe <span class="op">=</span> OneHotEncoder()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>X_trans <span class="op">=</span> ohe.fit_transform(df)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>X_trans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="189">
+<pre><code>&lt;118x909 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+    with 1534 stored elements in Compressed Sparse Row format&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="190">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>X_trans.toarray()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="190">
+<pre><code>array([[1., 0., 0., ..., 0., 0., 0.],
+       [0., 1., 0., ..., 0., 0., 0.],
+       [0., 0., 1., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]])</code></pre>
+</div>
+</div>
+<section id="switch-to-dense" class="level3">
+<h3 class="anchored" data-anchor-id="switch-to-dense">Switch to dense</h3>
+<div class="cell" data-execution_count="191">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ohe <span class="op">=</span> OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>ohe.fit_transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="191">
+<pre><code>array([[1., 0., 0., ..., 0., 0., 0.],
+       [0., 1., 0., ..., 0., 0., 0.],
+       [0., 0., 1., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]])</code></pre>
+</div>
+</div>
+</section>
+<section id="unknown-categories-during-transform" class="level3">
+<h3 class="anchored" data-anchor-id="unknown-categories-during-transform">Unknown categories during transform?</h3>
+</section>
+<section id="ohe-can-handle-unknowns" class="level3">
+<h3 class="anchored" data-anchor-id="ohe-can-handle-unknowns">OHE can handle unknowns</h3>
+<div class="cell" data-execution_count="192">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>ohe <span class="op">=</span> OneHotEncoder(sparse<span class="op">=</span><span class="va">False</span>, handle_unknown<span class="op">=</span><span class="st">'ignore'</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ohe.fit(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="192">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="8b41a3b5-b52c-4412-bae4-810384e40141" type="checkbox" checked=""><label class="sk-toggleable__label" for="8b41a3b5-b52c-4412-bae4-810384e40141">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="193">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ohe.transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="193">
+<pre><code>array([[1., 0., 0., ..., 0., 0., 0.],
+       [0., 1., 0., ..., 0., 0., 0.],
+       [0., 0., 1., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="194">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ohe.categories_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="194">
+<pre><code>[array([  4,   6,   7,  10,  11,  16,  18,  19,  22,  23,  34,  35,  40,
+         42,  43,  46,  47,  52,  54,  58,  64,  66,  67,  70,  71,  76,
+         78,  79,  82,  83,  88,  90,  91,  94,  95, 107, 112, 119, 124,
+        126, 127, 130, 131, 136, 138, 139, 142, 143, 148, 150, 151, 154,
+        155, 160, 162, 163, 166, 167, 172, 174, 175, 178, 179, 184, 186,
+        187, 190, 191, 196, 198, 199, 202, 203, 220, 222, 223, 226, 227,
+        232, 234, 235, 239, 244, 246, 247, 250, 251, 258, 259, 262, 263,
+        280, 282, 283, 292, 294, 295, 298, 310, 316, 318, 319, 322, 323,
+        328, 330, 331, 334, 335, 340, 342, 343, 346, 347, 354, 355, 358,
+        359]),
+ array(['Anhui', 'Beijing', 'Chongqing', 'Fujian', 'Gansu', 'Guangdong',
+        'Guangxi', 'Guizhou', 'Hainan', 'Hebei', 'Heilongjiang', 'Henan',
+        'Hubei', 'Hunan', 'Jiangsu', 'Jiangxi', 'Jilin', 'Ningxia',
+        'Qinghai', 'Shaanxi', 'Shandong', 'Shanxi', 'Sichuan', 'Tianjin',
+        'Tibet', 'Xinjiang', 'Yunnan', 'Zhejiang'], dtype=object),
+ array([  72939.,   91405.,   96825.,  103041.,  107046.,  107687.,
+         119536.,  127819.,  133858.,  137190.,  142650.,  144839.,
+         147749.,  148812.,  160637.,  179235.,  181409.,  195580.,
+         207615.,  217707.,  223984.,  228043.,  237948.,  248903.,
+         251539.,  254002.,  262197.,  265770.,  271297.,  271499.,
+         281769.,  295133.,  319710.,  331999.,  337894.,  340372.,
+         353776.,  354775.,  359275.,  365437.,  367568.,  369552.,
+         370049.,  379186.,  391292.,  395775.,  397517.,  430577.,
+         434149.,  436189.,  447709.,  458201.,  469514.,  472786.,
+         484715.,  487155.,  510656.,  518022.,  531994.,  558569.,
+         575550.,  591088.,  601485.,  615593.,  619201.,  642581.,
+         675931.,  681676.,  684767.,  685732.,  688887.,  714572.,
+         752279.,  753552.,  761081.,  821750.,  833423.,  833430.,
+         844647.,  859482.,  875877.,  909559.,  978069.,  985851.,
+        1017303., 1035872., 1097470., 1188989., 1204547., 1207353.,
+        1224179., 1235386., 1246484., 1315102., 1331590., 1358528.,
+        1388043., 1457872., 1550764., 1562694., 1791403., 1890650.,
+        1897575., 1956261., 2018158., 2022957., 2045869., 2121243.,
+        2213991., 2225220., 2482173., 2663667., 2669238., 2922784.,
+        2981235., 3156087., 3847672., 3860764.]),
+ array([      0.,    2990.,    8115.,   11755.,   11767.,   17400.,
+          20842.,   26300.,   27302.,   27387.,   29646.,   30705.,
+          32100.,   32119.,   32868.,   34842.,   36670.,   36946.,
+          40604.,   44623.,   45683.,   50097.,   52108.,   53900.,
+          56070.,   58533.,   59263.,   60560.,   60906.,   62000.,
+          66100.,   66529.,   68142.,   71807.,   80361.,   80609.,
+          81879.,   86256.,   88007.,   93323.,   95648.,  100000.,
+         100900.,  107658.,  108624.,  112137.,  113000.,  114418.,
+         116000.,  119658.,  123317.,  123546.,  124582.,  124647.,
+         129791.,  135765.,  143800.,  145000.,  149549.,  150000.,
+         153640.,  154364.,  165071.,  173552.,  173556.,  178705.,
+         179252.,  188633.,  197539.,  229895.,  241282.,  260313.,
+         264185.,  269596.,  279052.,  280277.,  302600.,  309582.,
+         317700.,  320627.,  321686.,  363054.,  394795.,  400000.,
+         405966.,  423049.,  429591.,  434318.,  447900.,  460668.,
+         498913.,  516342.,  527300.,  540479.,  564400.,  570723.,
+         581800.,  605400.,  655919.,  659400.,  694400.,  763953.,
+        1016400., 1023453., 1046700., 1081000., 1131615., 1187958.,
+        1197400., 1214100., 1239200., 1263500., 1272600., 1329200.,
+        1737800.]),
+ array([2000, 2002, 2003, 2006, 2007]),
+ array([  117.8 ,   162.04,   185.09,   263.68,   290.76,   295.02,
+          340.65,   341.43,   377.16,   390.2 ,   445.36,   725.9 ,
+          797.35,   919.11,  1029.92,  1052.88,  1232.03,  1243.43,
+         1254.17,  1363.56,  1426.34,  1612.65,  1672.96,  1804.  ,
+         1845.72,  1853.65,  1886.35,  2011.19,  2080.04,  2120.35,
+         2175.68,  2253.39,  2277.35,  2312.82,  2324.8 ,  2338.98,
+         2348.54,  2450.48,  2523.73,  2556.02,  2587.72,  2821.11,
+         2855.23,  2884.11,  2902.09,  3045.26,  3151.4 ,  3161.66,
+         3519.72,  3523.16,  3545.39,  3551.49,  3620.27,  3637.2 ,
+         3764.54,  3907.23,  3923.11,  3928.2 ,  3988.14,  4056.76,
+         4057.4 ,  4151.54,  4212.82,  4275.12,  4315.  ,  4462.74,
+         4467.55,  4659.99,  4676.13,  4725.01,  4743.61,  4746.16,
+         4757.45,  4772.52,  4820.53,  4983.67,  5007.21,  5043.96,
+         5052.99,  5333.09,  5757.29,  5823.41,  6035.48,  6112.5 ,
+         6211.8 ,  6867.7 ,  7104.  ,  7360.92,  7583.85,  7617.47,
+         7688.67,  7697.82,  8003.67,  8117.78,  8690.24,  9248.53,
+         9333.4 ,  9439.6 ,  9456.84,  9705.02,  9846.81, 10275.5 ,
+        10606.85, 10741.25, 12078.15, 12362.79, 13502.42, 13607.32,
+        15012.46, 15718.47, 15844.64, 18598.69, 18753.73, 21742.05,
+        21900.19, 25776.91, 26587.76, 31777.01]),
+ array([      2,     293,     467,    1522,    1534,    1741,    1743,
+           1899,    1911,    2200,    2418,    2501,    2522,    2954,
+           3718,    3821,    4521,    4726,    5047,    6121,    6235,
+           8384,    9384,   10366,   11020,   11169,   12484,   12651,
+          12812,   21164,   21361,   22472,   24468,   28842,   30086,
+          30120,   30234,   31000,   31847,   32080,   32180,   33190,
+          33766,   35511,   36005,   36720,   38375,   39453,   39575,
+          40463,   41231,   41726,   41856,   43694,   44740,   52466,
+          53903,   55583,   56403,   66100,   67833,   67923,   68396,
+          69595,   76064,   90022,   92489,   94368,  101835,  108197,
+         108534,  112001,  119516,  120819,  139354,  142665,  156886,
+         168368,  170801,  172464,  184526,  208508,  219126,  241621,
+         242000,  244853,  259335,  259903,  276622,  280657,  299892,
+         306162,  307610,  322047,  327051,  343191,  383837,  406058,
+         413077,  455191,  473404,  498055,  506572,  601617,  607756,
+         691482,  782294,  888935, 1000069, 1018960, 1036576, 1101159,
+        1128091, 1133400, 1318339, 1451065, 1712603, 1743140]),
+ array([0.        , 0.02702703, 0.03      , 0.03125   , 0.04761905,
+        0.09677419, 0.20512821, 0.22      , 0.4       , 1.21428571]),
+ array([0.        , 0.03      , 0.03571429, 0.10869565, 0.11111111,
+        0.13      , 0.13888889, 0.15384615, 0.16      , 0.24      ,
+        0.27027027, 0.3       , 0.31      , 0.4       , 0.41025641,
+        0.4375    , 0.5       , 0.7948718 ]),
+ array([0.        , 0.03571429, 0.05128205, 0.12820513, 0.13      ,
+        0.21621622, 0.22222222, 0.23076923, 0.27586207, 0.3       ,
+        0.32432432, 0.4       , 0.40625   , 0.47      , 0.51612903,
+        0.53      , 0.55      , 0.71052632, 0.8125    ]),
+ array(['1060812', '1082935', '1089674', '1108348', '11537149', '1163113',
+        '11673659', '118013', '1212843', '123888', '1292604', '1310512',
+        '1321004', '1389153', '1443753', '147235', '14740022', '14926380',
+        '1514364', '1514799', '1543658', '1548155', '157652', '1600475',
+        '1601508', '16494981', '1667114', '16753980', '1675757', '1677840',
+        '16804703', '169770', '1710605', '1723026', '1755299', '1762409',
+        '1802055', '1807967', '1841592', '1851377', '1896479', '1913563',
+        '1925862', '1938812', '201412', '2018672', '2024337', '202761',
+        '2110577', '2125369', '2195820', '22377276', '2308652', '2329505',
+        '233299', '2373047', '2419708', '2450874', '2511249', '2523352',
+        '2525301', '2567976', '2648861', '27858007', '2823366', '2823413',
+        '2851375', '2858600', '2972212', '3206892', '3434548', '3444533',
+        '3816261', '3898510', '4032810', '4188265', '4247403', '4404689',
+        '4427000', '4468640', '447643', '4752398', '4830320', '4830392',
+        '4867146', '4958329', '505196', '50819', '5145006', '5596906',
+        '567083', '5903552', '597159', '59841', '6065508', '6166904',
+        '6212824', '6217715', '6879383', '693750', '6994577', '70048',
+        '7071605', '740947', '776120', '7891198', '800312', '830159',
+        '8620804', '8818088', '919235', '924080', '932549', '960708',
+        '966606', '971485', '974325', '9898522'], dtype=object),
+ array(['East China', 'North China', 'Northeast China', 'Northwest China',
+        'South Central China', 'Southwest China'], dtype=object),
+ array([  475184,   546541,   632880,   736165,   757990,   819028,
+          866691,   948521,   976396,  1047698,  1078754,  1109537,
+         1174622,  1184990,  1210637,  1216605,  1228569,  1258100,
+         1308445,  1333133,  1364344,  1364980,  1423771,  1426600,
+         1428990,  1440939,  1472622,  1492835,  1499110,  1554999,
+         1648826,  1658350,  1742585,  1782317,  1845611,  1873822,
+         1898911,  1927102,  1962192,  1962633,  1986738,  2017594,
+         2023674,  2047192,  2052220,  2053980,  2072426,  2135224,
+         2138158,  2138758,  2143190,  2150325,  2254281,  2261631,
+         2268499,  2339769,  2347862,  2355164,  2376983,  2378616,
+         2404936,  2444270,  2455900,  2545841,  2553268,  2649011,
+         2764053,  2815820,  2867525,  2907301,  2926542,  2939778,
+         2940367,  2977880,  3035767,  3051103,  3101537,  3114638,
+         3124234,  3343228,  3388449,  3545004,  3557071,  3586373,
+         3847158,  3893879,  3923569,  4039036,  4062020,  4073606,
+         4133488,  4229821,  4390259,  4559252,  4607955,  4613724,
+         4686125,  4947824,  5046865,  5167300,  5304833,  5502470,
+         5639838,  6003791,  6033279,  6185600,  6308151,  6349262,
+         6357869,  6832541,  7040099,  7537692,  7601825,  7646885,
+         7666512,  7968319,  8340692, 10533312])]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="two-categorical-features" class="level2">
+<h2 class="anchored" data-anchor-id="two-categorical-features">Two categorical features</h2>
+<div class="cell" data-execution_count="195">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"province"</span>: [<span class="st">"Zhejiang"</span>, <span class="st">"Beijing"</span>, <span class="st">"Shanghai"</span>],</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"region"</span>: [<span class="st">"East China"</span>, <span class="st">"North China"</span>, <span class="st">"Southwest China"</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="196">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ohe.fit(df_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="196">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="3de2939f-e7cf-4da3-bcb9-ddfcbb49045e" type="checkbox" checked=""><label class="sk-toggleable__label" for="3de2939f-e7cf-4da3-bcb9-ddfcbb49045e">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="197">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ohe.categories_</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="197">
+<pre><code>[array(['Beijing', 'Shanghai', 'Zhejiang'], dtype=object),
+ array(['East China', 'North China', 'Southwest China'], dtype=object)]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="198">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ohe.transform(df_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="198">
+<pre><code>array([[0., 0., 1., 1., 0., 0.],
+       [1., 0., 0., 0., 1., 0.],
+       [0., 1., 0., 0., 0., 1.]])</code></pre>
+</div>
+</div>
+</section>
+<section id="column-transformer" class="level1">
+<h1>Column Transformer!</h1>
+<section id="with-oridinalencoder" class="level2">
+<h2 class="anchored" data-anchor-id="with-oridinalencoder">With OridinalEncoder</h2>
+<div class="cell" data-execution_count="199">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="200">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="200">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">province</th>
+<th data-quarto-table-cell-role="th">specific</th>
+<th data-quarto-table-cell-role="th">general</th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">gdp</th>
+<th data-quarto-table-cell-role="th">fdi</th>
+<th data-quarto-table-cell-role="th">rnr</th>
+<th data-quarto-table-cell-role="th">rr</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">fr</th>
+<th data-quarto-table-cell-role="th">reg</th>
+<th data-quarto-table-cell-role="th">it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>Anhui</td>
+<td>195580.0</td>
+<td>32100.0</td>
+<td>2000</td>
+<td>2902.09</td>
+<td>31847</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1601508</td>
+<td>East China</td>
+<td>1499110</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>6</td>
+<td>Anhui</td>
+<td>434149.0</td>
+<td>66529.0</td>
+<td>2002</td>
+<td>3519.72</td>
+<td>38375</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1677840</td>
+<td>East China</td>
+<td>2404936</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>7</td>
+<td>Anhui</td>
+<td>619201.0</td>
+<td>52108.0</td>
+<td>2003</td>
+<td>3923.11</td>
+<td>36720</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1896479</td>
+<td>East China</td>
+<td>2815820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>10</td>
+<td>Anhui</td>
+<td>1457872.0</td>
+<td>279052.0</td>
+<td>2006</td>
+<td>6112.50</td>
+<td>139354</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>3434548</td>
+<td>East China</td>
+<td>5167300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11</td>
+<td>11</td>
+<td>Anhui</td>
+<td>2213991.0</td>
+<td>178705.0</td>
+<td>2007</td>
+<td>7360.92</td>
+<td>299892</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>4468640</td>
+<td>East China</td>
+<td>7040099</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">347</td>
+<td>347</td>
+<td>Yunnan</td>
+<td>2482173.0</td>
+<td>564400.0</td>
+<td>2007</td>
+<td>4772.52</td>
+<td>39453</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4867146</td>
+<td>Southwest China</td>
+<td>6832541</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">354</td>
+<td>354</td>
+<td>Zhejiang</td>
+<td>365437.0</td>
+<td>321686.0</td>
+<td>2002</td>
+<td>8003.67</td>
+<td>307610</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4958329</td>
+<td>East China</td>
+<td>1962633</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">355</td>
+<td>355</td>
+<td>Zhejiang</td>
+<td>391292.0</td>
+<td>260313.0</td>
+<td>2003</td>
+<td>9705.02</td>
+<td>498055</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>6217715</td>
+<td>East China</td>
+<td>2261631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">358</td>
+<td>358</td>
+<td>Zhejiang</td>
+<td>1017303.0</td>
+<td>394795.0</td>
+<td>2006</td>
+<td>15718.47</td>
+<td>888935</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>11537149</td>
+<td>East China</td>
+<td>2553268</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">359</td>
+<td>359</td>
+<td>Zhejiang</td>
+<td>844647.0</td>
+<td>0.0</td>
+<td>2007</td>
+<td>18753.73</td>
+<td>1036576</td>
+<td>0.047619</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>16494981</td>
+<td>East China</td>
+<td>2939778</td>
+</tr>
+</tbody>
+</table>
+
+<p>118 rows × 13 columns</p>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="201">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'numerical'</span>, StandardScaler(), [<span class="st">'fdi'</span>, <span class="st">'gdp'</span>]),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'categorical'</span>, OrdinalEncoder(), [<span class="st">'reg'</span>])</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>ct.fit_transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="201">
+<pre><code>array([[-0.54088554, -0.48498461,  0.        ],
+       [-0.52313911, -0.37867596,  0.        ],
+       [-0.52763824, -0.30924305,  0.        ],
+       [-0.24862668,  0.06760246,  0.        ],
+       [ 0.18779748,  0.28248491,  0.        ],
+       [-0.16975183, -0.44030651,  1.        ],
+       [-0.15861681, -0.24178957,  1.        ],
+       [-0.0317657 , -0.12264395,  1.        ],
+       [ 0.60997938,  0.41275831,  1.        ],
+       [ 0.74965914,  0.71036505,  1.        ],
+       [-0.43826722, -0.31197638,  5.        ],
+       [-0.33241116, -0.1796306 ,  5.        ],
+       [ 0.30550625, -0.33653668,  0.        ],
+       [ 0.41600281, -0.21553212,  0.        ],
+       [ 0.07908699, -0.12669573,  0.        ],
+       [ 0.24802608,  0.3208564 ,  0.        ],
+       [ 0.47641082,  0.60738699,  0.        ],
+       [-0.61051202, -0.80327715,  3.        ],
+       [-0.61082193, -0.77244122,  3.        ],
+       [-0.61943145, -0.59251706,  3.        ],
+       [ 2.43926479,  0.86431921,  4.        ],
+       [ 2.45369736,  1.33958151,  4.        ],
+       [ 1.49921217,  1.74273266,  4.        ],
+       [ 3.31727285,  3.5918763 ,  4.        ],
+       [ 4.02826654,  4.48506828,  4.        ],
+       [-0.48483258, -0.62647875,  4.        ],
+       [-0.51402938, -0.55010927,  4.        ],
+       [-0.51367597, -0.49892317,  4.        ],
+       [-0.50583579, -0.16757679,  4.        ],
+       [-0.44152672,  0.01784327,  4.        ],
+       [-0.62066294, -0.8072291 ,  5.        ],
+       [-0.6170745 , -0.77047901,  5.        ],
+       [-0.61517155, -0.7389959 ,  5.        ],
+       [-0.60195143, -0.58190909,  5.        ],
+       [-0.59307006, -0.48807939,  5.        ],
+       [-0.32298609, -0.7686304 ,  4.        ],
+       [-0.44281257, -0.11631841,  1.        ],
+       [ 0.02938719,  1.35763727,  1.        ],
+       [-0.54567284, -0.4420725 ,  2.        ],
+       [-0.53092492, -0.35845489,  2.        ],
+       [-0.53998028, -0.28612859,  2.        ],
+       [-0.1631377 ,  0.08469433,  2.        ],
+       [-0.06063084,  0.23826293,  2.        ],
+       [-0.47412981, -0.11476413,  4.        ],
+       [-0.51746286,  0.05434551,  4.        ],
+       [-0.48092608,  0.19759014,  4.        ],
+       [-0.12582615,  1.14342438,  4.        ],
+       [ 0.20484254,  1.59949491,  4.        ],
+       [-0.37092157, -0.37425755,  4.        ],
+       [-0.23962569, -0.25937715,  4.        ],
+       [-0.20096576, -0.16563352,  4.        ],
+       [ 0.03817341,  0.3266432 ,  4.        ],
+       [ 0.12453776,  0.62199511,  4.        ],
+       [-0.44305724, -0.3732076 ,  4.        ],
+       [-0.38273622, -0.26992488,  4.        ],
+       [-0.35062246, -0.18240867,  4.        ],
+       [ 0.07754287,  0.33889839,  4.        ],
+       [ 0.2616295 ,  0.64027463,  4.        ],
+       [ 1.02472886,  0.34047332,  0.        ],
+       [ 1.25233884,  0.64324204,  0.        ],
+       [ 2.14259107,  0.84118581,  0.        ],
+       [ 2.95645589,  2.21676944,  0.        ],
+       [ 4.11128168,  2.75781563,  0.        ],
+       [-0.54025213, -0.6654458 ,  0.        ],
+       [-0.5198769 , -0.61001686,  0.        ],
+       [-0.3333273 , -0.56271731,  0.        ],
+       [ 0.0304175 , -0.28623875,  0.        ],
+       [ 0.13550694, -0.15477596,  0.        ],
+       [-0.54558041, -0.69654679,  2.        ],
+       [-0.53566872, -0.61954045,  2.        ],
+       [-0.56094543, -0.58026359,  2.        ],
+       [-0.44776842, -0.36136894,  2.        ],
+       [-0.42068118, -0.24865385,  2.        ],
+       [-0.62272901, -0.93372268,  3.        ],
+       [-0.62148121, -0.91958445,  3.        ],
+       [-0.62272357, -0.90784563,  3.        ],
+       [-0.61735451, -0.8595581 ,  3.        ],
+       [-0.61374161, -0.82630211,  3.        ],
+       [-0.59750395, -0.93911703,  3.        ],
+       [-0.61461425, -0.92586868,  3.        ],
+       [-0.62060585, -0.91733996,  3.        ],
+       [-0.54318812, -0.84725987,  3.        ],
+       [-0.54905466, -0.67399173,  3.        ],
+       [-0.52958198, -0.59664114,  3.        ],
+       [-0.53723458, -0.53909508,  3.        ],
+       [-0.37602966, -0.16801571,  3.        ],
+       [-0.30255648,  0.00646247,  3.        ],
+       [ 0.6594916 ,  0.78415268,  0.        ],
+       [ 1.00803993,  1.09443114,  0.        ],
+       [ 2.0912357 ,  2.78503525,  0.        ],
+       [ 2.36604988,  3.45230994,  0.        ],
+       [-0.56637157, -0.66681073,  1.        ],
+       [-0.56992738, -0.5843498 ,  1.        ],
+       [-0.56939184, -0.49305032,  1.        ],
+       [-0.50867935, -0.30836695,  5.        ],
+       [-0.47635899, -0.1712172 ,  5.        ],
+       [-0.51537504, -0.06655233,  5.        ],
+       [-0.29901427,  0.51129215,  5.        ],
+       [ 0.49549204, -0.21636004,  1.        ],
+       [-0.62745649, -0.96422641,  5.        ],
+       [-0.62666541, -0.95661166,  5.        ],
+       [-0.62619239, -0.95264422,  5.        ],
+       [-0.62332436, -0.93445592,  5.        ],
+       [-0.62088857, -0.92573443,  5.        ],
+       [-0.62226686, -0.74980181,  3.        ],
+       [-0.62229948, -0.70692756,  3.        ],
+       [-0.62329174, -0.65981736,  3.        ],
+       [-0.59928186, -0.46034169,  3.        ],
+       [-0.59352405, -0.37808386,  3.        ],
+       [-0.59263238, -0.63832946,  5.        ],
+       [-0.59709889, -0.58641184,  5.        ],
+       [-0.60466994, -0.5445514 ,  5.        ],
+       [-0.5452705 , -0.29804986,  5.        ],
+       [-0.52020855, -0.16303961,  5.        ],
+       [ 0.20877895,  0.3931173 ,  0.        ],
+       [ 0.72650559,  0.68595965,  0.        ],
+       [ 1.7891168 ,  1.72101584,  0.        ],
+       [ 2.19048034,  2.24345547,  0.        ]])</code></pre>
+</div>
+</div>
+</section>
+<section id="with-onehotencoder" class="level2">
+<h2 class="anchored" data-anchor-id="with-onehotencoder">With OneHotEncoder</h2>
+<div class="cell" data-execution_count="202">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'numerical'</span>, StandardScaler(), [<span class="st">'fdi'</span>, <span class="st">'gdp'</span>]),</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'categorical'</span>, OneHotEncoder(), [<span class="st">'reg'</span>])</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="203">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ct.fit_transform(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="203">
+<pre><code>array([[-0.54088554, -0.48498461,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.52313911, -0.37867596,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.52763824, -0.30924305,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.24862668,  0.06760246,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.18779748,  0.28248491,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.16975183, -0.44030651,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.15861681, -0.24178957,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.0317657 , -0.12264395,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.60997938,  0.41275831,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.74965914,  0.71036505,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.43826722, -0.31197638,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.33241116, -0.1796306 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [ 0.30550625, -0.33653668,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.41600281, -0.21553212,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.07908699, -0.12669573,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.24802608,  0.3208564 ,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.47641082,  0.60738699,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.61051202, -0.80327715,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.61082193, -0.77244122,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.61943145, -0.59251706,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [ 2.43926479,  0.86431921,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 2.45369736,  1.33958151,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 1.49921217,  1.74273266,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 3.31727285,  3.5918763 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 4.02826654,  4.48506828,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.48483258, -0.62647875,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.51402938, -0.55010927,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.51367597, -0.49892317,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.50583579, -0.16757679,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.44152672,  0.01784327,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.62066294, -0.8072291 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.6170745 , -0.77047901,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.61517155, -0.7389959 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.60195143, -0.58190909,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.59307006, -0.48807939,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.32298609, -0.7686304 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.44281257, -0.11631841,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.02938719,  1.35763727,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.54567284, -0.4420725 ,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.53092492, -0.35845489,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.53998028, -0.28612859,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.1631377 ,  0.08469433,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.06063084,  0.23826293,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.47412981, -0.11476413,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.51746286,  0.05434551,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.48092608,  0.19759014,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.12582615,  1.14342438,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 0.20484254,  1.59949491,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.37092157, -0.37425755,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.23962569, -0.25937715,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.20096576, -0.16563352,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 0.03817341,  0.3266432 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 0.12453776,  0.62199511,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.44305724, -0.3732076 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.38273622, -0.26992488,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [-0.35062246, -0.18240867,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 0.07754287,  0.33889839,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 0.2616295 ,  0.64027463,  0.        ,  0.        ,  0.        ,
+         0.        ,  1.        ,  0.        ],
+       [ 1.02472886,  0.34047332,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 1.25233884,  0.64324204,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 2.14259107,  0.84118581,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 2.95645589,  2.21676944,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 4.11128168,  2.75781563,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.54025213, -0.6654458 ,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.5198769 , -0.61001686,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.3333273 , -0.56271731,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.0304175 , -0.28623875,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.13550694, -0.15477596,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.54558041, -0.69654679,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.53566872, -0.61954045,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.56094543, -0.58026359,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.44776842, -0.36136894,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.42068118, -0.24865385,  0.        ,  0.        ,  1.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.62272901, -0.93372268,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.62148121, -0.91958445,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.62272357, -0.90784563,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.61735451, -0.8595581 ,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.61374161, -0.82630211,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.59750395, -0.93911703,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.61461425, -0.92586868,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.62060585, -0.91733996,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.54318812, -0.84725987,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.54905466, -0.67399173,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.52958198, -0.59664114,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.53723458, -0.53909508,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.37602966, -0.16801571,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.30255648,  0.00646247,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [ 0.6594916 ,  0.78415268,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 1.00803993,  1.09443114,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 2.0912357 ,  2.78503525,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 2.36604988,  3.45230994,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.56637157, -0.66681073,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.56992738, -0.5843498 ,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.56939184, -0.49305032,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.50867935, -0.30836695,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.47635899, -0.1712172 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.51537504, -0.06655233,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.29901427,  0.51129215,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [ 0.49549204, -0.21636004,  0.        ,  1.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [-0.62745649, -0.96422641,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.62666541, -0.95661166,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.62619239, -0.95264422,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.62332436, -0.93445592,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.62088857, -0.92573443,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.62226686, -0.74980181,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.62229948, -0.70692756,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.62329174, -0.65981736,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.59928186, -0.46034169,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.59352405, -0.37808386,  0.        ,  0.        ,  0.        ,
+         1.        ,  0.        ,  0.        ],
+       [-0.59263238, -0.63832946,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.59709889, -0.58641184,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.60466994, -0.5445514 ,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.5452705 , -0.29804986,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [-0.52020855, -0.16303961,  0.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  1.        ],
+       [ 0.20877895,  0.3931173 ,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 0.72650559,  0.68595965,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 1.7891168 ,  1.72101584,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ],
+       [ 2.19048034,  2.24345547,  1.        ,  0.        ,  0.        ,
+         0.        ,  0.        ,  0.        ]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="204">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="205">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="205">
+<pre><code>4       195580.0
+6       434149.0
+7       619201.0
+10     1457872.0
+11     2213991.0
+         ...    
+347    2482173.0
+354     365437.0
+355     391292.0
+358    1017303.0
+359     844647.0
+Name: specific, Length: 118, dtype: float64</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="206">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>X.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="206">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">province</th>
+<th data-quarto-table-cell-role="th">general</th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">gdp</th>
+<th data-quarto-table-cell-role="th">fdi</th>
+<th data-quarto-table-cell-role="th">rnr</th>
+<th data-quarto-table-cell-role="th">rr</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">fr</th>
+<th data-quarto-table-cell-role="th">reg</th>
+<th data-quarto-table-cell-role="th">it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Anhui</td>
+<td>32100.0</td>
+<td>2000</td>
+<td>2902.09</td>
+<td>31847</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>1601508</td>
+<td>East China</td>
+<td>1499110</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Anhui</td>
+<td>66529.0</td>
+<td>2002</td>
+<td>3519.72</td>
+<td>38375</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>1677840</td>
+<td>East China</td>
+<td>2404936</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Anhui</td>
+<td>52108.0</td>
+<td>2003</td>
+<td>3923.11</td>
+<td>36720</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.000000</td>
+<td>1896479</td>
+<td>East China</td>
+<td>2815820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Anhui</td>
+<td>279052.0</td>
+<td>2006</td>
+<td>6112.50</td>
+<td>139354</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.324324</td>
+<td>3434548</td>
+<td>East China</td>
+<td>5167300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Anhui</td>
+<td>178705.0</td>
+<td>2007</td>
+<td>7360.92</td>
+<td>299892</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.324324</td>
+<td>4468640</td>
+<td>East China</td>
+<td>7040099</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="are-three-categories-already-encoded-in-the-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="are-three-categories-already-encoded-in-the-dataset">Are three categories already encoded in the dataset?</h3>
+<div class="cell" data-execution_count="207">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>X.dtypes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="207">
+<pre><code>province     object
+general     float64
+year          int64
+gdp         float64
+fdi           int64
+rnr         float64
+rr          float64
+i           float64
+fr           object
+reg          object
+it            int64
+dtype: object</code></pre>
+</div>
+</div>
+</section>
+<section id="are-there-missing-values-in-the-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="are-there-missing-values-in-the-dataset">Are there missing values in the dataset?</h3>
+<div class="cell" data-execution_count="208">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>missing_values <span class="op">=</span> pd.concat({<span class="st">"na_cnt"</span>: X.isna().<span class="bu">sum</span>(), <span class="st">"dtypes"</span>: X.dtypes}, axis<span class="op">=</span><span class="st">'columns'</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>missing_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="208">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">na_cnt</th>
+<th data-quarto-table-cell-role="th">dtypes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">province</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">general</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">year</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">gdp</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">fdi</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">rnr</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">rr</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">i</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">fr</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">reg</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">it</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="split-data-into-training-and-test-set" class="level3">
+<h3 class="anchored" data-anchor-id="split-data-into-training-and-test-set">Split data into training and test set</h3>
+<div class="cell" data-execution_count="209">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    X, y, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="columntransformer" class="level2">
+<h2 class="anchored" data-anchor-id="columntransformer">ColumnTransformer</h2>
+<div class="cell" data-execution_count="210">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>missing_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="210">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">na_cnt</th>
+<th data-quarto-table-cell-role="th">dtypes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">province</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">general</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">year</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">gdp</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">fdi</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">rnr</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">rr</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">i</td>
+<td>0</td>
+<td>float64</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">fr</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">reg</td>
+<td>0</td>
+<td>object</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">it</td>
+<td>0</td>
+<td>int64</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="211">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="211">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">province</th>
+<th data-quarto-table-cell-role="th">general</th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">gdp</th>
+<th data-quarto-table-cell-role="th">fdi</th>
+<th data-quarto-table-cell-role="th">rnr</th>
+<th data-quarto-table-cell-role="th">rr</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">fr</th>
+<th data-quarto-table-cell-role="th">reg</th>
+<th data-quarto-table-cell-role="th">it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Anhui</td>
+<td>32100.0</td>
+<td>2000</td>
+<td>2902.09</td>
+<td>31847</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1601508</td>
+<td>East China</td>
+<td>1499110</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Anhui</td>
+<td>66529.0</td>
+<td>2002</td>
+<td>3519.72</td>
+<td>38375</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1677840</td>
+<td>East China</td>
+<td>2404936</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Anhui</td>
+<td>52108.0</td>
+<td>2003</td>
+<td>3923.11</td>
+<td>36720</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1896479</td>
+<td>East China</td>
+<td>2815820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Anhui</td>
+<td>279052.0</td>
+<td>2006</td>
+<td>6112.50</td>
+<td>139354</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>3434548</td>
+<td>East China</td>
+<td>5167300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Anhui</td>
+<td>178705.0</td>
+<td>2007</td>
+<td>7360.92</td>
+<td>299892</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>4468640</td>
+<td>East China</td>
+<td>7040099</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">347</td>
+<td>Yunnan</td>
+<td>564400.0</td>
+<td>2007</td>
+<td>4772.52</td>
+<td>39453</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4867146</td>
+<td>Southwest China</td>
+<td>6832541</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">354</td>
+<td>Zhejiang</td>
+<td>321686.0</td>
+<td>2002</td>
+<td>8003.67</td>
+<td>307610</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4958329</td>
+<td>East China</td>
+<td>1962633</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">355</td>
+<td>Zhejiang</td>
+<td>260313.0</td>
+<td>2003</td>
+<td>9705.02</td>
+<td>498055</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>6217715</td>
+<td>East China</td>
+<td>2261631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">358</td>
+<td>Zhejiang</td>
+<td>394795.0</td>
+<td>2006</td>
+<td>15718.47</td>
+<td>888935</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>11537149</td>
+<td>East China</td>
+<td>2553268</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">359</td>
+<td>Zhejiang</td>
+<td>0.0</td>
+<td>2007</td>
+<td>18753.73</td>
+<td>1036576</td>
+<td>0.047619</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>16494981</td>
+<td>East China</td>
+<td>2939778</td>
+</tr>
+</tbody>
+</table>
+
+<p>118 rows × 11 columns</p>
+</div>
+</div>
+</div>
+<section id="numerical-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="numerical-preprocessing">Numerical preprocessing</h3>
+<div class="cell" data-execution_count="212">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>numerical_features <span class="op">=</span> [<span class="st">'general'</span>, <span class="st">'gdp'</span>, <span class="st">'fdi'</span>, <span class="st">'i'</span>, <span class="st">'rr'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="213">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>num_prep <span class="op">=</span> Pipeline([</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'imputer'</span>, SimpleImputer()),</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'scaler'</span>, StandardScaler())</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="214">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>num_prep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="214">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="c131c942-0423-4e14-acac-cddada9ba4d8" type="checkbox"><label class="sk-toggleable__label" for="c131c942-0423-4e14-acac-cddada9ba4d8">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('imputer', SimpleImputer()), ('scaler', StandardScaler())])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="05538481-f77f-4c5f-a041-efd4375e3fb9" type="checkbox"><label class="sk-toggleable__label" for="05538481-f77f-4c5f-a041-efd4375e3fb9">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="5f3931c7-8271-4a71-af48-0e88f103b347" type="checkbox"><label class="sk-toggleable__label" for="5f3931c7-8271-4a71-af48-0e88f103b347">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<section id="running-only-on-numerical-features" class="level4">
+<h4 class="anchored" data-anchor-id="running-only-on-numerical-features">Running only on numerical features</h4>
+<div class="cell" data-execution_count="215">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>num_trans <span class="op">=</span> num_prep.fit_transform(X_train[numerical_features])</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>num_trans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="215">
+<pre><code>array([[ 0.84445696, -0.23824571,  0.05133332, -0.46886997,  1.84019633],
+       [ 0.24766853,  2.07395803,  1.57444985, -0.46886997, -0.43195321],
+       [-0.72214407, -0.0446055 , -0.43939868, -0.46886997, -0.43195321],
+       [-0.48856958, -0.11992158, -0.34379901, -0.46886997, -0.43195321],
+       [ 0.85337791, -0.87758205, -0.54348651, -0.46886997, -0.43195321],
+       [-0.62992082, -0.83196322, -0.62382665, -0.46886997,  0.17004293],
+       [-0.83650183,  3.23074054,  4.28312405,  1.06326271, -0.43195321],
+       [ 1.76828095, -0.19541419, -0.41644878, -0.46886997, -0.43195321],
+       [ 1.78635605,  0.89747804,  0.79717537, -0.46886997,  3.97033652],
+       [-0.01481382, -0.57518987, -0.60442312,  3.47737968, -0.43195321],
+       [-0.33025804, -0.71766019, -0.62552372, -0.46886997, -0.43195321],
+       [-0.75781248, -0.70583032, -0.54596728, -0.46886997, -0.43195321],
+       [ 0.18859962, -0.10301925, -0.50475274, -0.46886997,  1.78339259],
+       [ 3.61705142,  1.91072514,  0.2322093 , -0.46886997, -0.43195321],
+       [-0.52047074, -0.52639929, -0.53731279, -0.46886997, -0.43195321],
+       [-0.35308192, -0.41382042, -0.15623907,  2.47473995, -0.43195321],
+       [ 0.51483816, -0.85369871, -0.61664935, -0.46886997, -0.43195321],
+       [ 2.42485843, -0.08843151,  0.16030939, -0.46886997,  1.84019633],
+       [-0.63055638, -0.3205428 , -0.53076977, -0.46886997, -0.43195321],
+       [-0.81570508, -0.2076344 , -0.22869714,  0.25314756, -0.43195321],
+       [-0.06101258, -0.78797637, -0.31514053, -0.46886997, -0.43195321],
+       [-0.022315  ,  0.78012485,  0.51382125, -0.46886997, -0.43195321],
+       [-0.37712312, -0.55331904, -0.3258642 ,  2.14150109, -0.43195321],
+       [ 2.33926246, -0.46826211, -0.59521328,  3.47737968, -0.43195321],
+       [ 0.62612061, -0.10351944, -0.37014586, -0.46886997, -0.43195321],
+       [-0.1455937 , -0.05181405, -0.01314966, -0.46886997,  3.97033652],
+       [-0.69280823, -0.04283426, -0.47187415, -0.46886997, -0.43195321],
+       [-0.15946076, -0.25170559, -0.5456459 , -0.46886997, -0.43195321],
+       [-0.80637666, -0.98226192, -0.59981116, -0.46886997, -0.43195321],
+       [-0.45208878, -0.48061962, -0.51288289, -0.46886997,  1.78339259],
+       [ 0.4867555 , -0.58727866, -0.62254962,  0.24317887, -0.43195321],
+       [-0.74721037, -0.26346288, -0.50770147, -0.46886997, -0.26580227],
+       [ 0.71498921, -0.96701118, -0.62406064,  0.76534802, -0.43195321],
+       [-0.6776111 , -0.6259812 , -0.48297275,  1.75272242, -0.43195321],
+       [ 0.20388901,  0.55832718,  0.6523297 , -0.46886997,  3.97033652],
+       [-0.68462536, -0.15766887,  0.45117911, -0.46886997,  1.22955614],
+       [-0.68130147, -0.59197843, -0.52937716, -0.46886997, -0.43195321],
+       [-0.1213603 ,  0.16498962, -0.23803102,  1.33242116, -0.43195321],
+       [-0.68649617, -0.8274596 , -0.61330032, -0.46886997,  0.42010287],
+       [-0.73244378, -0.41583293, -0.54606312, -0.46886997, -0.43195321],
+       [-0.75418874, -0.67194329, -0.56752738, -0.46886997, -0.43195321],
+       [-0.11822093, -0.18759169, -0.14469223,  2.47473995, -0.43195321],
+       [-0.5606009 , -0.89159703, -0.62039587, -0.46886997, -0.43195321],
+       [-0.70811556, -0.99767742, -0.6295606 ,  1.33242116, -0.43195321],
+       [-0.44276036, -0.47392695, -0.57065935, -0.46886997, -0.43195321],
+       [-0.61544895, -0.21965453, -0.37710046, -0.46886997, -0.43195321],
+       [-0.57791999, -0.10080471, -0.18860741, -0.46886997,  0.18342062],
+       [ 2.23213936, -0.34291185, -0.59568406, -0.46886997, -0.43195321],
+       [ 2.06354861,  1.39098988, -0.11068883, -0.46886997, -0.43195321],
+       [-0.79190991, -0.9574449 , -0.62376745,  0.24317887, -0.43195321],
+       [ 0.26443406,  2.61416753,  3.08558822,  1.06326271, -0.43195321],
+       [-0.01209987,  0.53594439,  0.23629128, -0.46886997, -0.43195321],
+       [-0.80634591, -0.96716418, -0.61755426, -0.46886997, -0.43195321],
+       [-0.16938374,  0.8696658 ,  0.77316551, -0.27051351, -0.23415447],
+       [-0.04311944,  0.18446741, -0.14938031,  0.73199078, -0.43195321],
+       [-0.68041476,  0.47595163,  1.08241827, -0.18405044, -0.43195321],
+       [-0.76631569, -0.33855142, -0.36484886, -0.46886997,  1.06490206],
+       [-0.71942755, -1.0021987 , -0.63005112, -0.46886997,  1.28493979],
+       [ 2.56991029,  0.81760341,  0.29109646, -0.46886997,  1.99108126],
+       [-0.74181833, -0.94662522, -0.62596349, -0.46886997, -0.43195321],
+       [-0.39172056, -0.75420507, -0.61813217,  0.73199078, -0.43195321],
+       [-0.74252565, -0.58032118, -0.59939112, -0.46886997, -0.43195321],
+       [-0.52984786,  0.82098506,  1.31844616, -0.46886997, -0.43195321],
+       [-0.75226924, -0.67038781, -0.54044193, -0.46886997, -0.43195321],
+       [-0.51722886, -0.15861235,  0.53360817, -0.46886997, -0.43195321],
+       [ 0.94307429,  1.63510561,  0.0502649 , -0.46886997,  2.33722904],
+       [ 2.27493734,  0.10828435, -0.43806527,  0.81281795, -0.43195321],
+       [-0.62666612, -0.76651942, -0.62548989, -0.46886997, -0.43195321],
+       [-0.66600439, -0.34358661, -0.52269601, -0.46886997, -0.43195321],
+       [ 2.40153737,  0.79677218,  0.14893452, -0.46886997,  0.18342062],
+       [ 0.09391613,  1.61452938,  2.56423569, -0.46886997, -0.43195321],
+       [-0.70296186, -0.26446128, -0.52736154, -0.46886997, -0.43195321],
+       [ 0.44208927,  4.18123112,  3.45974963, -0.46886997, -0.43195321],
+       [-0.78308892, -1.01087642, -0.63087146, -0.46886997,  0.89725427],
+       [-0.54691067,  0.98156598,  0.70367308, -0.46886997, -0.43195321],
+       [ 0.60991632, -0.09784872, -0.51965707, -0.46886997, -0.43195321],
+       [-0.76052643, -0.96000271, -0.62467519, -0.46886997,  0.33726408],
+       [ 1.93383484,  0.09531485, -0.29395536,  4.04373958, -0.43195321],
+       [-0.76653353, -0.6801267 , -0.54957002, -0.46886997, -0.43195321],
+       [-0.83650183,  2.64457877,  2.29128386, -0.46886997, -0.43195321],
+       [-0.51706228,  1.07292328,  2.54926935, -0.46886997, -0.43195321],
+       [-0.39173081,  1.0465606 ,  2.24162345, -0.46886997, -0.43195321],
+       [ 0.54861269, -0.32386364, -0.44453781, -0.46886997, -0.43195321],
+       [-0.41346552, -0.66397367, -0.62655268, -0.46886997, -0.43195321],
+       [-0.66187067, -0.05643144,  0.1018028 ,  1.19732432, -0.43195321],
+       [-0.61096157, -0.57797129, -0.5712147 , -0.46886997, -0.43195321],
+       [ 0.34407676,  0.4601909 ,  0.05937608, -0.46886997,  0.18342062],
+       [-0.46490255, -0.97695015, -0.62658651,  1.7874348 , -0.43195321]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="216">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>num_trans.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="216">
+<pre><code>(88, 5)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="217">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="217">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">province</th>
+<th data-quarto-table-cell-role="th">general</th>
+<th data-quarto-table-cell-role="th">year</th>
+<th data-quarto-table-cell-role="th">gdp</th>
+<th data-quarto-table-cell-role="th">fdi</th>
+<th data-quarto-table-cell-role="th">rnr</th>
+<th data-quarto-table-cell-role="th">rr</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">fr</th>
+<th data-quarto-table-cell-role="th">reg</th>
+<th data-quarto-table-cell-role="th">it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Anhui</td>
+<td>32100.0</td>
+<td>2000</td>
+<td>2902.09</td>
+<td>31847</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1601508</td>
+<td>East China</td>
+<td>1499110</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>Anhui</td>
+<td>66529.0</td>
+<td>2002</td>
+<td>3519.72</td>
+<td>38375</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1677840</td>
+<td>East China</td>
+<td>2404936</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>Anhui</td>
+<td>52108.0</td>
+<td>2003</td>
+<td>3923.11</td>
+<td>36720</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1896479</td>
+<td>East China</td>
+<td>2815820</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10</td>
+<td>Anhui</td>
+<td>279052.0</td>
+<td>2006</td>
+<td>6112.50</td>
+<td>139354</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>3434548</td>
+<td>East China</td>
+<td>5167300</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">11</td>
+<td>Anhui</td>
+<td>178705.0</td>
+<td>2007</td>
+<td>7360.92</td>
+<td>299892</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.324324</td>
+<td>4468640</td>
+<td>East China</td>
+<td>7040099</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">347</td>
+<td>Yunnan</td>
+<td>564400.0</td>
+<td>2007</td>
+<td>4772.52</td>
+<td>39453</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4867146</td>
+<td>Southwest China</td>
+<td>6832541</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">354</td>
+<td>Zhejiang</td>
+<td>321686.0</td>
+<td>2002</td>
+<td>8003.67</td>
+<td>307610</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>4958329</td>
+<td>East China</td>
+<td>1962633</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">355</td>
+<td>Zhejiang</td>
+<td>260313.0</td>
+<td>2003</td>
+<td>9705.02</td>
+<td>498055</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>6217715</td>
+<td>East China</td>
+<td>2261631</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">358</td>
+<td>Zhejiang</td>
+<td>394795.0</td>
+<td>2006</td>
+<td>15718.47</td>
+<td>888935</td>
+<td>1.214286</td>
+<td>0.035714</td>
+<td>0.035714</td>
+<td>11537149</td>
+<td>East China</td>
+<td>2553268</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">359</td>
+<td>Zhejiang</td>
+<td>0.0</td>
+<td>2007</td>
+<td>18753.73</td>
+<td>1036576</td>
+<td>0.047619</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>16494981</td>
+<td>East China</td>
+<td>2939778</td>
+</tr>
+</tbody>
+</table>
+
+<p>118 rows × 11 columns</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="categorical-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="categorical-preprocessing">Categorical preprocessing</h3>
+<div class="cell" data-execution_count="218">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>categorical_features <span class="op">=</span> [<span class="st">'province'</span>, <span class="st">'reg'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="219">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>cat_prep <span class="op">=</span> Pipeline([</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'imputer'</span>, SimpleImputer(strategy<span class="op">=</span><span class="st">'constant'</span>, fill_value<span class="op">=</span><span class="st">'sk_missing'</span>)),</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'ohe'</span>, OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">'ignore'</span>, sparse<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="220">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>cat_prep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="220">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="038941dd-4ef5-4b72-ac2b-59a230098729" type="checkbox"><label class="sk-toggleable__label" for="038941dd-4ef5-4b72-ac2b-59a230098729">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('imputer',
+                 SimpleImputer(fill_value='sk_missing', strategy='constant')),
+                ('ohe', OneHotEncoder(handle_unknown='ignore', sparse=False))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="8cb21aae-d8f9-46a8-a01f-5c79810516f9" type="checkbox"><label class="sk-toggleable__label" for="8cb21aae-d8f9-46a8-a01f-5c79810516f9">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="70b55e21-1485-45dd-ba64-efcb3f5cf712" type="checkbox"><label class="sk-toggleable__label" for="70b55e21-1485-45dd-ba64-efcb3f5cf712">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<section id="running-only-on-the-categorical-features" class="level4">
+<h4 class="anchored" data-anchor-id="running-only-on-the-categorical-features">Running only on the categorical features</h4>
+<div class="cell" data-execution_count="221">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>cat_trans <span class="op">=</span> cat_prep.fit_transform(X_train[categorical_features])</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>cat_trans</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="221">
+<pre><code>array([[0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 1., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 1., 0.],
+       [0., 0., 0., ..., 0., 0., 1.]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="222">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>cat_trans.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="222">
+<pre><code>(88, 33)</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="columntransformer-1" class="level2">
+<h2 class="anchored" data-anchor-id="columntransformer-1">ColumnTransformer!</h2>
+<div class="cell" data-execution_count="223">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> ColumnTransformer([</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>   (<span class="st">'numerical'</span>, num_prep, numerical_features),</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>   (<span class="st">'categorical'</span>, cat_prep, categorical_features)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="224">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>ct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="224">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="f91724e8-5062-4d0d-9e45-effbcb242a60" type="checkbox"><label class="sk-toggleable__label" for="f91724e8-5062-4d0d-9e45-effbcb242a60">ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical',
+                                 Pipeline(steps=[('imputer', SimpleImputer()),
+                                                 ('scaler', StandardScaler())]),
+                                 ['general', 'gdp', 'fdi', 'i', 'rr']),
+                                ('categorical',
+                                 Pipeline(steps=[('imputer',
+                                                  SimpleImputer(fill_value='sk_missing',
+                                                                strategy='constant')),
+                                                 ('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False))]),
+                                 ['province', 'reg'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="31f75f22-3ab9-4fdb-a6ba-0b730259eee8" type="checkbox"><label class="sk-toggleable__label" for="31f75f22-3ab9-4fdb-a6ba-0b730259eee8">numerical</label><div class="sk-toggleable__content"><pre>['general', 'gdp', 'fdi', 'i', 'rr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="92fbbd7d-5fa7-41af-bdbb-7681631b26a1" type="checkbox"><label class="sk-toggleable__label" for="92fbbd7d-5fa7-41af-bdbb-7681631b26a1">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="887ab845-9398-4312-be3a-d700a1f2d41f" type="checkbox"><label class="sk-toggleable__label" for="887ab845-9398-4312-be3a-d700a1f2d41f">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="77139fa5-db41-4a04-b0fe-eb999cc67fe0" type="checkbox"><label class="sk-toggleable__label" for="77139fa5-db41-4a04-b0fe-eb999cc67fe0">categorical</label><div class="sk-toggleable__content"><pre>['province', 'reg']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="b684e0f4-9e34-4ba7-9f87-fa16a354ee80" type="checkbox"><label class="sk-toggleable__label" for="b684e0f4-9e34-4ba7-9f87-fa16a354ee80">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="0adc9a77-98d9-46b1-8b27-f2ed57c1ef6b" type="checkbox"><label class="sk-toggleable__label" for="0adc9a77-98d9-46b1-8b27-f2ed57c1ef6b">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="225">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>X_trans <span class="op">=</span> ct.fit_transform(X_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="226">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>X_trans[:, :<span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="226">
+<pre><code>array([[ 0.84445696, -0.23824571,  0.05133332, -0.46886997,  1.84019633],
+       [ 0.24766853,  2.07395803,  1.57444985, -0.46886997, -0.43195321],
+       [-0.72214407, -0.0446055 , -0.43939868, -0.46886997, -0.43195321],
+       [-0.48856958, -0.11992158, -0.34379901, -0.46886997, -0.43195321],
+       [ 0.85337791, -0.87758205, -0.54348651, -0.46886997, -0.43195321],
+       [-0.62992082, -0.83196322, -0.62382665, -0.46886997,  0.17004293],
+       [-0.83650183,  3.23074054,  4.28312405,  1.06326271, -0.43195321],
+       [ 1.76828095, -0.19541419, -0.41644878, -0.46886997, -0.43195321],
+       [ 1.78635605,  0.89747804,  0.79717537, -0.46886997,  3.97033652],
+       [-0.01481382, -0.57518987, -0.60442312,  3.47737968, -0.43195321],
+       [-0.33025804, -0.71766019, -0.62552372, -0.46886997, -0.43195321],
+       [-0.75781248, -0.70583032, -0.54596728, -0.46886997, -0.43195321],
+       [ 0.18859962, -0.10301925, -0.50475274, -0.46886997,  1.78339259],
+       [ 3.61705142,  1.91072514,  0.2322093 , -0.46886997, -0.43195321],
+       [-0.52047074, -0.52639929, -0.53731279, -0.46886997, -0.43195321],
+       [-0.35308192, -0.41382042, -0.15623907,  2.47473995, -0.43195321],
+       [ 0.51483816, -0.85369871, -0.61664935, -0.46886997, -0.43195321],
+       [ 2.42485843, -0.08843151,  0.16030939, -0.46886997,  1.84019633],
+       [-0.63055638, -0.3205428 , -0.53076977, -0.46886997, -0.43195321],
+       [-0.81570508, -0.2076344 , -0.22869714,  0.25314756, -0.43195321],
+       [-0.06101258, -0.78797637, -0.31514053, -0.46886997, -0.43195321],
+       [-0.022315  ,  0.78012485,  0.51382125, -0.46886997, -0.43195321],
+       [-0.37712312, -0.55331904, -0.3258642 ,  2.14150109, -0.43195321],
+       [ 2.33926246, -0.46826211, -0.59521328,  3.47737968, -0.43195321],
+       [ 0.62612061, -0.10351944, -0.37014586, -0.46886997, -0.43195321],
+       [-0.1455937 , -0.05181405, -0.01314966, -0.46886997,  3.97033652],
+       [-0.69280823, -0.04283426, -0.47187415, -0.46886997, -0.43195321],
+       [-0.15946076, -0.25170559, -0.5456459 , -0.46886997, -0.43195321],
+       [-0.80637666, -0.98226192, -0.59981116, -0.46886997, -0.43195321],
+       [-0.45208878, -0.48061962, -0.51288289, -0.46886997,  1.78339259],
+       [ 0.4867555 , -0.58727866, -0.62254962,  0.24317887, -0.43195321],
+       [-0.74721037, -0.26346288, -0.50770147, -0.46886997, -0.26580227],
+       [ 0.71498921, -0.96701118, -0.62406064,  0.76534802, -0.43195321],
+       [-0.6776111 , -0.6259812 , -0.48297275,  1.75272242, -0.43195321],
+       [ 0.20388901,  0.55832718,  0.6523297 , -0.46886997,  3.97033652],
+       [-0.68462536, -0.15766887,  0.45117911, -0.46886997,  1.22955614],
+       [-0.68130147, -0.59197843, -0.52937716, -0.46886997, -0.43195321],
+       [-0.1213603 ,  0.16498962, -0.23803102,  1.33242116, -0.43195321],
+       [-0.68649617, -0.8274596 , -0.61330032, -0.46886997,  0.42010287],
+       [-0.73244378, -0.41583293, -0.54606312, -0.46886997, -0.43195321],
+       [-0.75418874, -0.67194329, -0.56752738, -0.46886997, -0.43195321],
+       [-0.11822093, -0.18759169, -0.14469223,  2.47473995, -0.43195321],
+       [-0.5606009 , -0.89159703, -0.62039587, -0.46886997, -0.43195321],
+       [-0.70811556, -0.99767742, -0.6295606 ,  1.33242116, -0.43195321],
+       [-0.44276036, -0.47392695, -0.57065935, -0.46886997, -0.43195321],
+       [-0.61544895, -0.21965453, -0.37710046, -0.46886997, -0.43195321],
+       [-0.57791999, -0.10080471, -0.18860741, -0.46886997,  0.18342062],
+       [ 2.23213936, -0.34291185, -0.59568406, -0.46886997, -0.43195321],
+       [ 2.06354861,  1.39098988, -0.11068883, -0.46886997, -0.43195321],
+       [-0.79190991, -0.9574449 , -0.62376745,  0.24317887, -0.43195321],
+       [ 0.26443406,  2.61416753,  3.08558822,  1.06326271, -0.43195321],
+       [-0.01209987,  0.53594439,  0.23629128, -0.46886997, -0.43195321],
+       [-0.80634591, -0.96716418, -0.61755426, -0.46886997, -0.43195321],
+       [-0.16938374,  0.8696658 ,  0.77316551, -0.27051351, -0.23415447],
+       [-0.04311944,  0.18446741, -0.14938031,  0.73199078, -0.43195321],
+       [-0.68041476,  0.47595163,  1.08241827, -0.18405044, -0.43195321],
+       [-0.76631569, -0.33855142, -0.36484886, -0.46886997,  1.06490206],
+       [-0.71942755, -1.0021987 , -0.63005112, -0.46886997,  1.28493979],
+       [ 2.56991029,  0.81760341,  0.29109646, -0.46886997,  1.99108126],
+       [-0.74181833, -0.94662522, -0.62596349, -0.46886997, -0.43195321],
+       [-0.39172056, -0.75420507, -0.61813217,  0.73199078, -0.43195321],
+       [-0.74252565, -0.58032118, -0.59939112, -0.46886997, -0.43195321],
+       [-0.52984786,  0.82098506,  1.31844616, -0.46886997, -0.43195321],
+       [-0.75226924, -0.67038781, -0.54044193, -0.46886997, -0.43195321],
+       [-0.51722886, -0.15861235,  0.53360817, -0.46886997, -0.43195321],
+       [ 0.94307429,  1.63510561,  0.0502649 , -0.46886997,  2.33722904],
+       [ 2.27493734,  0.10828435, -0.43806527,  0.81281795, -0.43195321],
+       [-0.62666612, -0.76651942, -0.62548989, -0.46886997, -0.43195321],
+       [-0.66600439, -0.34358661, -0.52269601, -0.46886997, -0.43195321],
+       [ 2.40153737,  0.79677218,  0.14893452, -0.46886997,  0.18342062],
+       [ 0.09391613,  1.61452938,  2.56423569, -0.46886997, -0.43195321],
+       [-0.70296186, -0.26446128, -0.52736154, -0.46886997, -0.43195321],
+       [ 0.44208927,  4.18123112,  3.45974963, -0.46886997, -0.43195321],
+       [-0.78308892, -1.01087642, -0.63087146, -0.46886997,  0.89725427],
+       [-0.54691067,  0.98156598,  0.70367308, -0.46886997, -0.43195321],
+       [ 0.60991632, -0.09784872, -0.51965707, -0.46886997, -0.43195321],
+       [-0.76052643, -0.96000271, -0.62467519, -0.46886997,  0.33726408],
+       [ 1.93383484,  0.09531485, -0.29395536,  4.04373958, -0.43195321],
+       [-0.76653353, -0.6801267 , -0.54957002, -0.46886997, -0.43195321],
+       [-0.83650183,  2.64457877,  2.29128386, -0.46886997, -0.43195321],
+       [-0.51706228,  1.07292328,  2.54926935, -0.46886997, -0.43195321],
+       [-0.39173081,  1.0465606 ,  2.24162345, -0.46886997, -0.43195321],
+       [ 0.54861269, -0.32386364, -0.44453781, -0.46886997, -0.43195321],
+       [-0.41346552, -0.66397367, -0.62655268, -0.46886997, -0.43195321],
+       [-0.66187067, -0.05643144,  0.1018028 ,  1.19732432, -0.43195321],
+       [-0.61096157, -0.57797129, -0.5712147 , -0.46886997, -0.43195321],
+       [ 0.34407676,  0.4601909 ,  0.05937608, -0.46886997,  0.18342062],
+       [-0.46490255, -0.97695015, -0.62658651,  1.7874348 , -0.43195321]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="227">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>X_trans[:, <span class="dv">5</span>:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="227">
+<pre><code>array([[0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 1., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 1., 0.],
+       [0., 0., 0., ..., 0., 0., 1.]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="228">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>X_trans.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="228">
+<pre><code>(88, 38)</code></pre>
+</div>
+</div>
+<section id="linear-model" class="level3">
+<h3 class="anchored" data-anchor-id="linear-model">Linear model</h3>
+<div class="cell" data-execution_count="229">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="230">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>lin_reg <span class="op">=</span> Pipeline([</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'preprocess'</span>, ct),</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'lin_reg'</span>, LinearRegression())</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>lin_reg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="230">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4f992efc-9cf9-4c41-b61f-4f609e0a2933" type="checkbox"><label class="sk-toggleable__label" for="4f992efc-9cf9-4c41-b61f-4f609e0a2933">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('preprocess',
+                 ColumnTransformer(transformers=[('numerical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer()),
+                                                                  ('scaler',
+                                                                   StandardScaler())]),
+                                                  ['general', 'gdp', 'fdi', 'i',
+                                                   'rr']),
+                                                 ('categorical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer(fill_value='sk_missing',
+                                                                                 strategy='constant')),
+                                                                  ('ohe',
+                                                                   OneHotEncoder(handle_unknown='ignore',
+                                                                                 sparse=False))]),
+                                                  ['province', 'reg'])])),
+                ('lin_reg', LinearRegression())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="5a6120d9-6291-438e-b527-dc324c9517c8" type="checkbox"><label class="sk-toggleable__label" for="5a6120d9-6291-438e-b527-dc324c9517c8">preprocess: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical',
+                                 Pipeline(steps=[('imputer', SimpleImputer()),
+                                                 ('scaler', StandardScaler())]),
+                                 ['general', 'gdp', 'fdi', 'i', 'rr']),
+                                ('categorical',
+                                 Pipeline(steps=[('imputer',
+                                                  SimpleImputer(fill_value='sk_missing',
+                                                                strategy='constant')),
+                                                 ('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False))]),
+                                 ['province', 'reg'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="e9bcade0-b7e0-4c81-abca-930c31a55461" type="checkbox"><label class="sk-toggleable__label" for="e9bcade0-b7e0-4c81-abca-930c31a55461">numerical</label><div class="sk-toggleable__content"><pre>['general', 'gdp', 'fdi', 'i', 'rr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="655ff3d1-a8cc-43fd-bf36-cdd2aa18db53" type="checkbox"><label class="sk-toggleable__label" for="655ff3d1-a8cc-43fd-bf36-cdd2aa18db53">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="818adc04-3533-477b-9362-e385e3a0180d" type="checkbox"><label class="sk-toggleable__label" for="818adc04-3533-477b-9362-e385e3a0180d">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4b1bf99c-4140-4e26-a76c-921b67b32c6a" type="checkbox"><label class="sk-toggleable__label" for="4b1bf99c-4140-4e26-a76c-921b67b32c6a">categorical</label><div class="sk-toggleable__content"><pre>['province', 'reg']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="c05d3963-291d-4286-9afa-223b29c0a579" type="checkbox"><label class="sk-toggleable__label" for="c05d3963-291d-4286-9afa-223b29c0a579">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="20f08436-47a9-4fc3-8d47-2bf7f6e30eb2" type="checkbox"><label class="sk-toggleable__label" for="20f08436-47a9-4fc3-8d47-2bf7f6e30eb2">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="28efe5f6-5187-4cbe-a160-c3a51aadc4b7" type="checkbox"><label class="sk-toggleable__label" for="28efe5f6-5187-4cbe-a160-c3a51aadc4b7">LinearRegression</label><div class="sk-toggleable__content"><pre>LinearRegression()</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="231">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>lin_reg.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="231">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="188becff-8fa7-491e-b45f-b766b1aa37eb" type="checkbox"><label class="sk-toggleable__label" for="188becff-8fa7-491e-b45f-b766b1aa37eb">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('preprocess',
+                 ColumnTransformer(transformers=[('numerical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer()),
+                                                                  ('scaler',
+                                                                   StandardScaler())]),
+                                                  ['general', 'gdp', 'fdi', 'i',
+                                                   'rr']),
+                                                 ('categorical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer(fill_value='sk_missing',
+                                                                                 strategy='constant')),
+                                                                  ('ohe',
+                                                                   OneHotEncoder(handle_unknown='ignore',
+                                                                                 sparse=False))]),
+                                                  ['province', 'reg'])])),
+                ('lin_reg', LinearRegression())])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="d10b3eb8-be36-465e-9a1e-f0e86b2b2109" type="checkbox"><label class="sk-toggleable__label" for="d10b3eb8-be36-465e-9a1e-f0e86b2b2109">preprocess: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical',
+                                 Pipeline(steps=[('imputer', SimpleImputer()),
+                                                 ('scaler', StandardScaler())]),
+                                 ['general', 'gdp', 'fdi', 'i', 'rr']),
+                                ('categorical',
+                                 Pipeline(steps=[('imputer',
+                                                  SimpleImputer(fill_value='sk_missing',
+                                                                strategy='constant')),
+                                                 ('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False))]),
+                                 ['province', 'reg'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="081d1f80-b2d5-4341-a44e-1598a89d3b25" type="checkbox"><label class="sk-toggleable__label" for="081d1f80-b2d5-4341-a44e-1598a89d3b25">numerical</label><div class="sk-toggleable__content"><pre>['general', 'gdp', 'fdi', 'i', 'rr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="12006af6-c6a1-4ef1-a3db-77917c5127ba" type="checkbox"><label class="sk-toggleable__label" for="12006af6-c6a1-4ef1-a3db-77917c5127ba">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="ab4590e2-8525-41c9-aca2-6319e8d07f45" type="checkbox"><label class="sk-toggleable__label" for="ab4590e2-8525-41c9-aca2-6319e8d07f45">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="524f2ff0-6cdb-4ffc-b584-78c8eb32be6e" type="checkbox"><label class="sk-toggleable__label" for="524f2ff0-6cdb-4ffc-b584-78c8eb32be6e">categorical</label><div class="sk-toggleable__content"><pre>['province', 'reg']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="f7092ef3-4742-4923-847e-cb918ca3e8da" type="checkbox"><label class="sk-toggleable__label" for="f7092ef3-4742-4923-847e-cb918ca3e8da">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="0641a150-92aa-4e7a-b044-ed2ce964e94b" type="checkbox"><label class="sk-toggleable__label" for="0641a150-92aa-4e7a-b044-ed2ce964e94b">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="91dcafa8-3622-494d-8723-ae83633151a5" type="checkbox"><label class="sk-toggleable__label" for="91dcafa8-3622-494d-8723-ae83633151a5">LinearRegression</label><div class="sk-toggleable__content"><pre>LinearRegression()</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="233">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>lin_reg.score(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="233">
+<pre><code>0.9195619190476331</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="random-forest" class="level2">
+<h2 class="anchored" data-anchor-id="random-forest">Random Forest</h2>
+<div class="cell" data-execution_count="234">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="235">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> Pipeline([</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'preprocess'</span>, ct),</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">'log_reg'</span>, RandomForestRegressor(random_state<span class="op">=</span><span class="dv">42</span>))</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>rf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="235">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="94c28f21-fa87-4fe0-8ebb-d5bd1806df1d" type="checkbox"><label class="sk-toggleable__label" for="94c28f21-fa87-4fe0-8ebb-d5bd1806df1d">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('preprocess',
+                 ColumnTransformer(transformers=[('numerical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer()),
+                                                                  ('scaler',
+                                                                   StandardScaler())]),
+                                                  ['general', 'gdp', 'fdi', 'i',
+                                                   'rr']),
+                                                 ('categorical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer(fill_value='sk_missing',
+                                                                                 strategy='constant')),
+                                                                  ('ohe',
+                                                                   OneHotEncoder(handle_unknown='ignore',
+                                                                                 sparse=False))]),
+                                                  ['province', 'reg'])])),
+                ('log_reg', RandomForestRegressor(random_state=42))])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="7a9013d7-b0cf-430c-9587-f4142f7d0d07" type="checkbox"><label class="sk-toggleable__label" for="7a9013d7-b0cf-430c-9587-f4142f7d0d07">preprocess: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical',
+                                 Pipeline(steps=[('imputer', SimpleImputer()),
+                                                 ('scaler', StandardScaler())]),
+                                 ['general', 'gdp', 'fdi', 'i', 'rr']),
+                                ('categorical',
+                                 Pipeline(steps=[('imputer',
+                                                  SimpleImputer(fill_value='sk_missing',
+                                                                strategy='constant')),
+                                                 ('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False))]),
+                                 ['province', 'reg'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4c03c05f-8b07-4651-b0ca-b7dfb364bd2a" type="checkbox"><label class="sk-toggleable__label" for="4c03c05f-8b07-4651-b0ca-b7dfb364bd2a">numerical</label><div class="sk-toggleable__content"><pre>['general', 'gdp', 'fdi', 'i', 'rr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="0ed3bf5e-46e5-42f1-b348-593c83f1416c" type="checkbox"><label class="sk-toggleable__label" for="0ed3bf5e-46e5-42f1-b348-593c83f1416c">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="2d67c14a-6d6f-4b9a-b381-9d146fba171a" type="checkbox"><label class="sk-toggleable__label" for="2d67c14a-6d6f-4b9a-b381-9d146fba171a">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="1ccaca0c-f00a-47eb-8116-d583bb7725e5" type="checkbox"><label class="sk-toggleable__label" for="1ccaca0c-f00a-47eb-8116-d583bb7725e5">categorical</label><div class="sk-toggleable__content"><pre>['province', 'reg']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="aae7eb93-f903-4620-a7c1-4e1ee83f98b6" type="checkbox"><label class="sk-toggleable__label" for="aae7eb93-f903-4620-a7c1-4e1ee83f98b6">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="72c901e7-d213-46f5-b18a-527ebef43edf" type="checkbox"><label class="sk-toggleable__label" for="72c901e7-d213-46f5-b18a-527ebef43edf">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="a55e1dac-49ba-475f-8b1c-09ee46b433b2" type="checkbox"><label class="sk-toggleable__label" for="a55e1dac-49ba-475f-8b1c-09ee46b433b2">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor(random_state=42)</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="236">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>rf.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="236">
+<style>div.sk-top-container {color: black;background-color: white;}div.sk-toggleable {background-color: white;}label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.2em 0.3em;box-sizing: border-box;text-align: center;}div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}div.sk-estimator {font-family: monospace;background-color: #f0f8ff;margin: 0.25em 0.25em;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;}div.sk-estimator:hover {background-color: #d4ebff;}div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 2em;bottom: 0;left: 50%;}div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;}div.sk-item {z-index: 1;}div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;}div.sk-parallel-item {display: flex;flex-direction: column;position: relative;background-color: white;}div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}div.sk-parallel-item:only-child::after {width: 0;}div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0.2em;box-sizing: border-box;padding-bottom: 0.1em;background-color: white;position: relative;}div.sk-label label {font-family: monospace;font-weight: bold;background-color: white;display: inline-block;line-height: 1.2em;}div.sk-label-container {position: relative;z-index: 2;text-align: center;}div.sk-container {display: inline-block;position: relative;}</style><div class="sk-top-container"><div class="sk-container"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="e145d5e3-c30f-45de-912b-2fdf3041bb84" type="checkbox"><label class="sk-toggleable__label" for="e145d5e3-c30f-45de-912b-2fdf3041bb84">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[('preprocess',
+                 ColumnTransformer(transformers=[('numerical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer()),
+                                                                  ('scaler',
+                                                                   StandardScaler())]),
+                                                  ['general', 'gdp', 'fdi', 'i',
+                                                   'rr']),
+                                                 ('categorical',
+                                                  Pipeline(steps=[('imputer',
+                                                                   SimpleImputer(fill_value='sk_missing',
+                                                                                 strategy='constant')),
+                                                                  ('ohe',
+                                                                   OneHotEncoder(handle_unknown='ignore',
+                                                                                 sparse=False))]),
+                                                  ['province', 'reg'])])),
+                ('log_reg', RandomForestRegressor(random_state=42))])</pre></div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="27e04c30-079a-4dac-b72f-725ce47fcef9" type="checkbox"><label class="sk-toggleable__label" for="27e04c30-079a-4dac-b72f-725ce47fcef9">preprocess: ColumnTransformer</label><div class="sk-toggleable__content"><pre>ColumnTransformer(transformers=[('numerical',
+                                 Pipeline(steps=[('imputer', SimpleImputer()),
+                                                 ('scaler', StandardScaler())]),
+                                 ['general', 'gdp', 'fdi', 'i', 'rr']),
+                                ('categorical',
+                                 Pipeline(steps=[('imputer',
+                                                  SimpleImputer(fill_value='sk_missing',
+                                                                strategy='constant')),
+                                                 ('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse=False))]),
+                                 ['province', 'reg'])])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="4246ba1a-4db5-419a-8262-7a44d6f9e6a9" type="checkbox"><label class="sk-toggleable__label" for="4246ba1a-4db5-419a-8262-7a44d6f9e6a9">numerical</label><div class="sk-toggleable__content"><pre>['general', 'gdp', 'fdi', 'i', 'rr']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="a5833ef8-0ea1-442d-89d5-bf3e773576ef" type="checkbox"><label class="sk-toggleable__label" for="a5833ef8-0ea1-442d-89d5-bf3e773576ef">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="9a880e02-8d01-425b-b00f-95fd0fabe330" type="checkbox"><label class="sk-toggleable__label" for="9a880e02-8d01-425b-b00f-95fd0fabe330">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="87de2e0c-eb61-4f39-873c-0ce06c263395" type="checkbox"><label class="sk-toggleable__label" for="87de2e0c-eb61-4f39-873c-0ce06c263395">categorical</label><div class="sk-toggleable__content"><pre>['province', 'reg']</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="bc4ff994-e6a9-4b5d-8103-a9e1268ce3e1" type="checkbox"><label class="sk-toggleable__label" for="bc4ff994-e6a9-4b5d-8103-a9e1268ce3e1">SimpleImputer</label><div class="sk-toggleable__content"><pre>SimpleImputer(fill_value='sk_missing', strategy='constant')</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="23e9961a-3e6f-445f-b6d6-8238b86510ca" type="checkbox"><label class="sk-toggleable__label" for="23e9961a-3e6f-445f-b6d6-8238b86510ca">OneHotEncoder</label><div class="sk-toggleable__content"><pre>OneHotEncoder(handle_unknown='ignore', sparse=False)</pre></div></div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="520c8f1c-2193-4340-8ff1-b1e88863723c" type="checkbox"><label class="sk-toggleable__label" for="520c8f1c-2193-4340-8ff1-b1e88863723c">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor(random_state=42)</pre></div></div></div></div></div></div></div>
+</div>
+</div>
+<div class="cell" data-execution_count="237">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>rf.score(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="237">
+<pre><code>0.9503718502648469</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

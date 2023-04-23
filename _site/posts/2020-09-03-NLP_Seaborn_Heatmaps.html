@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - NLP Heatmaps with Seaborn</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">NLP Heatmaps with Seaborn</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> jupyterthemes <span class="im">import</span> jtplot</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> imblearn.over_sampling <span class="im">import</span> SMOTE</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas_profiling</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> datasets</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> preprocessing</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ignore warnings</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>jtplot.style(theme<span class="op">=</span><span class="st">'oceans16'</span>, context<span class="op">=</span><span class="st">'notebook'</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>             ticks<span class="op">=</span><span class="va">True</span>, grid<span class="op">=</span><span class="va">False</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:11.592972Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:11.572490Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df<span class="op">=</span>pd.read_csv(<span class="st">'../processed_data/nf_complete.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:40.933852Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:40.720303Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 126 entries, 0 to 125
+Data columns (total 23 columns):
+ #   Column                 Non-Null Count  Dtype 
+---  ------                 --------------  ----- 
+ 0   Unnamed: 0             126 non-null    int64 
+ 1   year                   126 non-null    int64 
+ 2   title                  126 non-null    object
+ 3   abstract               126 non-null    object
+ 4   theme                  126 non-null    object
+ 5   China                  126 non-null    int64 
+ 6   Russia                 126 non-null    int64 
+ 7   War                    126 non-null    int64 
+ 8   President              126 non-null    int64 
+ 9   US                     126 non-null    int64 
+ 10  Vietnam                126 non-null    int64 
+ 11  Cold War               126 non-null    int64 
+ 12  World War              126 non-null    int64 
+ 13  Vietnam War            126 non-null    int64 
+ 14  Korean War             126 non-null    int64 
+ 15  Survey                 126 non-null    int64 
+ 16  Case Study             126 non-null    int64 
+ 17  Trade                  126 non-null    int64 
+ 18  Humanitarian           126 non-null    int64 
+ 19  fixed_effects          126 non-null    int64 
+ 20  instrumental_variable  126 non-null    int64 
+ 21  regression             126 non-null    int64 
+ 22  experimental           126 non-null    int64 
+dtypes: int64(20), object(3)
+memory usage: 22.8+ KB</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:49:17.388915Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:49:16.354909Z&quot;}" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly_express <span class="im">as</span> ple</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ple.histogram(df.sort_values(<span class="st">'year'</span>).groupby([<span class="st">'year'</span>,<span class="st">'theme'</span>])[<span class="st">'Cold War'</span>].<span class="bu">sum</span>().reset_index(), x<span class="op">=</span><span class="st">"year"</span>, y<span class="op">=</span><span class="st">"Cold War"</span>, histfunc<span class="op">=</span><span class="st">"sum"</span>, color<span class="op">=</span><span class="st">"theme"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>
+        
+        
+            <div id="88421b26-aece-4630-92a2-94e95a93acf8" class="plotly-graph-div" style="height:600px; width:100%;"></div>
+            <script type="text/javascript">
+                require(["plotly"], function(Plotly) {
+                    window.PLOTLYENV=window.PLOTLYENV || {};
+                    
+                if (document.getElementById("88421b26-aece-4630-92a2-94e95a93acf8")) {
+                    Plotly.newPlot(
+                        '88421b26-aece-4630-92a2-94e95a93acf8',
+                        [{"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Conflict Between States<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Conflict Between States", "marker": {"color": "#636efa"}, "name": "theme=Conflict Between States", "offsetgroup": "theme=Conflict Between States", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000, 2002, 2008, 2009], "xaxis": "x", "y": [0, 0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Conflit Between States<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Conflit Between States", "marker": {"color": "#EF553B"}, "name": "theme=Conflit Between States", "offsetgroup": "theme=Conflit Between States", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Culture<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Culture", "marker": {"color": "#00cc96"}, "name": "theme=Culture", "offsetgroup": "theme=Culture", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000, 2002], "xaxis": "x", "y": [0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Culture / Peace Process<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Culture / Peace Process", "marker": {"color": "#ab63fa"}, "name": "theme=Culture / Peace Process", "offsetgroup": "theme=Culture / Peace Process", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Domestic Military History<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Domestic Military History", "marker": {"color": "#FFA15A"}, "name": "theme=Domestic Military History", "offsetgroup": "theme=Domestic Military History", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=IR scholarship<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=IR scholarship", "marker": {"color": "#19d3f3"}, "name": "theme=IR scholarship", "offsetgroup": "theme=IR scholarship", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2000], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Canadian History / War History<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Canadian History / War History", "marker": {"color": "#FF6692"}, "name": "theme=Canadian History / War History", "offsetgroup": "theme=Canadian History / War History", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Conflict between states<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Conflict between states", "marker": {"color": "#B6E880"}, "name": "theme=Conflict between states", "offsetgroup": "theme=Conflict between states", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001, 2008, 2012, 2014, 2016, 2018], "xaxis": "x", "y": [0, 0, 0, 0, 1, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Ethics of War<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Ethics of War", "marker": {"color": "#FF97FF"}, "name": "theme=Ethics of War", "offsetgroup": "theme=Ethics of War", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=IR Scholarship<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=IR Scholarship", "marker": {"color": "#FECB52"}, "name": "theme=IR Scholarship", "offsetgroup": "theme=IR Scholarship", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001, 2002, 2004, 2005, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018], "xaxis": "x", "y": [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Military History<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Military History", "marker": {"color": "#636efa"}, "name": "theme=Military History", "offsetgroup": "theme=Military History", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010, 2012, 2013, 2015, 2016, 2017, 2018], "xaxis": "x", "y": [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Peace Process<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Peace Process", "marker": {"color": "#EF553B"}, "name": "theme=Peace Process", "offsetgroup": "theme=Peace Process", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2001], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Civil War<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Civil War", "marker": {"color": "#00cc96"}, "name": "theme=Civil War", "offsetgroup": "theme=Civil War", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2002], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Military Technology<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Military Technology", "marker": {"color": "#ab63fa"}, "name": "theme=Military Technology", "offsetgroup": "theme=Military Technology", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2002], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Nuclear Weapons<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Nuclear Weapons", "marker": {"color": "#FFA15A"}, "name": "theme=Nuclear Weapons", "offsetgroup": "theme=Nuclear Weapons", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2002, 2009, 2014, 2015, 2018], "xaxis": "x", "y": [0, 0, 0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Vietnam War / Conflict Between States<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Vietnam War / Conflict Between States", "marker": {"color": "#19d3f3"}, "name": "theme=Vietnam War / Conflict Between States", "offsetgroup": "theme=Vietnam War / Conflict Between States", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2002], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Unconventional Warfare / Conflcit Between States<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Unconventional Warfare / Conflcit Between States", "marker": {"color": "#FF6692"}, "name": "theme=Unconventional Warfare / Conflcit Between States", "offsetgroup": "theme=Unconventional Warfare / Conflcit Between States", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2003], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Conflict Between states<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Conflict Between states", "marker": {"color": "#B6E880"}, "name": "theme=Conflict Between states", "offsetgroup": "theme=Conflict Between states", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2004], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=ConflictBetween states<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=ConflictBetween states", "marker": {"color": "#FF97FF"}, "name": "theme=ConflictBetween states", "offsetgroup": "theme=ConflictBetween states", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2004], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Domestic Policy<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Domestic Policy", "marker": {"color": "#FECB52"}, "name": "theme=Domestic Policy", "offsetgroup": "theme=Domestic Policy", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2005], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Miltary History<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Miltary History", "marker": {"color": "#636efa"}, "name": "theme=Miltary History", "offsetgroup": "theme=Miltary History", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2007], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Nonstate<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Nonstate", "marker": {"color": "#EF553B"}, "name": "theme=Nonstate", "offsetgroup": "theme=Nonstate", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2007, 2008, 2013], "xaxis": "x", "y": [0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Other<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Other", "marker": {"color": "#00cc96"}, "name": "theme=Other", "offsetgroup": "theme=Other", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2007, 2008, 2013], "xaxis": "x", "y": [1, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=ICS<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=ICS", "marker": {"color": "#ab63fa"}, "name": "theme=ICS", "offsetgroup": "theme=ICS", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2009], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Non-state<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Non-state", "marker": {"color": "#FFA15A"}, "name": "theme=Non-state", "offsetgroup": "theme=Non-state", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2009, 2010, 2015, 2016], "xaxis": "x", "y": [0, 0, 0, 0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Cold War<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Cold War", "marker": {"color": "#19d3f3"}, "name": "theme=Cold War", "offsetgroup": "theme=Cold War", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2010, 2017, 2018], "xaxis": "x", "y": [1, 1, 1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Terrorism<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Terrorism", "marker": {"color": "#FF6692"}, "name": "theme=Terrorism", "offsetgroup": "theme=Terrorism", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2010], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Non-State<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Non-State", "marker": {"color": "#B6E880"}, "name": "theme=Non-State", "offsetgroup": "theme=Non-State", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2011], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=IR Scholarship / Nuclear Weapons<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=IR Scholarship / Nuclear Weapons", "marker": {"color": "#FF97FF"}, "name": "theme=IR Scholarship / Nuclear Weapons", "offsetgroup": "theme=IR Scholarship / Nuclear Weapons", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2012], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Civil-military<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Civil-military", "marker": {"color": "#FECB52"}, "name": "theme=Civil-military", "offsetgroup": "theme=Civil-military", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2014], "xaxis": "x", "y": [0], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Soviet Union<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Soviet Union", "marker": {"color": "#636efa"}, "name": "theme=Soviet Union", "offsetgroup": "theme=Soviet Union", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2015], "xaxis": "x", "y": [1], "yaxis": "y"}, {"alignmentgroup": "True", "bingroup": "x", "histfunc": "sum", "hoverlabel": {"namelength": 0}, "hovertemplate": "theme=Civ-Mil<br>year=%{x}<br>sum of Cold War=%{y}", "legendgroup": "theme=Civ-Mil", "marker": {"color": "#EF553B"}, "name": "theme=Civ-Mil", "offsetgroup": "theme=Civ-Mil", "orientation": "v", "showlegend": true, "type": "histogram", "x": [2016], "xaxis": "x", "y": [0], "yaxis": "y"}],
+                        {"barmode": "relative", "height": 600, "legend": {"tracegroupgap": 0}, "margin": {"t": 60}, "template": {"data": {"bar": [{"error_x": {"color": "#2a3f5f"}, "error_y": {"color": "#2a3f5f"}, "marker": {"line": {"color": "#E5ECF6", "width": 0.5}}, "type": "bar"}], "barpolar": [{"marker": {"line": {"color": "#E5ECF6", "width": 0.5}}, "type": "barpolar"}], "carpet": [{"aaxis": {"endlinecolor": "#2a3f5f", "gridcolor": "white", "linecolor": "white", "minorgridcolor": "white", "startlinecolor": "#2a3f5f"}, "baxis": {"endlinecolor": "#2a3f5f", "gridcolor": "white", "linecolor": "white", "minorgridcolor": "white", "startlinecolor": "#2a3f5f"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "heatmapgl": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmapgl"}], "histogram": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "histogram"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "scatter": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#EBF0F8"}, "line": {"color": "white"}}, "header": {"fill": {"color": "#C8D4E3"}, "line": {"color": "white"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#2a3f5f", "arrowhead": 0, "arrowwidth": 1}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#2a3f5f"}, "geo": {"bgcolor": "white", "lakecolor": "white", "landcolor": "#E5ECF6", "showlakes": true, "showland": true, "subunitcolor": "white"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "light"}, "paper_bgcolor": "white", "plot_bgcolor": "#E5ECF6", "polar": {"angularaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "bgcolor": "#E5ECF6", "radialaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "gridwidth": 2, "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white"}, "yaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "gridwidth": 2, "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white"}, "zaxis": {"backgroundcolor": "#E5ECF6", "gridcolor": "white", "gridwidth": 2, "linecolor": "white", "showbackground": true, "ticks": "", "zerolinecolor": "white"}}, "shapedefaults": {"line": {"color": "#2a3f5f"}}, "ternary": {"aaxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "baxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}, "bgcolor": "#E5ECF6", "caxis": {"gridcolor": "white", "linecolor": "white", "ticks": ""}}, "title": {"x": 0.05}, "xaxis": {"automargin": true, "gridcolor": "white", "linecolor": "white", "ticks": "", "zerolinecolor": "white", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "white", "linecolor": "white", "ticks": "", "zerolinecolor": "white", "zerolinewidth": 2}}}, "xaxis": {"anchor": "y", "domain": [0.0, 0.98], "title": {"text": "year"}}, "yaxis": {"anchor": "x", "domain": [0.0, 1.0], "title": {"text": "sum of Cold War"}}},
+                        {"responsive": true}
+                    ).then(function(){
+                            
+var gd = document.getElementById('88421b26-aece-4630-92a2-94e95a93acf8');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })
+                };
+                });
+            </script>
+        </div>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:50:34.510420Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:50:34.470272Z&quot;}" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ple.lidifferences(dfm_regional.sort_values('year').groupby(['year','theme'])['Cold War'].sum().reset_index(),</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#          x='year',</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#          y='Cold War',</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#          line_group='theme',</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#          color='theme'</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:12.226144Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:11.596150Z&quot;}" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the crosstab DataFrame</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>pd_crosstab <span class="op">=</span> pd.crosstab(df[<span class="st">"theme"</span>], df[<span class="st">"year"</span>])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot a heatmap of the table with no color bar and using the BuGn palette</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>sns.heatmap(pd_crosstab, cbar<span class="op">=</span><span class="va">False</span>, cmap<span class="op">=</span><span class="st">"GnBu"</span>, linewidths<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Rotate tick marks for visibility</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.yticks(rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">90</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.savefig('./img/theme_heat_1.png', bbox_inches='tight', dpi=500)</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Show the plot</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.clf()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 720x648 with 0 Axes&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:13.340570Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:12.229412Z&quot;}" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sns.clustermap(pd_crosstab, cmap<span class="op">=</span><span class="st">'Greens'</span>, robust<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot using a color palette</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.heatmap(df, cmap="YlGnBu")</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.heatmap(df, cmap="Blues")</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.heatmap(df, cmap="BuPu")</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.heatmap(df, cmap="Greens")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:14.759666Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:13.342606Z&quot;}" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import seaborn library</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation matrix of the meat DataFrame</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>corr_meat <span class="op">=</span> df.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Customize the heatmap of the corr_meat correlation matrix and rotate the x-axis labels</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sns.clustermap(pd_crosstab,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                     row_cluster<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                     col_cluster<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                     figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>plt.setp(fig.ax_heatmap.xaxis.get_majorticklabels(), rotation<span class="op">=</span><span class="dv">90</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>plt.setp(fig.ax_heatmap.yaxis.get_majorticklabels(), rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:16.201731Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:14.762795Z&quot;}" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> pd_crosstab</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize the mean and variance within a stat, so different stats can be comparable</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (This is the same as changing all the columns to Z-scores)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> (data_normalized <span class="op">-</span> data_normalized.mean())<span class="op">/</span>data_normalized.var()</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize these values to range from -1 to 1</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> (data_normalized)<span class="op">/</span>(data_normalized.<span class="bu">max</span>() <span class="op">-</span> data_normalized.<span class="bu">min</span>())</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> data_normalized.T</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Can use a semicolon after the command to suppress output of the row_dendrogram and col_dendrogram.</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>sns.clustermap(data_normalized, cmap<span class="op">=</span><span class="st">'Blues'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:17.674718Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:16.205804Z&quot;}" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> pd_crosstab</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize the mean and variance within a stat, so different stats can be comparable</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (This is the same as changing all the columns to Z-scores)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> (data_normalized <span class="op">-</span> data_normalized.mean())<span class="op">/</span>data_normalized.var()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize these values to range from -1 to 1</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>data_normalized <span class="op">=</span> (data_normalized)<span class="op">/</span>(data_normalized.<span class="bu">max</span>() <span class="op">-</span> data_normalized.<span class="bu">min</span>())</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#data_normalized = data_normalized.T</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Can use a semicolon after the command to suppress output of the row_dendrogram and col_dendrogram.</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>sns.clustermap(data_normalized, cmap<span class="op">=</span><span class="st">'BuPu'</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:19.378174Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:17.678084Z&quot;}" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sns.clustermap(data_normalized)<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.gcf()</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>fig.savefig(<span class="st">'clusteredheatmap_bbox_tight.png'</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-09-03-NLP_Seaborn_Heatmaps_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-executetime="{&quot;end_time&quot;:&quot;2019-09-08T22:47:19.445871Z&quot;,&quot;start_time&quot;:&quot;2019-09-08T22:47:19.385329Z&quot;}" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tidy_df <span class="op">=</span> pd.melt(df.reset_index(), id_vars<span class="op">=</span><span class="st">'index'</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df.T.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">0</th>
+<th data-quarto-table-cell-role="th">1</th>
+<th data-quarto-table-cell-role="th">2</th>
+<th data-quarto-table-cell-role="th">3</th>
+<th data-quarto-table-cell-role="th">4</th>
+<th data-quarto-table-cell-role="th">5</th>
+<th data-quarto-table-cell-role="th">6</th>
+<th data-quarto-table-cell-role="th">7</th>
+<th data-quarto-table-cell-role="th">8</th>
+<th data-quarto-table-cell-role="th">9</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">116</th>
+<th data-quarto-table-cell-role="th">117</th>
+<th data-quarto-table-cell-role="th">118</th>
+<th data-quarto-table-cell-role="th">119</th>
+<th data-quarto-table-cell-role="th">120</th>
+<th data-quarto-table-cell-role="th">121</th>
+<th data-quarto-table-cell-role="th">122</th>
+<th data-quarto-table-cell-role="th">123</th>
+<th data-quarto-table-cell-role="th">124</th>
+<th data-quarto-table-cell-role="th">125</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Unnamed: 0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>14</td>
+<td>13</td>
+<td>...</td>
+<td>128</td>
+<td>130</td>
+<td>123</td>
+<td>125</td>
+<td>131</td>
+<td>132</td>
+<td>133</td>
+<td>134</td>
+<td>135</td>
+<td>136</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">year</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2000</td>
+<td>2001</td>
+<td>2001</td>
+<td>...</td>
+<td>2017</td>
+<td>2017</td>
+<td>2017</td>
+<td>2017</td>
+<td>2018</td>
+<td>2018</td>
+<td>2018</td>
+<td>2018</td>
+<td>2018</td>
+<td>2018</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">title</td>
+<td>"Institutions at the Domestic/International Ne...</td>
+<td>Born to Lose and Doomed to Survive: State Deat...</td>
+<td>The significance of “allegiance” in internatio...</td>
+<td>The significance of “allegiance” in internatio...</td>
+<td>Truth-Telling and Mythmaking in Post-Soviet Ru...</td>
+<td>Building a Cape Fear Metropolis: Fort Bragg, F...</td>
+<td>The Glories and the Sadness: Shaping the natio...</td>
+<td>What leads longstanding adversaries to engage ...</td>
+<td>A School for the Nation: Military Institution...</td>
+<td>The 'American Century' Army: The Origins of t...</td>
+<td>...</td>
+<td>Fully Committed? Religiously Committed State P...</td>
+<td>Straddling the Threshold of Two Worlds: Soldie...</td>
+<td>U.S. Army’s Investigation and Adjudication of ...</td>
+<td>Grand Strategic Crucibles: The Lasting Effects...</td>
+<td>Trust in International Politics: The Role of L...</td>
+<td>Planning for the Short Haul: Trade Among Belli...</td>
+<td>Clinging to the Anti-Imperial Mantle: The Repu...</td>
+<td>The New Navy's Pacific Wars: Peripheral Confl...</td>
+<td>Stop or I'll Shoot, Comply and I Won't: The Di...</td>
+<td>Unexpected Humanitarians: Albania, the U.S. Mi...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">abstract</td>
+<td>Civil-military relations are frequently studie...</td>
+<td>Under what conditions do states die, or exit t...</td>
+<td>My dissertation employs original and secondary...</td>
+<td>\nThis study revises prevailing interpretation...</td>
+<td>Can distorted and pernicious ideas r histo...</td>
+<td>My dissertation examines the cultural and econ...</td>
+<td>In my dissertation I compare the ways in whic...</td>
+<td>This dissertation develops a socio-psychoanal...</td>
+<td>Beginning in Europe in the latter half of the ...</td>
+<td>This dissertation covers the period 1949-1959 ...</td>
+<td>...</td>
+<td>This dissertation argues that the higher the l...</td>
+<td>This dissertation explores how American soldie...</td>
+<td>This dissertation examines the U.S. Army’s res...</td>
+<td>When and how do military interventions shape g...</td>
+<td>In my dissertation, I focus on how leader rela...</td>
+<td>In times of war, why do belligerents continue ...</td>
+<td>My dissertation project, Clinging to the Anti-...</td>
+<td>Using a transnational methodology and sources ...</td>
+<td>There is a dilemma at the heart of coercion. S...</td>
+<td>Using archives and oral history, this disserta...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">theme</td>
+<td>IR scholarship</td>
+<td>IR scholarship</td>
+<td>IR scholarship</td>
+<td>Conflit Between States</td>
+<td>Conflict Between States</td>
+<td>Domestic Military History</td>
+<td>Culture</td>
+<td>Culture / Peace Process</td>
+<td>Military History</td>
+<td>Military History</td>
+<td>...</td>
+<td>IR Scholarship</td>
+<td>Military History</td>
+<td>Military History</td>
+<td>IR Scholarship</td>
+<td>Nuclear Weapons</td>
+<td>Conflict between states</td>
+<td>Cold War</td>
+<td>Military History</td>
+<td>IR Scholarship</td>
+<td>Military History</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 126 columns</p>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

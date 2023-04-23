@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - AutoML, Xgboost and H2O</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">AutoML, Xgboost and H2O</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>Credit: code from https://www.kaggle.com/paradiselost/tutorial-automl-capabilities-of-h2o-library</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://avatars0.githubusercontent.com/u/1402695?s=200&amp;v=4.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">h2o.ai</figcaption>
+</figure>
+</div>
+<p><strong>Automated machine learning (AutoML)</strong> is the process of automating the end-to-end process of applying machine learning to real-world problems. In a typical machine learning application, the typical stages (and sub-stages) of work are the following: 1. Data preparation * data pre-processing * feature engineering * feature extraction * feature selection 2. Model selection 3. Hyperparameter optimization (to maximize the performance of the final model)</p>
+<p>Many of these steps are often beyond the abilities of non-experts. <strong>AutoML</strong> was proposed as an artificial intelligence-based solution to the ever-growing challenge of applying machine learning.</p>
+<p>Some of the notable platforms tackling various stages of AutoML are the following: * <a href="https://automl.github.io/auto-sklearn/stable/">auto-sklearn</a> is a Bayesian hyperparameter optimization layer on top of <a href="https://scikit-learn.org/">scikit-learn</a>. * <a href="https://github.com/EpistasisLab/tpot">TPOT</a> (TeaPOT) is a Python library that automatically creates and optimizes full machine learning pipelines using genetic programming. * <a href="https://github.com/salesforce/TransmogrifAI">TransmogrifAI</a> is a Scala/SparkML library created by <a href="http://salesforce.com/">Salesforce</a> for automated data cleansing, feature engineering, model selection, and hyperparameter optimization. * <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html">H2O AutoML</a> performs (simple) data preprocessing, automates the process of training a large selection of candidate models, tunes hyperparameters of the models and creates stacked ensembles. * <a href="https://www.h2o.ai/products/h2o-driverless-ai/">H2O Driverless AI</a> is a commercial software package that automates lots of aspects of machine learning applications. It has a strong focus on automatic feature engineering.</p>
+<p>An overview of AutoML capabilities of H2O library is presented in this tutorial. The library can be installed simply by</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!pip install h2o</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s import the required packages and call <code>h2o.init()</code>. The specified arguments (<code>nthreads</code> and <code>max_mem_size</code>) are optional.</p>
+<p>::: {.cell _cell_guid=‘b1076dfc-b9ad-4769-8c92-a6c4dae69d19’ _uuid=‘8f2839f25d086af736a60e9eeb907d3b93b6e0e5’ execution_count=2}</p>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys, os, os.path</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> h2o</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> h2o.automl <span class="im">import</span> H2OAutoML</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>h2o.init(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    nthreads<span class="op">=-</span><span class="dv">1</span>,     <span class="co"># number of threads when launching a new H2O server</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    max_mem_size<span class="op">=</span><span class="dv">12</span>  <span class="co"># in gigabytes</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Checking whether there is an H2O instance running at http://localhost:54321 . connected.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+
+
+<style>
+
+#h2o-table-1.h2o-container {
+  overflow-x: auto;
+}
+#h2o-table-1 .h2o-table {
+  /* width: 100%; */
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+#h2o-table-1 .h2o-table caption {
+  white-space: nowrap;
+  caption-side: top;
+  text-align: left;
+  /* margin-left: 1em; */
+  margin: 0;
+  font-size: larger;
+}
+#h2o-table-1 .h2o-table thead {
+  white-space: nowrap; 
+  position: sticky;
+  top: 0;
+  box-shadow: 0 -1px inset;
+}
+#h2o-table-1 .h2o-table tbody {
+  overflow: auto;
+}
+#h2o-table-1 .h2o-table th,
+#h2o-table-1 .h2o-table td {
+  text-align: right;
+  /* border: 1px solid; */
+}
+#h2o-table-1 .h2o-table tr:nth-child(even) {
+  /* background: #F5F5F5 */
+}
+
+</style>      
+<div id="h2o-table-1" class="h2o-container">
+  
+<table class="h2o-table table" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td>H2O_cluster_uptime:</td>
+<td>3 mins 51 secs</td>
+</tr>
+<tr class="even">
+<td>H2O_cluster_timezone:</td>
+<td>America/Los_Angeles</td>
+</tr>
+<tr class="odd">
+<td>H2O_data_parsing_timezone:</td>
+<td>UTC</td>
+</tr>
+<tr class="even">
+<td>H2O_cluster_version:</td>
+<td>3.38.0.1</td>
+</tr>
+<tr class="odd">
+<td>H2O_cluster_version_age:</td>
+<td>12 days</td>
+</tr>
+<tr class="even">
+<td>H2O_cluster_name:</td>
+<td>H2O_from_python_gao_qldgcm</td>
+</tr>
+<tr class="odd">
+<td>H2O_cluster_total_nodes:</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>H2O_cluster_free_memory:</td>
+<td>3.838 Gb</td>
+</tr>
+<tr class="odd">
+<td>H2O_cluster_total_cores:</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td>H2O_cluster_allowed_cores:</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td>H2O_cluster_status:</td>
+<td>locked, healthy</td>
+</tr>
+<tr class="even">
+<td>H2O_connection_url:</td>
+<td>http://localhost:54321</td>
+</tr>
+<tr class="odd">
+<td>H2O_connection_proxy:</td>
+<td>{"http": null, "https": null}</td>
+</tr>
+<tr class="even">
+<td>H2O_internal_security:</td>
+<td>False</td>
+</tr>
+<tr class="odd">
+<td>Python_version:</td>
+<td>3.9.12 final</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>:::</p>
+<p><strong>Example 1: a classification task</strong></p>
+<p>Let’s apply the power of H2O AutoML to the <a href="https://www.kaggle.com/c/flight-delays-fall-2018">“Flight delays” competition</a> (it’s a binary classification task) from <a href="https://mlcourse.ai/">mlcourse.ai</a>.</p>
+<p>::: {.cell _cell_guid=‘79c7e3d0-c299-4dcb-8224-4455121ee9b0’ _uuid=‘d629ff2d2480ee46fbb7e2d37f6b5fab8052498a’ execution_count=11}</p>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">'https://raw.githubusercontent.com/davidrkearney/colab-notebooks/main/datasets/bikes.csv'</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>train_df <span class="op">=</span> pd.read_csv(url, error_bad_lines<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>test_df <span class="op">=</span> pd.read_csv(url, error_bad_lines<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>:::</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'train_df cols:'</span>, <span class="bu">list</span>(train_df.columns))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'test_df cols: '</span>, <span class="bu">list</span>(test_df.columns))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>train_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_df cols: ['trip_id', 'gender', 'starttime', 'stoptime', 'tripduration', 'from_station_name', 'dpcapacity_start', 'to_station_name', 'dpcapacity_end', 'temperature', 'visibility', 'wind_speed', 'precipitation', 'events']
+test_df cols:  ['trip_id', 'gender', 'starttime', 'stoptime', 'tripduration', 'from_station_name', 'dpcapacity_start', 'to_station_name', 'dpcapacity_end', 'temperature', 'visibility', 'wind_speed', 'precipitation', 'events']</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">trip_id</th>
+<th data-quarto-table-cell-role="th">gender</th>
+<th data-quarto-table-cell-role="th">starttime</th>
+<th data-quarto-table-cell-role="th">stoptime</th>
+<th data-quarto-table-cell-role="th">tripduration</th>
+<th data-quarto-table-cell-role="th">from_station_name</th>
+<th data-quarto-table-cell-role="th">dpcapacity_start</th>
+<th data-quarto-table-cell-role="th">to_station_name</th>
+<th data-quarto-table-cell-role="th">dpcapacity_end</th>
+<th data-quarto-table-cell-role="th">temperature</th>
+<th data-quarto-table-cell-role="th">visibility</th>
+<th data-quarto-table-cell-role="th">wind_speed</th>
+<th data-quarto-table-cell-role="th">precipitation</th>
+<th data-quarto-table-cell-role="th">events</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>7147</td>
+<td>Male</td>
+<td>2013-06-28 19:01:00</td>
+<td>2013-06-28 19:17:00</td>
+<td>993</td>
+<td>Lake Shore Dr &amp; Monroe St</td>
+<td>11.0</td>
+<td>Michigan Ave &amp; Oak St</td>
+<td>15.0</td>
+<td>73.9</td>
+<td>10.0</td>
+<td>12.7</td>
+<td>-9999.0</td>
+<td>mostlycloudy</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>7524</td>
+<td>Male</td>
+<td>2013-06-28 22:53:00</td>
+<td>2013-06-28 23:03:00</td>
+<td>623</td>
+<td>Clinton St &amp; Washington Blvd</td>
+<td>31.0</td>
+<td>Wells St &amp; Walton St</td>
+<td>19.0</td>
+<td>69.1</td>
+<td>10.0</td>
+<td>6.9</td>
+<td>-9999.0</td>
+<td>partlycloudy</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>10927</td>
+<td>Male</td>
+<td>2013-06-30 14:43:00</td>
+<td>2013-06-30 15:01:00</td>
+<td>1040</td>
+<td>Sheffield Ave &amp; Kingsbury St</td>
+<td>15.0</td>
+<td>Dearborn St &amp; Monroe St</td>
+<td>23.0</td>
+<td>73.0</td>
+<td>10.0</td>
+<td>16.1</td>
+<td>-9999.0</td>
+<td>mostlycloudy</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>12907</td>
+<td>Male</td>
+<td>2013-07-01 10:05:00</td>
+<td>2013-07-01 10:16:00</td>
+<td>667</td>
+<td>Carpenter St &amp; Huron St</td>
+<td>19.0</td>
+<td>Clark St &amp; Randolph St</td>
+<td>31.0</td>
+<td>72.0</td>
+<td>10.0</td>
+<td>16.1</td>
+<td>-9999.0</td>
+<td>mostlycloudy</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>13168</td>
+<td>Male</td>
+<td>2013-07-01 11:16:00</td>
+<td>2013-07-01 11:18:00</td>
+<td>130</td>
+<td>Damen Ave &amp; Pierce Ave</td>
+<td>19.0</td>
+<td>Damen Ave &amp; Pierce Ave</td>
+<td>19.0</td>
+<td>73.0</td>
+<td>10.0</td>
+<td>17.3</td>
+<td>-9999.0</td>
+<td>partlycloudy</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>train_df.dtypes</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>trip_id                int64
+gender                object
+starttime             object
+stoptime              object
+tripduration           int64
+from_station_name     object
+dpcapacity_start     float64
+to_station_name       object
+dpcapacity_end       float64
+temperature          float64
+visibility           float64
+wind_speed           float64
+precipitation        float64
+events                object
+dtype: object</code></pre>
+</div>
+</div>
+<p>The features <code>Month</code>, <code>DayofMonth</code>, <code>DayOfWeek</code>, <code>DepTime</code>, <code>Distance</code> can be represented as numbers. Let’s convert those features to numerical type (a new feature <code>HourFloat</code> is added):</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for df in [train_df, test_df]:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     df['Month'] = df['Month'].apply(lambda s: s.split('-')[1]).astype('int')</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     df['DayofMonth'] = df['DayofMonth'].apply(lambda s: s.split('-')[1]).astype('int')</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     df['DayOfWeek'] = df['DayOfWeek'].apply(lambda s: s.split('-')[1]).astype('int')</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     df['HourFloat'] = df['DepTime'].apply(</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         lambda t: (t // 100) % 24 + ((t % 100) % 60) / 60</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     ).astype('float')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s also introduce a new feature <code>Route</code> that is the concatenation of <code>Origin</code> and <code>Dest</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for df in [train_df, test_df]:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     df['Route'] = df[['Origin', 'Dest']].apply(</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#         lambda pair: ''.join([str(a) for a in pair]),</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         axis='columns'</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     ).astype('str')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will not use the column <code>DepTime</code> anymore. Split the target column from the features columns in <code>train_df</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> train_df[<span class="st">'dep_delayed_15min'</span>].<span class="bu">map</span>({<span class="st">'Y'</span>: <span class="dv">1</span>, <span class="st">'N'</span>: <span class="dv">0</span>})</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>feature_cols <span class="op">=</span> [</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Month'</span>, <span class="st">'DayofMonth'</span>, <span class="st">'DayOfWeek'</span>, <span class="st">'HourFloat'</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'UniqueCarrier'</span>, <span class="st">'Origin'</span>, <span class="st">'Dest'</span>, <span class="st">'Route'</span>, <span class="st">'Distance'</span>,]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>train_df_modif <span class="op">=</span> train_df[feature_cols]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>test_df_modif <span class="op">=</span> test_df[feature_cols]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The features <code>UniqueCarrier</code>, <code>Origin</code>, <code>Dest</code>, <code>Route</code> should be categorical:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>N_train <span class="op">=</span> train_df_modif.shape[<span class="dv">0</span>]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>train_test_X <span class="op">=</span> pd.concat([train_df_modif, test_df_modif], axis<span class="op">=</span><span class="st">'index'</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> feat <span class="kw">in</span> [<span class="st">'UniqueCarrier'</span>, <span class="st">'Origin'</span>, <span class="st">'Dest'</span>, <span class="st">'Route'</span>]:</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    train_test_X[feat] <span class="op">=</span> train_test_X[feat].astype(<span class="st">'category'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> train_test_X[:N_train]</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> train_test_X[N_train:]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> target</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Pandas DataFrames should be converted to H2O dataframes before calling <code>H2OAutoML()</code>.</p>
+<p>Note: if you don’t have to preprocess the data, you can get H2O dataframes directly from the data files by a call like <code>df = h2o.import_file(datafile_path)</code> (where <code>datafile_path</code> is a filesystem path or a URL).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X_y_train_h <span class="op">=</span> h2o.H2OFrame(pd.concat([X_train, y_train], axis<span class="op">=</span><span class="st">'columns'</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>X_y_train_h[<span class="st">'dep_delayed_15min'</span>] <span class="op">=</span> X_y_train_h[<span class="st">'dep_delayed_15min'</span>].asfactor()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ the target column should have categorical type for classification tasks</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   (numerical type for regression tasks)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>X_test_h <span class="op">=</span> h2o.H2OFrame(X_test)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>X_y_train_h.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aml <span class="op">=</span> H2OAutoML(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    max_runtime_secs<span class="op">=</span>(<span class="dv">3600</span> <span class="op">*</span> <span class="dv">8</span>),  <span class="co"># 8 hours</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    max_models<span class="op">=</span><span class="va">None</span>,  <span class="co"># no limit</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">17</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Among the most important arguments (with their default values) of <code>H2OAutoML()</code> are the following: * <code>nfolds=5</code> – number of folds for k-fold cross-validation (<code>nfolds=0</code> disables cross-validation) * <code>balance_classes=False</code> – balance training data class counts via over/under-sampling * <code>max_runtime_secs=3600</code> – how long the AutoML run will execute (in seconds) * <code>max_models=None</code> – the maximum number of models to build in an AutoML run (<code>None</code> means no limitation) * <code>include_algos=None</code> – list of algorithms to restrict to during the model-building phase (cannot be used in combination with <code>exclude_algos</code> parameter; <code>None</code> means that all appropriate H2O algorithms will be used) * <code>exclude_algos=None</code> – list of algorithms to skip during the model-building phase (<code>None</code> means that all appropriate H2O algorithms will be used) * <code>seed=None</code> – a random seed for reproducibility (AutoML can only guarantee reproducibility if <code>max_models</code> or early stopping is used because <code>max_runtime_secs</code> is resource limited, meaning that if the resources are not the same between runs, AutoML may be able to train more models on one run vs another)</p>
+<p>H2O AutoML trains and cross-validates: * a default Random Forest (DRF), * an Extremely-Randomized Forest (XRT), * a random grid of Generalized Linear Models (GLM), * a random grid of XGBoost (XGBoost), * a random grid of Gradient Boosting Machines (GBM), * a random grid of Deep Neural Nets (DeepLearning), * and 2 Stacked Ensembles, one of all the models, and one of only the best models of each kind.</p>
+<p>In the cell below, I call <code>aml.train()</code>, save the leaderboard and all individual models. The running time is about 8 hours, so after running it once I saved the output files as a new dataset, connected the dataset to this kernel and commented out the code in the cell.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># aml.train(</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     x=feature_cols,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     y='dep_delayed_15min',</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     training_frame=X_y_train_h</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># lb = aml.leaderboard</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># model_ids = list(lb['model_id'].as_data_frame().iloc[:,0])</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># out_path = "."</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># for m_id in model_ids:</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co">#     mdl = h2o.get_model(m_id)</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co">#     h2o.save_model(model=mdl, path=out_path, force=True)</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co"># h2o.export_file(lb, os.path.join(out_path, 'aml_leaderboard.h2o'), force=True)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Some of the arguments for <code>H2OAutoML.train()</code> are the following: * <code>training_frame</code> – the H2OFrame having the columns indicated by <code>x</code> and <code>y</code> * <code>x</code> – list of feature column names in <code>training_frame</code> * <code>y</code> – a column name indicating the target * <code>validation_frame</code> – the H2OFrame with validation data (by default and when <code>nfolds</code> &gt; 1, <code>validation_frame</code> will be ignored) * <code>leaderboard_frame</code> – the H2OFrame with test data for scoring the leaderboard (optinal; by default (<code>leaderboard_frame=None</code>) the cross-validation metric on <code>training_frame</code> will be used to generate the leaderboard rankings)</p>
+<p>Let’s take a look at the leaderboard:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>models_path <span class="op">=</span> <span class="st">"../input/h2o-automl-saved-models-classif/"</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>lb <span class="op">=</span> h2o.import_file(path<span class="op">=</span>os.path.join(models_path, <span class="st">"aml_leaderboard.h2o"</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>lb.head(rows<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#lb.head(rows=lb.nrows)</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ to see the entire leaderboard</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Among the individual models, XGBoost is the leader (auc = 0.749523) for this task. Best individual GBM has auc = 0.741785, best XRT has auc = 0.731317, best DRF has auc = 0.725166, best DNN has auc = 0.706676.</p>
+<p><code>StackedEnsemble_AllModels</code> is usually the leader, <code>StackedEnsemble_BestOfFamily</code> is usually at the 2nd place. Let’s look inside the <code>StackedEnsemble_AllModels</code>. It is an ensemble of all of the individual models in the AutoML run.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>se_all <span class="op">=</span> h2o.load_model(os.path.join(models_path, <span class="st">"StackedEnsemble_AllModels_AutoML_20190414_112210"</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the Stacked Ensemble metalearner model</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>metalearner <span class="op">=</span> h2o.get_model(se_all.metalearner()[<span class="st">'name'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The AutoML Stacked Ensembles use the GLM with non-negative weights as the default metalearner (combiner) algorithm. Let’s examine the variable importance of the metalearner algorithm in the ensemble. This shows us how much each base learner is contributing to the ensemble. <code>Intercept</code> represents the constant term in a linear model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>metalearner.std_coef_plot(num_of_features<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ all importance values starting from the 16th are zero</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#metalearner.coef_norm()</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ to see the table in the text form</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>StackedEnsemble_BestOfFamily</code> shows the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>se_best_of_family <span class="op">=</span> h2o.load_model(os.path.join(models_path, <span class="st">"StackedEnsemble_BestOfFamily_AutoML_20190414_112210"</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the Stacked Ensemble metalearner model</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>metalearner <span class="op">=</span> h2o.get_model(se_best_of_family.metalearner()[<span class="st">'name'</span>])</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>metalearner.std_coef_plot(num_of_features<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#metalearner.coef_norm()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s reproduce the result (auc) of a few best individual models.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> h2o.estimators.xgboost <span class="im">import</span> H2OXGBoostEstimator</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>model_01 <span class="op">=</span> h2o.load_model(os.path.join(models_path, <span class="st">"XGBoost_grid_1_AutoML_20190414_112210_model_19"</span>))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>excluded_params <span class="op">=</span> [<span class="st">'model_id'</span>, <span class="st">'response_column'</span>, <span class="st">'ignored_columns'</span>]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>model_01_actual_params <span class="op">=</span> {k: v[<span class="st">'actual'</span>] <span class="cf">for</span> k, v <span class="kw">in</span> model_01.params.items() <span class="cf">if</span> k <span class="kw">not</span> <span class="kw">in</span> excluded_params}</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>reprod_model_01 <span class="op">=</span> H2OXGBoostEstimator(<span class="op">**</span>model_01_actual_params)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>reprod_model_01.train(</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>feature_cols,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'dep_delayed_15min'</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    training_frame<span class="op">=</span>X_y_train_h</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>reprod_model_01.auc(xval<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ 0.749453, slightly worse compared to the leaderboard value</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> h2o.estimators.gbm <span class="im">import</span> H2OGradientBoostingEstimator</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>model_12 <span class="op">=</span> h2o.load_model(os.path.join(models_path, <span class="st">"GBM_grid_1_AutoML_20190414_112210_model_85"</span>))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>excluded_params <span class="op">=</span> [<span class="st">'model_id'</span>, <span class="st">'response_column'</span>, <span class="st">'ignored_columns'</span>]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>model_12_actual_params <span class="op">=</span> {k: v[<span class="st">'actual'</span>] <span class="cf">for</span> k, v <span class="kw">in</span> model_12.params.items() <span class="cf">if</span> k <span class="kw">not</span> <span class="kw">in</span> excluded_params}</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>reprod_model_12 <span class="op">=</span> H2OGradientBoostingEstimator(<span class="op">**</span>model_12_actual_params)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>reprod_model_12.train(</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>feature_cols,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'dep_delayed_15min'</span>,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    training_frame<span class="op">=</span>X_y_train_h</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>reprod_model_12.auc(xval<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ 0.741785, the same as at the leaderboard</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> h2o.estimators.glm <span class="im">import</span> H2OGeneralizedLinearEstimator</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> h2o.grid.grid_search <span class="im">import</span> H2OGridSearch</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>model_93 <span class="op">=</span> h2o.load_model(os.path.join(models_path, <span class="st">"GLM_grid_1_AutoML_20190414_112210_model_1"</span>))</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>excluded_params <span class="op">=</span> [<span class="st">'model_id'</span>, <span class="st">'response_column'</span>, <span class="st">'ignored_columns'</span>, <span class="st">'lambda'</span>]</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>model_93_actual_params <span class="op">=</span> {k: v[<span class="st">'actual'</span>] <span class="cf">for</span> k, v <span class="kw">in</span> model_93.params.items() <span class="cf">if</span> k <span class="kw">not</span> <span class="kw">in</span> excluded_params}</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>reprod_model_93 <span class="op">=</span> H2OGeneralizedLinearEstimator(<span class="op">**</span>model_93_actual_params)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>reprod_model_93.train(</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span>feature_cols,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">'dep_delayed_15min'</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    training_frame<span class="op">=</span>X_y_train_h</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>reprod_model_93.auc(xval<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ^ 0.699418, the same as at the leaderboard</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s train the CatBoostClassifier with the default parameters and compare its results with AutoML run results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> catboost <span class="im">import</span> Pool, CatBoostClassifier, cv</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>cb_model <span class="op">=</span> CatBoostClassifier(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    eval_metric<span class="op">=</span><span class="st">'AUC'</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    use_best_model<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    random_seed<span class="op">=</span><span class="dv">17</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>cv_data <span class="op">=</span> cv(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    Pool(X_train, y_train, cat_features<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>]),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    cb_model.get_params(),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    fold_count<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CatBoostClassifier: the best cv auc is"</span>, np.<span class="bu">max</span>(cv_data[<span class="st">'test-AUC-mean'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The CatBoostClassifier cross-validation auc result is 0.749009. This value falls between the 2nd (auc = 0.749523) and 3rd (auc = 0.749192) places among the individual models at the leaderboard.</p>
+<p><strong>Example 2: a regression task</strong></p>
+<p>Let’s consider a regression task from the <a href="https://www.kaggle.com/c/nyc-taxi-trip-duration">“New York City Taxi Trip Duration” competition</a>. The challenge is to build a model that predicts the total ride duration of taxi trips in New York City. The features include pickup time, geo-coordinates, number of passengers, and a few other variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_train <span class="op">=</span> pd.read_csv(<span class="st">'../input/nyc-taxi-trip-duration/train.csv'</span>, index_col<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>df_test  <span class="op">=</span> pd.read_csv(<span class="st">'../input/nyc-taxi-trip-duration/test.csv'</span>,  index_col<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will use only <code>df_train</code> (perform 5-fold cross-validation on it). Convert the date- and time-related features to the <code>datetime</code> format; take the logarithm (<code>log(1 + x)</code>) of the target value (trip duration). After the logarithm transform, the distribution of the target variable is close to normal (see this <a href="https://www.kaggle.com/gaborfodor/from-eda-to-the-top-lb-0-367">kernel</a>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'pickup_datetime'</span>] <span class="op">=</span> pd.to_datetime(df_train.pickup_datetime)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>df_train.loc[:, <span class="st">'pickup_date'</span>] <span class="op">=</span> df_train[<span class="st">'pickup_datetime'</span>].dt.date</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'dropoff_datetime'</span>] <span class="op">=</span> pd.to_datetime(df_train.dropoff_datetime)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'store_and_fwd_flag'</span>] <span class="op">=</span> <span class="dv">1</span> <span class="op">*</span> (df_train.store_and_fwd_flag.values <span class="op">==</span> <span class="st">'Y'</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'check_trip_duration'</span>] <span class="op">=</span> (df_train[<span class="st">'dropoff_datetime'</span>] <span class="op">-</span> df_train[<span class="st">'pickup_datetime'</span>]).<span class="bu">map</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> x: x.total_seconds()</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>df_train[<span class="st">'log_trip_duration'</span>] <span class="op">=</span> np.log1p(df_train[<span class="st">'trip_duration'</span>].values)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>cnd <span class="op">=</span> np.<span class="bu">abs</span>(df_train[<span class="st">'check_trip_duration'</span>].values  <span class="op">-</span> df_train[<span class="st">'trip_duration'</span>].values) <span class="op">&gt;</span> <span class="dv">1</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>duration_difference <span class="op">=</span> df_train[cnd]</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(duration_difference[[<span class="st">'pickup_datetime'</span>, <span class="st">'dropoff_datetime'</span>, <span class="st">'trip_duration'</span>, <span class="st">'check_trip_duration'</span>]]) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Trip_duration and datetimes are ok.'</span>)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Ooops.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Select the columns common to the train set and test set; convert <code>pd.DataFrame</code> to <code>H2OFrame</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>common_cols <span class="op">=</span> [</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'vendor_id'</span>, </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'pickup_datetime'</span>, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'passenger_count'</span>, </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'pickup_longitude'</span>, <span class="st">'pickup_latitude'</span>, </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'dropoff_longitude'</span>, <span class="st">'dropoff_latitude'</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'store_and_fwd_flag'</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>X_y_train_h <span class="op">=</span> h2o.H2OFrame(</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    pd.concat(</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>        [df_train[common_cols], df_train[<span class="st">'log_trip_duration'</span>]],</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        axis<span class="op">=</span><span class="st">'columns'</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ft <span class="kw">in</span> [<span class="st">'vendor_id'</span>, <span class="st">'store_and_fwd_flag'</span>]:</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    X_y_train_h[ft] <span class="op">=</span> X_y_train_h[ft].asfactor()</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>X_y_train_h.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I have run the cell below (~8 hours), saved all models and the leaderboard, then commented out the code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># aml = H2OAutoML(</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     max_runtime_secs=(3600 * 8),  # 8 hours</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     max_models=None,  # no limit</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     seed=SEED,</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># aml.train(</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     x=common_cols,</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     y='log_trip_duration',</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#     training_frame=X_y_train_h</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># lb = aml.leaderboard</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># model_ids = list(lb['model_id'].as_data_frame().iloc[:,0])</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co"># out_path = "."</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co"># for m_id in model_ids:</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#     mdl = h2o.get_model(m_id)</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co">#     h2o.save_model(model=mdl, path=out_path, force=True)</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="co"># h2o.export_file(lb, os.path.join(out_path, 'aml_leaderboard.h2o'), force=True)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Interestingly, there is only one model at the leaderboard:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>models_path <span class="op">=</span> <span class="st">"../input/h2o-automl-saved-models-regress/"</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>lb <span class="op">=</span> h2o.import_file(path<span class="op">=</span>os.path.join(models_path, <span class="st">"aml_leaderboard.h2o"</span>))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>lb.head(rows<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s compare the result of the model <code>XGBoost_1_AutoML_20190417_212831</code> with that of the CatBoostRegressor with the default parameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> catboost <span class="im">import</span> Pool, CatBoostRegressor, cv</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>cb_model <span class="op">=</span> CatBoostRegressor(</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    eval_metric<span class="op">=</span><span class="st">'RMSE'</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    use_best_model<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    random_seed<span class="op">=</span><span class="dv">17</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>cv_data <span class="op">=</span> cv(</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    Pool(df_train[common_cols], df_train[<span class="st">'log_trip_duration'</span>], cat_features<span class="op">=</span>[<span class="dv">0</span>,<span class="dv">7</span>]),</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    cb_model.get_params(),</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    fold_count<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CatBoostRegressor: the best cv rmse is"</span>, np.<span class="bu">min</span>(cv_data[<span class="st">'test-RMSE-mean'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Default CatBoost’s RMSE is slightly worse than that of the XGBoost model from the H2O AutoML run.</p>
+<p><strong>Conclusion</strong></p>
+<p>I think that H2O AutoML is worth a try. And I hope you have found this tutorial useful.</p>
+<p>There are extremely useful “H2O AutoML Pro Tips” in the presentation “Scalable Automatic Machine Learning in H2O” mentioned in the References below.</p>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://www.h2o.ai/">H2O.ai</a></li>
+<li><a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html">H2O AutoML documentation</a></li>
+<li><a href="https://github.com/h2oai/h2o-tutorials/tree/master/h2o-world-2017/automl">AutoML Tutorial</a>: R and Python notebooks</li>
+<li>Intro to AutoML + Hands-on Lab: <a href="https://www.youtube.com/watch?v=42Oo8TOl85I">1 hour video</a>, <a href="https://www.slideshare.net/0xdata/intro-to-automl-handson-lab-erin-ledell-machine-learning-scientist-h2oai">slides</a></li>
+<li>Scalable Automatic Machine Learning in H2O: <a href="https://www.youtube.com/watch?v=j6rqrEYQNdo">1 hour video</a>, <a href="https://www.slideshare.net/0xdata/scalable-automatic-machine-learning-in-h2o-89130971">slides</a></li>
+<li><a href="https://www.h2o.ai/products/h2o4gpu/">H2O for GPU</a> (H2O4GPU)</li>
+</ul>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

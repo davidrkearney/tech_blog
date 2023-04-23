@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - Tensorflow and Keras</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Tensorflow and Keras</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p><a href="https://colab.research.google.com/github/davidrkearney/colab-notebooks/blob/main/Tensorflow_and_Keras.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a></p>
+<section id="credit-code-from-httpsgithub.comjeffheatont81_558_deep_learning" class="level2">
+<h2 class="anchored" data-anchor-id="credit-code-from-httpsgithub.comjeffheatont81_558_deep_learning">Credit: Code from https://github.com/jeffheaton/t81_558_deep_learning</h2>
+<ul>
+<li><a href="https://www.tensorflow.org/">TensorFlow Homepage</a></li>
+<li><a href="https://github.com/tensorflow/tensorflow">TensorFlow GitHib</a></li>
+<li><a href="https://groups.google.com/forum/#!forum/tensorflow">TensorFlow Google Groups Support</a></li>
+<li><a href="https://groups.google.com/a/tensorflow.org/forum/#!forum/discuss">TensorFlow Google Groups Developer Discussion</a></li>
+<li><a href="https://www.tensorflow.org/resources/faq">TensorFlow FAQ</a></li>
+</ul>
+</section>
+<section id="deep-learning-tools" class="level2">
+<h2 class="anchored" data-anchor-id="deep-learning-tools">Deep Learning Tools</h2>
+<ul>
+<li><p><strong><a href="https://www.tensorflow.org/">TensorFlow</a></strong> - Google’s deep learning API. The focus of this class, along with Keras.</p></li>
+<li><p><strong><a href="https://keras.io/">Keras</a></strong> - Also by Google, higher level framework that allows the use of TensorFlow, MXNet and Theano interchangeably.</p></li>
+<li><p><strong><a href="https://pytorch.org/">PyTorch</a></strong> - PyTorch is an open source machine learning library based on the Torch library, used for applications such as computer vision and natural language processing. It is primarily developed by Facebook’s AI Research lab.</p></li>
+<li><p><strong><a href="https://mxnet.incubator.apache.org/">MXNet</a></strong> Apache foundation’s deep learning API. Can be used through Keras.</p></li>
+<li><p><strong><a href="http://torch.ch/">Torch</a></strong> is used by Google DeepMind, the Facebook AI Research Group, IBM, Yandex and the Idiap Research Institute. It has been used for some of the most advanced deep learning projects in the world. However, it requires the <a href="https://en.wikipedia.org/wiki/Lua_(programming_language)">LUA</a>** programming language. It is very advanced, but it is not mainstream. I have not worked with Torch (yet!).</p></li>
+<li><p><strong><a href="https://github.com/baidu/Paddle">PaddlePaddle</a></strong> - <a href="http://www.baidu.com/">Baidu</a>’s deep learning API.</p></li>
+<li><p><strong><a href="http://deeplearning4j.org/">Deeplearning4J</a></strong> - Java based. Supports all major platforms. GPU support in Java!</p></li>
+<li><p><strong><a href="https://github.com/Microsoft/CNTK">Computational Network Toolkit (CNTK)</a></strong> - Microsoft. Support for Windows/Linux, command line only. Bindings for predictions for C#/Python. GPU support.</p></li>
+<li><p><strong><a href="http://www.h2o.ai/">H2O</a></strong> - Java based. Supports all major platforms. Limited support for computer vision. No GPU support.</p></li>
+<li><p>Communicate with TensorFlow using Keras <a href="https://www.manning.com/books/deep-learning-with-python">[Cite:franccois2017deep]</a>.</p></li>
+</ul>
+<div class="cell" data-outputid="1a8dc23b-e08f-4470-d35e-c34b66adaa2a" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">%</span>tensorflow_version <span class="fl">2.</span><span class="er">x</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    COLAB <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Note: using Google CoLab"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span>:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Note: not using Google CoLab"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    COLAB <span class="op">=</span> <span class="va">False</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Note: using Google CoLab</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="e4d45d61-df0a-40ec-a98f-f8b31a9623f3" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Constant op that produces a 1x2 matrix.  The op is</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># added as a node to the default graph.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># The value returned by the constructor represents the output</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># of the Constant op.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>matrix1 <span class="op">=</span> tf.constant([[<span class="fl">3.</span>, <span class="fl">3.</span>]])</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create another Constant that produces a 2x1 matrix.</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>matrix2 <span class="op">=</span> tf.constant([[<span class="fl">2.</span>],[<span class="fl">2.</span>]])</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Matmul op that takes 'matrix1' and 'matrix2' as inputs.</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># The returned value, 'product', represents the result of the matrix</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># multiplication.</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>product <span class="op">=</span> tf.matmul(matrix1, matrix2)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(product)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">float</span>(product))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tf.Tensor([[12.]], shape=(1, 1), dtype=float32)
+12.0</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="c8b6837c-9b9d-41f0-d1cb-760d98e8dc6c" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> tf.Variable([<span class="fl">1.0</span>, <span class="fl">2.0</span>])</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> tf.constant([<span class="fl">3.0</span>, <span class="fl">3.0</span>])</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Add an op to subtract 'a' from 'x'.  Run it and print the result</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>sub <span class="op">=</span> tf.subtract(x, a)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sub)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sub.numpy())</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ==&gt; [-2. -1.]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tf.Tensor([-2. -1.], shape=(2,), dtype=float32)
+[-2. -1.]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f41ddf96-a723-40d1-9ba4-a7ea342bb959" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x.assign([<span class="fl">4.0</span>, <span class="fl">6.0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>&lt;tf.Variable 'UnreadVariable' shape=(2,) dtype=float32, numpy=array([4., 6.], dtype=float32)&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f2b6f526-8013-4902-dcde-0772b802bb84" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sub <span class="op">=</span> tf.subtract(x, a)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sub)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sub.numpy())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tf.Tensor([1. 3.], shape=(2,), dtype=float32)
+[1. 3.]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="060b2939-6983-4f98-b6be-d4282ee2df9d" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import libraries for simulation</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Imports for visualization</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> PIL.Image</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Image, display</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> DisplayFractal(a, fmt<span class="op">=</span><span class="st">'jpeg'</span>):</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">"""Display an array of iteration counts as a</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">     colorful picture of a fractal."""</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  a_cyclic <span class="op">=</span> (<span class="fl">6.28</span><span class="op">*</span>a<span class="op">/</span><span class="fl">20.0</span>).reshape(<span class="bu">list</span>(a.shape)<span class="op">+</span>[<span class="dv">1</span>])</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  img <span class="op">=</span> np.concatenate([<span class="dv">10</span><span class="op">+</span><span class="dv">20</span><span class="op">*</span>np.cos(a_cyclic),</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                        <span class="dv">30</span><span class="op">+</span><span class="dv">50</span><span class="op">*</span>np.sin(a_cyclic),</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                        <span class="dv">155</span><span class="op">-</span><span class="dv">80</span><span class="op">*</span>np.cos(a_cyclic)], <span class="dv">2</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  img[a<span class="op">==</span>a.<span class="bu">max</span>()] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  a <span class="op">=</span> img</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  a <span class="op">=</span> np.uint8(np.clip(a, <span class="dv">0</span>, <span class="dv">255</span>))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> BytesIO()</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  PIL.Image.fromarray(a).save(f, fmt)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  display(Image(data<span class="op">=</span>f.getvalue()))</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Use NumPy to create a 2D array of complex numbers</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>Y, X <span class="op">=</span> np.mgrid[<span class="op">-</span><span class="fl">1.3</span>:<span class="fl">1.3</span>:<span class="fl">0.005</span>, <span class="op">-</span><span class="dv">2</span>:<span class="dv">1</span>:<span class="fl">0.005</span>]</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> X<span class="op">+</span><span class="ot">1j</span><span class="op">*</span>Y</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> tf.constant(Z.astype(np.complex64))</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>zs <span class="op">=</span> tf.Variable(xs)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> tf.Variable(tf.zeros_like(xs, tf.float32))</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Operation to update the zs and the iteration count.</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: We keep computing zs after they diverge! This</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#       is very wasteful! There are better, if a little</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#       less simple, ways to do this.</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>):</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the new values of z: z^2 + x</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    zs_ <span class="op">=</span> zs<span class="op">*</span>zs <span class="op">+</span> xs</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Have we diverged with this new value?</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    not_diverged <span class="op">=</span> tf.<span class="bu">abs</span>(zs_) <span class="op">&lt;</span> <span class="dv">4</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    zs.assign(zs_),</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>    ns.assign_add(tf.cast(not_diverged, tf.float32))</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>DisplayFractal(ns.numpy())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-11-12-Tensorflow_and_Keras_files/figure-html/cell-7-output-1.jpeg" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-outputid="b3a70e43-ad31-4e82-b3d7-bdc42f78a975" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.models <span class="im">import</span> Sequential</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers <span class="im">import</span> Dense, Activation</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> metrics</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://data.heatonresearch.com/data/t81-558/auto-mpg.csv"</span>, </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    na_values<span class="op">=</span>[<span class="st">'NA'</span>, <span class="st">'?'</span>])</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>cars <span class="op">=</span> df[<span class="st">'name'</span>]</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Handle missing value</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'horsepower'</span>] <span class="op">=</span> df[<span class="st">'horsepower'</span>].fillna(df[<span class="st">'horsepower'</span>].median())</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Pandas to Numpy</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> df[[<span class="st">'cylinders'</span>, <span class="st">'displacement'</span>, <span class="st">'horsepower'</span>, <span class="st">'weight'</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>       <span class="st">'acceleration'</span>, <span class="st">'year'</span>, <span class="st">'origin'</span>]].values</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'mpg'</span>].values <span class="co"># regression</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the neural network</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Sequential()</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="dv">25</span>, input_dim<span class="op">=</span>x.shape[<span class="dv">1</span>], activation<span class="op">=</span><span class="st">'relu'</span>)) <span class="co"># Hidden 1</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="dv">10</span>, activation<span class="op">=</span><span class="st">'relu'</span>)) <span class="co"># Hidden 2</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="dv">1</span>)) <span class="co"># Output</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">'mean_squared_error'</span>, optimizer<span class="op">=</span><span class="st">'adam'</span>)</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>model.fit(x,y,verbose<span class="op">=</span><span class="dv">2</span>,epochs<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/100
+13/13 - 0s - loss: 4580.9326
+Epoch 2/100
+13/13 - 0s - loss: 1225.3738
+Epoch 3/100
+13/13 - 0s - loss: 553.5983
+Epoch 4/100
+13/13 - 0s - loss: 376.0931
+Epoch 5/100
+13/13 - 0s - loss: 371.2755
+Epoch 6/100
+13/13 - 0s - loss: 355.6521
+Epoch 7/100
+13/13 - 0s - loss: 340.7242
+Epoch 8/100
+13/13 - 0s - loss: 332.5170
+Epoch 9/100
+13/13 - 0s - loss: 321.3474
+Epoch 10/100
+13/13 - 0s - loss: 309.0533
+Epoch 11/100
+13/13 - 0s - loss: 298.6037
+Epoch 12/100
+13/13 - 0s - loss: 290.2845
+Epoch 13/100
+13/13 - 0s - loss: 281.7734
+Epoch 14/100
+13/13 - 0s - loss: 267.6147
+Epoch 15/100
+13/13 - 0s - loss: 255.6712
+Epoch 16/100
+13/13 - 0s - loss: 245.0956
+Epoch 17/100
+13/13 - 0s - loss: 238.7114
+Epoch 18/100
+13/13 - 0s - loss: 228.2198
+Epoch 19/100
+13/13 - 0s - loss: 215.6643
+Epoch 20/100
+13/13 - 0s - loss: 206.8975
+Epoch 21/100
+13/13 - 0s - loss: 198.3939
+Epoch 22/100
+13/13 - 0s - loss: 189.5826
+Epoch 23/100
+13/13 - 0s - loss: 184.5812
+Epoch 24/100
+13/13 - 0s - loss: 173.4126
+Epoch 25/100
+13/13 - 0s - loss: 169.0896
+Epoch 26/100
+13/13 - 0s - loss: 158.8616
+Epoch 27/100
+13/13 - 0s - loss: 147.4314
+Epoch 28/100
+13/13 - 0s - loss: 140.2026
+Epoch 29/100
+13/13 - 0s - loss: 133.2955
+Epoch 30/100
+13/13 - 0s - loss: 128.1834
+Epoch 31/100
+13/13 - 0s - loss: 120.1640
+Epoch 32/100
+13/13 - 0s - loss: 114.6829
+Epoch 33/100
+13/13 - 0s - loss: 109.8683
+Epoch 34/100
+13/13 - 0s - loss: 105.6856
+Epoch 35/100
+13/13 - 0s - loss: 100.0182
+Epoch 36/100
+13/13 - 0s - loss: 93.3371
+Epoch 37/100
+13/13 - 0s - loss: 91.3530
+Epoch 38/100
+13/13 - 0s - loss: 85.7752
+Epoch 39/100
+13/13 - 0s - loss: 82.4184
+Epoch 40/100
+13/13 - 0s - loss: 76.0113
+Epoch 41/100
+13/13 - 0s - loss: 73.7212
+Epoch 42/100
+13/13 - 0s - loss: 70.6216
+Epoch 43/100
+13/13 - 0s - loss: 67.4598
+Epoch 44/100
+13/13 - 0s - loss: 64.0807
+Epoch 45/100
+13/13 - 0s - loss: 62.0253
+Epoch 46/100
+13/13 - 0s - loss: 59.2131
+Epoch 47/100
+13/13 - 0s - loss: 56.5928
+Epoch 48/100
+13/13 - 0s - loss: 56.3038
+Epoch 49/100
+13/13 - 0s - loss: 52.7268
+Epoch 50/100
+13/13 - 0s - loss: 50.3988
+Epoch 51/100
+13/13 - 0s - loss: 49.0474
+Epoch 52/100
+13/13 - 0s - loss: 47.9957
+Epoch 53/100
+13/13 - 0s - loss: 47.7353
+Epoch 54/100
+13/13 - 0s - loss: 44.7161
+Epoch 55/100
+13/13 - 0s - loss: 44.8755
+Epoch 56/100
+13/13 - 0s - loss: 43.3957
+Epoch 57/100
+13/13 - 0s - loss: 42.0779
+Epoch 58/100
+13/13 - 0s - loss: 41.9396
+Epoch 59/100
+13/13 - 0s - loss: 40.3681
+Epoch 60/100
+13/13 - 0s - loss: 41.1852
+Epoch 61/100
+13/13 - 0s - loss: 39.7117
+Epoch 62/100
+13/13 - 0s - loss: 41.0216
+Epoch 63/100
+13/13 - 0s - loss: 36.1499
+Epoch 64/100
+13/13 - 0s - loss: 35.3468
+Epoch 65/100
+13/13 - 0s - loss: 35.1042
+Epoch 66/100
+13/13 - 0s - loss: 34.2546
+Epoch 67/100
+13/13 - 0s - loss: 33.6177
+Epoch 68/100
+13/13 - 0s - loss: 32.9660
+Epoch 69/100
+13/13 - 0s - loss: 32.6077
+Epoch 70/100
+13/13 - 0s - loss: 32.2787
+Epoch 71/100
+13/13 - 0s - loss: 31.4921
+Epoch 72/100
+13/13 - 0s - loss: 30.9388
+Epoch 73/100
+13/13 - 0s - loss: 30.7971
+Epoch 74/100
+13/13 - 0s - loss: 30.1166
+Epoch 75/100
+13/13 - 0s - loss: 30.3033
+Epoch 76/100
+13/13 - 0s - loss: 29.7823
+Epoch 77/100
+13/13 - 0s - loss: 29.0691
+Epoch 78/100
+13/13 - 0s - loss: 29.2846
+Epoch 79/100
+13/13 - 0s - loss: 28.1004
+Epoch 80/100
+13/13 - 0s - loss: 28.0843
+Epoch 81/100
+13/13 - 0s - loss: 27.5363
+Epoch 82/100
+13/13 - 0s - loss: 27.3842
+Epoch 83/100
+13/13 - 0s - loss: 26.8047
+Epoch 84/100
+13/13 - 0s - loss: 26.2902
+Epoch 85/100
+13/13 - 0s - loss: 26.4791
+Epoch 86/100
+13/13 - 0s - loss: 25.9914
+Epoch 87/100
+13/13 - 0s - loss: 26.4426
+Epoch 88/100
+13/13 - 0s - loss: 25.3650
+Epoch 89/100
+13/13 - 0s - loss: 24.7668
+Epoch 90/100
+13/13 - 0s - loss: 25.0466
+Epoch 91/100
+13/13 - 0s - loss: 23.9254
+Epoch 92/100
+13/13 - 0s - loss: 24.7530
+Epoch 93/100
+13/13 - 0s - loss: 24.3067
+Epoch 94/100
+13/13 - 0s - loss: 25.2663
+Epoch 95/100
+13/13 - 0s - loss: 24.8965
+Epoch 96/100
+13/13 - 0s - loss: 24.3817
+Epoch 97/100
+13/13 - 0s - loss: 22.7545
+Epoch 98/100
+13/13 - 0s - loss: 23.2711
+Epoch 99/100
+13/13 - 0s - loss: 22.9325
+Epoch 100/100
+13/13 - 0s - loss: 22.9305</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>&lt;tensorflow.python.keras.callbacks.History at 0x7efe002f9fd0&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f3be6f5b-8a79-4b51-dd6f-f94a9c3d7a27" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> model.predict(x)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>pred<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred[<span class="dv">0</span>:<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (398, 1)
+[[14.227755]
+ [13.352877]
+ [13.366304]
+ [14.042093]
+ [13.76317 ]
+ [12.621584]
+ [11.604197]
+ [11.754587]
+ [12.065157]
+ [11.800211]]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="1a92bc50-1d1e-4015-b661-476f76d985bd" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure RMSE error.  RMSE is common for regression.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>score <span class="op">=</span> np.sqrt(metrics.mean_squared_error(pred,y))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Final score (RMSE): </span><span class="sc">{</span>score<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final score (RMSE): 4.71485252486946</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="db5f0d53-2886-42f2-f583-e8ff15c7ecdf" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample predictions</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. Car name: </span><span class="sc">{</span>cars[i]<span class="sc">}</span><span class="ss">, MPG: </span><span class="sc">{</span>y[i]<span class="sc">}</span><span class="ss">, "</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>          <span class="op">+</span> <span class="st">"predicted MPG: </span><span class="sc">{pred[i]}</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1. Car name: chevrolet chevelle malibu, MPG: 18.0, predicted MPG: {pred[i]}
+2. Car name: buick skylark 320, MPG: 15.0, predicted MPG: {pred[i]}
+3. Car name: plymouth satellite, MPG: 18.0, predicted MPG: {pred[i]}
+4. Car name: amc rebel sst, MPG: 16.0, predicted MPG: {pred[i]}
+5. Car name: ford torino, MPG: 17.0, predicted MPG: {pred[i]}
+6. Car name: ford galaxie 500, MPG: 15.0, predicted MPG: {pred[i]}
+7. Car name: chevrolet impala, MPG: 14.0, predicted MPG: {pred[i]}
+8. Car name: plymouth fury iii, MPG: 14.0, predicted MPG: {pred[i]}
+9. Car name: pontiac catalina, MPG: 14.0, predicted MPG: {pred[i]}
+10. Car name: amc ambassador dpl, MPG: 15.0, predicted MPG: {pred[i]}</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f8309755-b731-4ee9-c9c6-ea9ac5d8bfbd" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> metrics</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.models <span class="im">import</span> Sequential</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.layers <span class="im">import</span> Dense, Activation</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tensorflow.keras.callbacks <span class="im">import</span> EarlyStopping</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://data.heatonresearch.com/data/t81-558/iris.csv"</span>, </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    na_values<span class="op">=</span>[<span class="st">'NA'</span>, <span class="st">'?'</span>])</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to numpy - Classification</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> df[[<span class="st">'sepal_l'</span>, <span class="st">'sepal_w'</span>, <span class="st">'petal_l'</span>, <span class="st">'petal_w'</span>]].values</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>dummies <span class="op">=</span> pd.get_dummies(df[<span class="st">'species'</span>]) <span class="co"># Classification</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>species <span class="op">=</span> dummies.columns</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> dummies.values</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Build neural network</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> Sequential()</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="dv">50</span>, input_dim<span class="op">=</span>x.shape[<span class="dv">1</span>], activation<span class="op">=</span><span class="st">'relu'</span>)) <span class="co"># Hidden 1</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>model.add(Dense(<span class="dv">25</span>, activation<span class="op">=</span><span class="st">'relu'</span>)) <span class="co"># Hidden 2</span></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>model.add(Dense(y.shape[<span class="dv">1</span>],activation<span class="op">=</span><span class="st">'softmax'</span>)) <span class="co"># Output</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>model.<span class="bu">compile</span>(loss<span class="op">=</span><span class="st">'categorical_crossentropy'</span>, optimizer<span class="op">=</span><span class="st">'adam'</span>)</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>model.fit(x,y,verbose<span class="op">=</span><span class="dv">2</span>,epochs<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch 1/100
+5/5 - 0s - loss: 1.2044
+Epoch 2/100
+5/5 - 0s - loss: 1.0163
+Epoch 3/100
+5/5 - 0s - loss: 0.9398
+Epoch 4/100
+5/5 - 0s - loss: 0.9153
+Epoch 5/100
+5/5 - 0s - loss: 0.8853
+Epoch 6/100
+5/5 - 0s - loss: 0.8544
+Epoch 7/100
+5/5 - 0s - loss: 0.8274
+Epoch 8/100
+5/5 - 0s - loss: 0.8119
+Epoch 9/100
+5/5 - 0s - loss: 0.7936
+Epoch 10/100
+5/5 - 0s - loss: 0.7705
+Epoch 11/100
+5/5 - 0s - loss: 0.7500
+Epoch 12/100
+5/5 - 0s - loss: 0.7247
+Epoch 13/100
+5/5 - 0s - loss: 0.7005
+Epoch 14/100
+5/5 - 0s - loss: 0.6765
+Epoch 15/100
+5/5 - 0s - loss: 0.6503
+Epoch 16/100
+5/5 - 0s - loss: 0.6312
+Epoch 17/100
+5/5 - 0s - loss: 0.6034
+Epoch 18/100
+5/5 - 0s - loss: 0.5799
+Epoch 19/100
+5/5 - 0s - loss: 0.5612
+Epoch 20/100
+5/5 - 0s - loss: 0.5416
+Epoch 21/100
+5/5 - 0s - loss: 0.5222
+Epoch 22/100
+5/5 - 0s - loss: 0.5048
+Epoch 23/100
+5/5 - 0s - loss: 0.4886
+Epoch 24/100
+5/5 - 0s - loss: 0.4717
+Epoch 25/100
+5/5 - 0s - loss: 0.4600
+Epoch 26/100
+5/5 - 0s - loss: 0.4461
+Epoch 27/100
+5/5 - 0s - loss: 0.4323
+Epoch 28/100
+5/5 - 0s - loss: 0.4218
+Epoch 29/100
+5/5 - 0s - loss: 0.4096
+Epoch 30/100
+5/5 - 0s - loss: 0.3990
+Epoch 31/100
+5/5 - 0s - loss: 0.3883
+Epoch 32/100
+5/5 - 0s - loss: 0.3787
+Epoch 33/100
+5/5 - 0s - loss: 0.3684
+Epoch 34/100
+5/5 - 0s - loss: 0.3594
+Epoch 35/100
+5/5 - 0s - loss: 0.3510
+Epoch 36/100
+5/5 - 0s - loss: 0.3413
+Epoch 37/100
+5/5 - 0s - loss: 0.3341
+Epoch 38/100
+5/5 - 0s - loss: 0.3243
+Epoch 39/100
+5/5 - 0s - loss: 0.3164
+Epoch 40/100
+5/5 - 0s - loss: 0.3128
+Epoch 41/100
+5/5 - 0s - loss: 0.3011
+Epoch 42/100
+5/5 - 0s - loss: 0.2978
+Epoch 43/100
+5/5 - 0s - loss: 0.2863
+Epoch 44/100
+5/5 - 0s - loss: 0.2832
+Epoch 45/100
+5/5 - 0s - loss: 0.2735
+Epoch 46/100
+5/5 - 0s - loss: 0.2705
+Epoch 47/100
+5/5 - 0s - loss: 0.2627
+Epoch 48/100
+5/5 - 0s - loss: 0.2563
+Epoch 49/100
+5/5 - 0s - loss: 0.2499
+Epoch 50/100
+5/5 - 0s - loss: 0.2448
+Epoch 51/100
+5/5 - 0s - loss: 0.2381
+Epoch 52/100
+5/5 - 0s - loss: 0.2348
+Epoch 53/100
+5/5 - 0s - loss: 0.2301
+Epoch 54/100
+5/5 - 0s - loss: 0.2236
+Epoch 55/100
+5/5 - 0s - loss: 0.2187
+Epoch 56/100
+5/5 - 0s - loss: 0.2144
+Epoch 57/100
+5/5 - 0s - loss: 0.2082
+Epoch 58/100
+5/5 - 0s - loss: 0.2033
+Epoch 59/100
+5/5 - 0s - loss: 0.1978
+Epoch 60/100
+5/5 - 0s - loss: 0.1949
+Epoch 61/100
+5/5 - 0s - loss: 0.1858
+Epoch 62/100
+5/5 - 0s - loss: 0.1832
+Epoch 63/100
+5/5 - 0s - loss: 0.1779
+Epoch 64/100
+5/5 - 0s - loss: 0.1736
+Epoch 65/100
+5/5 - 0s - loss: 0.1689
+Epoch 66/100
+5/5 - 0s - loss: 0.1657
+Epoch 67/100
+5/5 - 0s - loss: 0.1655
+Epoch 68/100
+5/5 - 0s - loss: 0.1607
+Epoch 69/100
+5/5 - 0s - loss: 0.1587
+Epoch 70/100
+5/5 - 0s - loss: 0.1523
+Epoch 71/100
+5/5 - 0s - loss: 0.1498
+Epoch 72/100
+5/5 - 0s - loss: 0.1473
+Epoch 73/100
+5/5 - 0s - loss: 0.1452
+Epoch 74/100
+5/5 - 0s - loss: 0.1455
+Epoch 75/100
+5/5 - 0s - loss: 0.1390
+Epoch 76/100
+5/5 - 0s - loss: 0.1415
+Epoch 77/100
+5/5 - 0s - loss: 0.1332
+Epoch 78/100
+5/5 - 0s - loss: 0.1379
+Epoch 79/100
+5/5 - 0s - loss: 0.1297
+Epoch 80/100
+5/5 - 0s - loss: 0.1287
+Epoch 81/100
+5/5 - 0s - loss: 0.1269
+Epoch 82/100
+5/5 - 0s - loss: 0.1243
+Epoch 83/100
+5/5 - 0s - loss: 0.1234
+Epoch 84/100
+5/5 - 0s - loss: 0.1204
+Epoch 85/100
+5/5 - 0s - loss: 0.1196
+Epoch 86/100
+5/5 - 0s - loss: 0.1177
+Epoch 87/100
+5/5 - 0s - loss: 0.1153
+Epoch 88/100
+5/5 - 0s - loss: 0.1154
+Epoch 89/100
+5/5 - 0s - loss: 0.1138
+Epoch 90/100
+5/5 - 0s - loss: 0.1118
+Epoch 91/100
+5/5 - 0s - loss: 0.1101
+Epoch 92/100
+5/5 - 0s - loss: 0.1094
+Epoch 93/100
+5/5 - 0s - loss: 0.1087
+Epoch 94/100
+5/5 - 0s - loss: 0.1057
+Epoch 95/100
+5/5 - 0s - loss: 0.1066
+Epoch 96/100
+5/5 - 0s - loss: 0.1035
+Epoch 97/100
+5/5 - 0s - loss: 0.1027
+Epoch 98/100
+5/5 - 0s - loss: 0.1037
+Epoch 99/100
+5/5 - 0s - loss: 0.1016
+Epoch 100/100
+5/5 - 0s - loss: 0.1036</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>&lt;tensorflow.python.keras.callbacks.History at 0x7efe41398b00&gt;</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="062dcacf-f288-4000-dbc6-b78fd7172e88" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print out number of species found:</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Index(['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'], dtype='object')</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="314b2d1c-6872-4b40-911c-2420731bafe3" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> model.predict(x)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>pred<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred[<span class="dv">0</span>:<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape: (150, 3)
+[[9.97697055e-01 2.15794984e-03 1.44956546e-04]
+ [9.94137406e-01 5.50468592e-03 3.57910059e-04]
+ [9.96191502e-01 3.52777750e-03 2.80687527e-04]
+ [9.93117690e-01 6.42941520e-03 4.52894397e-04]
+ [9.97973382e-01 1.89066969e-03 1.36019531e-04]
+ [9.97510195e-01 2.37838831e-03 1.11383706e-04]
+ [9.95967269e-01 3.74595844e-03 2.86734197e-04]
+ [9.96544778e-01 3.24807805e-03 2.07129444e-04]
+ [9.91251111e-01 8.11220054e-03 6.36695651e-04]
+ [9.94891763e-01 4.79313312e-03 3.15106096e-04]]</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>np.set_printoptions(suppress<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-outputid="b6a126e2-b9dc-48d9-9ac6-ac60762128a3" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y[<span class="dv">0</span>:<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]
+ [1 0 0]]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="9313053c-4c0f-4111-ed50-6c372e9ecd67" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>predict_classes <span class="op">=</span> np.argmax(pred,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>expected_classes <span class="op">=</span> np.argmax(y,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Predictions: </span><span class="sc">{</span>predict_classes<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected: </span><span class="sc">{</span>expected_classes<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predictions: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 2 1
+ 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2
+ 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ 2 2]
+Expected: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2
+ 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ 2 2]</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="323535be-8ace-43a8-94d6-3fbb1ecc38d4" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(species[predict_classes[<span class="dv">1</span>:<span class="dv">10</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Index(['Iris-setosa', 'Iris-setosa', 'Iris-setosa', 'Iris-setosa',
+       'Iris-setosa', 'Iris-setosa', 'Iris-setosa', 'Iris-setosa',
+       'Iris-setosa'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="c5613bc3-b017-4cbf-b5c7-a8b8ad581754" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>correct <span class="op">=</span> accuracy_score(expected_classes,predict_classes)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Accuracy: </span><span class="sc">{</span>correct<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Accuracy: 0.98</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="25347fec-f42c-4100-dace-0acb38250867" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sample_flower <span class="op">=</span> np.array( [[<span class="fl">5.0</span>,<span class="fl">3.0</span>,<span class="fl">4.0</span>,<span class="fl">2.0</span>]], dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> model.predict(sample_flower)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> np.argmax(pred)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Predict that </span><span class="sc">{</span>sample_flower<span class="sc">}</span><span class="ss"> is: </span><span class="sc">{</span>species[pred]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[0.00188068 0.5159181  0.48220128]]
+Predict that [[5. 3. 4. 2.]] is: Iris-versicolor</code></pre>
+</div>
+</div>
+<div class="cell" data-outputid="f354f14a-a582-421c-e494-be2b1aed08ff" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>sample_flower <span class="op">=</span> np.array( [[<span class="fl">5.0</span>,<span class="fl">3.0</span>,<span class="fl">4.0</span>,<span class="fl">2.0</span>],[<span class="fl">5.2</span>,<span class="fl">3.5</span>,<span class="fl">1.5</span>,<span class="fl">0.8</span>]],<span class="op">\</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>        dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> model.predict(sample_flower)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> np.argmax(pred,axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Predict that these two flowers </span><span class="sc">{</span>sample_flower<span class="sc">}</span><span class="ss"> "</span>)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"are: </span><span class="sc">{</span>species[pred]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[0.00188067 0.51591814 0.4822012 ]
+ [0.9928797  0.00682994 0.0002904 ]]
+Predict that these two flowers [[5.  3.  4.  2. ]
+ [5.2 3.5 1.5 0.8]] 
+are: Index(['Iris-versicolor', 'Iris-setosa'], dtype='object')</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

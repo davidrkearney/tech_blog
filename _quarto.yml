@@ -2,14 +2,14 @@ project:
   type: website
 
 website:
-  title: "tech_blog"
+  title: "Kearney Data Science"
   navbar:
     right:
       - about.qmd
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/davidrkearney
+      - icon: linkedin
+        href: https://www.linkedin.com/in/davidrkearney/
 format:
   html:
     theme: cosmo

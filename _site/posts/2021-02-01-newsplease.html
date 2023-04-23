@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - Using NewsPlease an open source, news crawler that extracts structured information</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Using NewsPlease an open source, news crawler that extracts structured information</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>https://github.com/fhamborg/news-please</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> newsplease <span class="im">import</span> NewsPlease</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>article <span class="op">=</span> NewsPlease.from_url(<span class="st">'https://www.bbc.com/vietnamese/vert-earth-55751040'</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(article.title)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Những loài vật chịu được độ lạnh lẽo khủng khiếp nhất hành tinh</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>article.authors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>['Https', 'Www.Facebook.Com Bbcnews']</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>article.date_publish</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>datetime.datetime(2021, 1, 25, 0, 0)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>article.description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>'Một số loài động vật kỳ lạ đã có chiến lược thông minh và tiến hóa để sinh tồn được trong những điều kiện khí hậu khủng khiếp nhất.'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>article.filename</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>'https%3A%2F%2Fwww.bbc.com%2Fvietnamese%2Fvert-earth-55751040.json'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>article.language</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>'vi'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>article.maintext</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>'Những loài vật chịu được độ lạnh lẽo khủng khiếp nhất hành tinh\nDale Shaw\nBBC Earth\nNguồn hình ảnh, Getty Images\nLoài động vật nào có thể sống sót trong điều kiện nhiệt độ thấp nhất?\nChúng ta đang nói tới những động vật sống ở xứ hàn đới vĩ đại nhất trên hành tinh.\nĐúng vậy, những loài ở xứ lạnh, hay nói cách khác, là những sinh vật có thể thích nghi và phát triển trong thời tiết lạnh (từ chionophile trong tiếng Anh có nghĩa là "những kẻ mê tuyết").\nNhưng loài nào có thể phát triển trong điều kiện nhiệt độ thấp nhất? Sau đây là một trong số những loài hay ho nhất trên Trái Đất làm được vậy…\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Chim cánh cụt hoàng đế sống sót nhờ khả năng hoạt động tập hợp sức mạnh tập thể - chúng ôm nhau để giữ ấm\nChim cánh cụt Hoàng đế\nGió lạnh ở Nam Cực làm nhiệt độ giảm xuống đến -60 độ C khiến ta run cầm cập, đây là thách thức với chim cánh cụt hoàng đế.\nĐây là loài chim cánh cụt lớn nhất trên hành tinh - và vì cao lớn như vậy nên chúng dễ bị hứng những đợt gió lạnh buốt hơn so với các loài kích cỡ nhỏ hơn sống ở đó.\nNhưng chúng vẫn có khả năng sống sót nhờ vào hoạt động đồng đội, ôm nhau giữ ấm trong suốt những tháng lạnh nhất ở Nam Cực.\nNhững chú chim cánh cụt đứng giữa nhóm ôm nhau là những con ấm nhất, và khi đã ấm áp rồi, chúng sẽ luân phiên chui ra ngoài để các chú chim bên ngoài có thể thay phiên đi vào giữa sưởi ấm.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Sóc Bắc Cực tránh cái lạnh khắc nghiệt nhờ đào hang sâu vào lòng đất\nSóc đất Bắc Cực\nNếu tình hình hiện thời của thế giới khiến bạn muốn đi ngủ đông cho rồi, thì bạn có thể xem xét loài sóc đất Bắc Cực để chọn làm hình tượng noi theo.\nSống ở vùng lãnh nguyên Bắc Cực ở Bắc Mỹ, nơi nhiệt độ có thể xuống dưới -63 độ C, chúng có thể thoát khỏi mùa đông tồi tệ nhất nhờ vào việc đào hang dưới lòng đất và ngủ một mạch tám tháng trong năm.\nKhi ngủ đông, nhiệt độ trong não các chú sóc này có thể giảm xuống chỉ vừa trên mức đóng băng, trong khi nhiệt độ cơ thể có thể giảm tới mức -2,9 độ C và nhịp tim giảm xuống chỉ còn một nhịp mỗi phút.\nKhi thời gian ngủ đông kết thúc, các chú sóc này cần khoảng ba giờ để làm ấm cơ thể trở lại.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Hải cẩu Weddel dùng răng để đào hố trong khối băng đại dương để thở\nHải cẩu Weddell\nNếu bạn muốn tìm một loài động vật có vú yêu thích cái lạnh trong từng giây phút, tôi giới thiệu bạn với hải cẩu Weddel.\nChúng là loài sống ở miền nam xa xôi nhất so với bất kỳ giống hải cẩu nào khác, và dành hầu hết thời gian sống bên dưới lớp băng Nam Cực, nơi chúng có thể săn mồi và tránh bị cá voi sát thủ bắt.\nLặn sâu xuống độ sâu hơn 2.000 feet, chúng có thể ở dưới nước đến 45 phút và nếu không thể đập vỡ băng để ngớp khí oxy cần thiết, chúng sẽ dùng răng để đào cho mình một lỗ lấy khí.\nNước biển Nam Cực thực ra ấm hơn so với không khí trên bề mặt (vốn có thể giảm xuống -70 độ C), vì vậy đặc biệt trong những trận bão mùa đông dữ dội, hải cẩu sẽ giữ ấm bằng cách lặn xuống biển.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Cá mập khổng lồ Greenland có thể chịu được nước biển lạnh buốt như những nơi thế này\nSống ở vùng nước sâu trong khu vực Bắc Đại Tây Dương và Bắc Cực, những con cá mập khổng lồ này không chỉ sống sót trong làn nước lạnh căm, mà còn có tuổi thọ dài nhất so với bất cứ loài có xương sống nào trên hành tinh.\nChúng có tuổi thọ trung bình từ 300 đến 500 năm tuổi.\nNhịp trao đổi chất cực kỳ chậm của chúng giúp kiểm soát nhiệt độ và kéo dài tuổi thọ, và chúng cũng có thể là loài cá mập lớn nhất, có thể đạt tới 6,4m chiều dài và nặng khoảng 1,000kg.\nDù vậy, Usain Bolt không có gì phải lo lắng, vì chúng chỉ có thể tăng tốc độ bơi đến 1,6 dặm/giờ, và do vậy, không có gì ngạc nhiên khi chúng thường săn con mồi đã đi ngủ.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Lớp lông dày mịn giúp chim sheathbill tuyết giữ nhiệt tốt\nChim sheathbill tuyết\nLoài chim trông giống bồ câu, trắng phau và dũng cảm này là loài chim bản địa duy nhất sống trên bề mặt Nam Cực và là loài duy nhất sinh sản tại đây.\nVới lớp lông dày giúp giữ ấm, chúng hầu như sống trên mặt đất, cố gắng lượm lặt thức ăn thừa rơi vãi của các loài chim khác. Điều này thật hay.\nChúng cũng là loài chim duy nhất ở Nam Cực không có màng chân.\nVậy làm sao chúng có thể giữ ngón chân ấm áp, trong khi lại dành quá nhiều thời gian trên bề mặt đất lạnh cóng?\nKhông có giải pháp sinh học kỳ diệu nào ở đây cả, chúng chỉ dành nhiều thời gian nhảy lò cò từ chân này đổi sang chân kia.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Bí kíp để loài bò xạ hương có thể sống sót là nhờ lớp lông rậm\nBò xạ hương\nMột trong những sinh vật sống trên lãnh nguyên xuất hiện ở khu vực từ Siberia đến Greenland là loài bò xạ hương. Loài này có cái tên nổi bật, được đặt theo mùi hăng khó chịu thoát ra trong mùa động đực.\nNhững con thú kỳ vĩ này đã sống sót giữa môi trường khắc nghiệt nhất trong hàng ngàn năm qua nhờ vào lớp lông dày rậm.\nLớp lông rậm rạp và dày nổi bật được làm từ nhiều lớp, với phần bên ngoài - được gọi là lớp lông bảo vệ - che phủ cho lớp lông thứ hai bên dưới, ngắn hơn, đem lại khả năng giữ ấm tăng cường trong những tháng lạnh nhất.\nNguồn hình ảnh, Getty Images Chụp lại hình ảnh, Nhờ sống bên dưới lớp bỏ cây, những chú bọ cánh cứng can trường này có thể sống sót qua tháng lạnh nhất trong mùa đông\nBọ cánh cứng dẹt vỏ cây đỏ\nLoài bọ cánh cứng dài khoảng nửa inch này có khu vực sinh sống từ North Carolina đến Vòng Cực Bắc.\nChúng sống bên dưới lớp vỏ cây và cơ thể được cấu tạo có chủ đích để sinh tồn trong điều kiện khắc nghiệt nhất giữa mùa đông.\nKhí hậu ở vùng Bắc Cực vào tháng Tám có tác dụng như khí hậu nghỉ dưỡng đối với loài này.\nTrong các phòng thí nghiệm, chúng có thể chống chọi được nhiệt độ lạnh cóng đến mức -150 độ C. Mức này đúng là cực lạnh!'</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>article.url</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>'https://www.bbc.com/vietnamese/vert-earth-55751040'</code></pre>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

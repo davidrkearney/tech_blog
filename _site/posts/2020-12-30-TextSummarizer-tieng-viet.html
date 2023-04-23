@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.336">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Science - Text summarizer in Python, Tieng Viet</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Data Science</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/davidrkearney" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/davidrkearney" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Text summarizer in Python, Tieng Viet</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="credit-code-from-httpsgithub.comlouisteo9personal-text-summarizer" class="level2">
+<h2 class="anchored" data-anchor-id="credit-code-from-httpsgithub.comlouisteo9personal-text-summarizer">Credit: code from https://github.com/louisteo9/personal-text-summarizer</h2>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Natural Language Tool Kit (NLTK)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nltk</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>nltk.download(<span class="st">'stopwords'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Regular Expression for text preprocessing</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Heap (priority) queue algorithm to get the top sentences</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> heapq</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># NumPy for numerical computing</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># pandas for creating DataFrames</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># matplotlib for plot</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[nltk_data] Downloading package stopwords to /home/david/nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!</code></pre>
+</div>
+</div>
+</section>
+<section id="load-text-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-text-data">Load text data</h2>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load text file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'viet_article1.txt'</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    file_data <span class="op">=</span> f.read()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># view text data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(file_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Thêm 9 người nhập cảnh nhiễm nCoV
+
+Ngày 1/1, Bộ Y tế ghi nhận ca dương tính nCoV, đều là người nhập cảnh được cách ly ngay tại Khánh Hòa, Bình Dương và Long An. Tổng ca nhiễm lên 1.474.
+
+"Bệnh nhân 1466", nam, 35 tuổi, ở TP Hưng Yên, tỉnh Hưng Yên. "Bệnh nhân 1467" nam, 38, tuổi, ở huyện Thanh Hà, tỉnh Hải Dương. "Bệnh nhân 1468", nam, 51 tuổi, ở huyện Thanh Chương, tỉnh Nghệ An. Ba người này từ Nga nhập cảnh sân bay Cam Ranh trên chuyến bay VN5062 ngày 25/12, cách ly tại tỉnh Khánh Hòa. Kết quả xét nghiệm lần một ngày 25/12 âm tính; lấy mẫu lần hai ngày 30/12 kết quả xét nghiệm tại Trung tâm Kiểm soát Bệnh tật tỉnh Khánh Hòa dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Bệnh nhiệt đới tỉnh Khánh Hòa.
+
+Trước đó trên chuyến bay này đã ghi nhận 9 trường hợp dương tính với nCoV.
+
+"Bệnh nhân 1469", nam, 32 tuổi, ở quận Hải Châu, TP Đà Nẵng. "Bệnh nhân 1470", nữ, 40 tuổi, ở huyện Ba Vì, và "bệnh nhân 1471", nam, 37 tuổi, ở huyện Chương Mỹ, TP Hà Nội. "Bệnh nhân 1472", nam, 29 tuổi, ở huyện Kim Thành, và "bệnh nhân 1473", nam, 37 tuổi, ở huyện Thanh Hà, tỉnh Hải Dương. Họ từ Đức nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN30 ngày 30/12 được cách ly tại tỉnh Bình Dương. Kết quả xét nghiệm ngày 31/12 tại Viện Pasteur TP HCM dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Bình Dương.
+
+"Bệnh nhân 1474", nam, 50 tuổi, ở Quận 7, TP HCM. Ông từ Canada quá cảnh sân bay Incheon (Hàn Quốc), sau đó nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN405 ngày 29/12, được cách ly tại tỉnh Long An. Lấy mẫu ngày 30/12, kết quả xét nghiệm tại Trung tâm Kiểm soát bệnh tật tỉnh Long An và Viện Pasteur TP HCM đều dương tính với nCoV, bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Long An.
+
+Như vậy, tổng ca nhiễm lên 1.474, tổng số khỏi 1.325. Số người tử vong do Covid-19 là 35, bốn người tử vong sau ba đến bốn lần xét nghiệm âm tính. Các bệnh nhân còn lại đa số sức khỏe ổn định, trong đó 7 người xét nghiệm âm tính nCoV lần một, 11 người âm tính lần hai và 10 người âm tính lần ba.
+
+Tổng số người tiếp xúc gần và nhập cảnh từ vùng dịch đang được cách ly hơn 17.000. Trong đó, cách ly tập trung tại bệnh viện 150; cách ly tập trung hơn 15.000, còn lại ở nhà hoặc nơi lưu trú.
+
+Việt Nam đã 30 ngày không ghi nhận ca nhiễm mới trong cộng đồng. Song, nguy cơ dịch xâm nhập luôn thường trực, đặc biệt khi tăng số lượng chuyến bay đưa công dân Việt Nam, chuyên gia về nước. Nhà chức trách luôn cảnh báo nguy cơ dịch xâm nhập từ người nhập cảnh trái phép.
+
+Bộ Y tế khuyến cáo người dân tiếp tục thực hiện tốt "Thông điệp 5K", nhất là đeo khẩu trang và rửa tay bằng xà phòng, dung dịch sát khuẩn.
+
+Thế giới ghi nhận hơn 1,7 triệu người chết vì nCoV trong hơn 83 triệu người nhiễm. Mỹ là quốc gia chịu ảnh hưởng nghiêm trọng nhất của dịch, tiếp theo là Ấn Độ và Brazil.
+</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> file_data</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> re.sub(<span class="vs">r'\[[0-9]*\]'</span>,<span class="st">' '</span>,text) <span class="co"># replace reference number i.e. [1], [10], [20] with empty space, if any..</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>text <span class="op">=</span> re.sub(<span class="vs">r'\s+'</span>,<span class="st">' '</span>,text) <span class="co"># replace one or more spaces with single space</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Thêm 9 người nhập cảnh nhiễm nCoV Ngày 1/1, Bộ Y tế ghi nhận ca dương tính nCoV, đều là người nhập cảnh được cách ly ngay tại Khánh Hòa, Bình Dương và Long An. Tổng ca nhiễm lên 1.474. "Bệnh nhân 1466", nam, 35 tuổi, ở TP Hưng Yên, tỉnh Hưng Yên. "Bệnh nhân 1467" nam, 38, tuổi, ở huyện Thanh Hà, tỉnh Hải Dương. "Bệnh nhân 1468", nam, 51 tuổi, ở huyện Thanh Chương, tỉnh Nghệ An. Ba người này từ Nga nhập cảnh sân bay Cam Ranh trên chuyến bay VN5062 ngày 25/12, cách ly tại tỉnh Khánh Hòa. Kết quả xét nghiệm lần một ngày 25/12 âm tính; lấy mẫu lần hai ngày 30/12 kết quả xét nghiệm tại Trung tâm Kiểm soát Bệnh tật tỉnh Khánh Hòa dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Bệnh nhiệt đới tỉnh Khánh Hòa. Trước đó trên chuyến bay này đã ghi nhận 9 trường hợp dương tính với nCoV. "Bệnh nhân 1469", nam, 32 tuổi, ở quận Hải Châu, TP Đà Nẵng. "Bệnh nhân 1470", nữ, 40 tuổi, ở huyện Ba Vì, và "bệnh nhân 1471", nam, 37 tuổi, ở huyện Chương Mỹ, TP Hà Nội. "Bệnh nhân 1472", nam, 29 tuổi, ở huyện Kim Thành, và "bệnh nhân 1473", nam, 37 tuổi, ở huyện Thanh Hà, tỉnh Hải Dương. Họ từ Đức nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN30 ngày 30/12 được cách ly tại tỉnh Bình Dương. Kết quả xét nghiệm ngày 31/12 tại Viện Pasteur TP HCM dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Bình Dương. "Bệnh nhân 1474", nam, 50 tuổi, ở Quận 7, TP HCM. Ông từ Canada quá cảnh sân bay Incheon (Hàn Quốc), sau đó nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN405 ngày 29/12, được cách ly tại tỉnh Long An. Lấy mẫu ngày 30/12, kết quả xét nghiệm tại Trung tâm Kiểm soát bệnh tật tỉnh Long An và Viện Pasteur TP HCM đều dương tính với nCoV, bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Long An. Như vậy, tổng ca nhiễm lên 1.474, tổng số khỏi 1.325. Số người tử vong do Covid-19 là 35, bốn người tử vong sau ba đến bốn lần xét nghiệm âm tính. Các bệnh nhân còn lại đa số sức khỏe ổn định, trong đó 7 người xét nghiệm âm tính nCoV lần một, 11 người âm tính lần hai và 10 người âm tính lần ba. Tổng số người tiếp xúc gần và nhập cảnh từ vùng dịch đang được cách ly hơn 17.000. Trong đó, cách ly tập trung tại bệnh viện 150; cách ly tập trung hơn 15.000, còn lại ở nhà hoặc nơi lưu trú. Việt Nam đã 30 ngày không ghi nhận ca nhiễm mới trong cộng đồng. Song, nguy cơ dịch xâm nhập luôn thường trực, đặc biệt khi tăng số lượng chuyến bay đưa công dân Việt Nam, chuyên gia về nước. Nhà chức trách luôn cảnh báo nguy cơ dịch xâm nhập từ người nhập cảnh trái phép. Bộ Y tế khuyến cáo người dân tiếp tục thực hiện tốt "Thông điệp 5K", nhất là đeo khẩu trang và rửa tay bằng xà phòng, dung dịch sát khuẩn. Thế giới ghi nhận hơn 1,7 triệu người chết vì nCoV trong hơn 83 triệu người nhiễm. Mỹ là quốc gia chịu ảnh hưởng nghiêm trọng nhất của dịch, tiếp theo là Ấn Độ và Brazil. </code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate clean text</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>clean_text <span class="op">=</span> text.lower() <span class="co"># convert all uppercase characters into lowercase characters</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># replace characters other than [a-zA-Z0-9], digits &amp; one or more spaces with single space</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>regex_patterns <span class="op">=</span> [<span class="vs">r'\W'</span>,<span class="vs">r'\d'</span>,<span class="vs">r'\s+'</span>]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> regex <span class="kw">in</span> regex_patterns:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    clean_text <span class="op">=</span> re.sub(regex,<span class="st">' '</span>,clean_text)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(clean_text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>thêm người nhập cảnh nhiễm ncov ngày bộ y tế ghi nhận ca dương tính ncov đều là người nhập cảnh được cách ly ngay tại khánh hòa bình dương và long an tổng ca nhiễm lên bệnh nhân nam tuổi ở tp hưng yên tỉnh hưng yên bệnh nhân nam tuổi ở huyện thanh hà tỉnh hải dương bệnh nhân nam tuổi ở huyện thanh chương tỉnh nghệ an ba người này từ nga nhập cảnh sân bay cam ranh trên chuyến bay vn ngày cách ly tại tỉnh khánh hòa kết quả xét nghiệm lần một ngày âm tính lấy mẫu lần hai ngày kết quả xét nghiệm tại trung tâm kiểm soát bệnh tật tỉnh khánh hòa dương tính với ncov các bệnh nhân điều trị tại bệnh viện bệnh nhiệt đới tỉnh khánh hòa trước đó trên chuyến bay này đã ghi nhận trường hợp dương tính với ncov bệnh nhân nam tuổi ở quận hải châu tp đà nẵng bệnh nhân nữ tuổi ở huyện ba vì và bệnh nhân nam tuổi ở huyện chương mỹ tp hà nội bệnh nhân nam tuổi ở huyện kim thành và bệnh nhân nam tuổi ở huyện thanh hà tỉnh hải dương họ từ đức nhập cảnh sân bay tân sơn nhất trên chuyến bay vn ngày được cách ly tại tỉnh bình dương kết quả xét nghiệm ngày tại viện pasteur tp hcm dương tính với ncov các bệnh nhân điều trị tại bệnh viện đa khoa tỉnh bình dương bệnh nhân nam tuổi ở quận tp hcm ông từ canada quá cảnh sân bay incheon hàn quốc sau đó nhập cảnh sân bay tân sơn nhất trên chuyến bay vn ngày được cách ly tại tỉnh long an lấy mẫu ngày kết quả xét nghiệm tại trung tâm kiểm soát bệnh tật tỉnh long an và viện pasteur tp hcm đều dương tính với ncov bệnh nhân điều trị tại bệnh viện đa khoa tỉnh long an như vậy tổng ca nhiễm lên tổng số khỏi số người tử vong do covid là bốn người tử vong sau ba đến bốn lần xét nghiệm âm tính các bệnh nhân còn lại đa số sức khỏe ổn định trong đó người xét nghiệm âm tính ncov lần một người âm tính lần hai và người âm tính lần ba tổng số người tiếp xúc gần và nhập cảnh từ vùng dịch đang được cách ly hơn trong đó cách ly tập trung tại bệnh viện cách ly tập trung hơn còn lại ở nhà hoặc nơi lưu trú việt nam đã ngày không ghi nhận ca nhiễm mới trong cộng đồng song nguy cơ dịch xâm nhập luôn thường trực đặc biệt khi tăng số lượng chuyến bay đưa công dân việt nam chuyên gia về nước nhà chức trách luôn cảnh báo nguy cơ dịch xâm nhập từ người nhập cảnh trái phép bộ y tế khuyến cáo người dân tiếp tục thực hiện tốt thông điệp k nhất là đeo khẩu trang và rửa tay bằng xà phòng dung dịch sát khuẩn thế giới ghi nhận hơn triệu người chết vì ncov trong hơn triệu người nhiễm mỹ là quốc gia chịu ảnh hưởng nghiêm trọng nhất của dịch tiếp theo là ấn độ và brazil </code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split (tokenize) the sentences</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sentences <span class="op">=</span> nltk.sent_tokenize(text)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sentences)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['Thêm 9 người nhập cảnh nhiễm nCoV Ngày 1/1, Bộ Y tế ghi nhận ca dương tính nCoV, đều là người nhập cảnh được cách ly ngay tại Khánh Hòa, Bình Dương và Long An.', 'Tổng ca nhiễm lên 1.474.', '"Bệnh nhân 1466", nam, 35 tuổi, ở TP Hưng Yên, tỉnh Hưng Yên.', '"Bệnh nhân 1467" nam, 38, tuổi, ở huyện Thanh Hà, tỉnh Hải Dương.', '"Bệnh nhân 1468", nam, 51 tuổi, ở huyện Thanh Chương, tỉnh Nghệ An.', 'Ba người này từ Nga nhập cảnh sân bay Cam Ranh trên chuyến bay VN5062 ngày 25/12, cách ly tại tỉnh Khánh Hòa.', 'Kết quả xét nghiệm lần một ngày 25/12 âm tính; lấy mẫu lần hai ngày 30/12 kết quả xét nghiệm tại Trung tâm Kiểm soát Bệnh tật tỉnh Khánh Hòa dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Bệnh nhiệt đới tỉnh Khánh Hòa.', 'Trước đó trên chuyến bay này đã ghi nhận 9 trường hợp dương tính với nCoV.', '"Bệnh nhân 1469", nam, 32 tuổi, ở quận Hải Châu, TP Đà Nẵng.', '"Bệnh nhân 1470", nữ, 40 tuổi, ở huyện Ba Vì, và "bệnh nhân 1471", nam, 37 tuổi, ở huyện Chương Mỹ, TP Hà Nội.', '"Bệnh nhân 1472", nam, 29 tuổi, ở huyện Kim Thành, và "bệnh nhân 1473", nam, 37 tuổi, ở huyện Thanh Hà, tỉnh Hải Dương.', 'Họ từ Đức nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN30 ngày 30/12 được cách ly tại tỉnh Bình Dương.', 'Kết quả xét nghiệm ngày 31/12 tại Viện Pasteur TP HCM dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Bình Dương.', '"Bệnh nhân 1474", nam, 50 tuổi, ở Quận 7, TP HCM.', 'Ông từ Canada quá cảnh sân bay Incheon (Hàn Quốc), sau đó nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN405 ngày 29/12, được cách ly tại tỉnh Long An.', 'Lấy mẫu ngày 30/12, kết quả xét nghiệm tại Trung tâm Kiểm soát bệnh tật tỉnh Long An và Viện Pasteur TP HCM đều dương tính với nCoV, bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Long An.', 'Như vậy, tổng ca nhiễm lên 1.474, tổng số khỏi 1.325.', 'Số người tử vong do Covid-19 là 35, bốn người tử vong sau ba đến bốn lần xét nghiệm âm tính.', 'Các bệnh nhân còn lại đa số sức khỏe ổn định, trong đó 7 người xét nghiệm âm tính nCoV lần một, 11 người âm tính lần hai và 10 người âm tính lần ba.', 'Tổng số người tiếp xúc gần và nhập cảnh từ vùng dịch đang được cách ly hơn 17.000.', 'Trong đó, cách ly tập trung tại bệnh viện 150; cách ly tập trung hơn 15.000, còn lại ở nhà hoặc nơi lưu trú.', 'Việt Nam đã 30 ngày không ghi nhận ca nhiễm mới trong cộng đồng.', 'Song, nguy cơ dịch xâm nhập luôn thường trực, đặc biệt khi tăng số lượng chuyến bay đưa công dân Việt Nam, chuyên gia về nước.', 'Nhà chức trách luôn cảnh báo nguy cơ dịch xâm nhập từ người nhập cảnh trái phép.', 'Bộ Y tế khuyến cáo người dân tiếp tục thực hiện tốt "Thông điệp 5K", nhất là đeo khẩu trang và rửa tay bằng xà phòng, dung dịch sát khuẩn.', 'Thế giới ghi nhận hơn 1,7 triệu người chết vì nCoV trong hơn 83 triệu người nhiễm.', 'Mỹ là quốc gia chịu ảnh hưởng nghiêm trọng nhất của dịch, tiếp theo là Ấn Độ và Brazil.']</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # get stop words list</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># stop_words = nltk.corpus.stopwords.words('Vietnamese')</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(stop_words)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create an empty dictionary to house the word count</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>word_count <span class="op">=</span> {}</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># loop through tokenized words, remove stop words and save word count to dictionary</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> word <span class="kw">in</span> nltk.word_tokenize(clean_text):</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># save word count to dictionary</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> word <span class="kw">not</span> <span class="kw">in</span> word_count.keys():</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>            word_count[word] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>            word_count[word] <span class="op">+=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">10</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation <span class="op">=</span> <span class="dv">90</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.bar(word_count.keys(), word_count.values())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-12-30-TextSummarizer-tieng-viet_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># helper function for plotting the top words.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_top_words(word_count_dict, show_top_n<span class="op">=</span><span class="dv">20</span>):</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    word_count_table <span class="op">=</span> pd.DataFrame.from_dict(word_count_dict, orient <span class="op">=</span> <span class="st">'index'</span>).rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">'score'</span>})</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    word_count_table.sort_values(by<span class="op">=</span><span class="st">'score'</span>).tail(show_top_n).plot(kind<span class="op">=</span><span class="st">'barh'</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plot_top_words(word_count, <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-12-30-TextSummarizer-tieng-viet_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create empty dictionary to house sentence score    </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>sentence_score <span class="op">=</span> {}</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># loop through tokenized sentence, only take sentences that have less than 30 words, then add word score to form sentence score</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sentence <span class="kw">in</span> sentences:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># check if word in sentence is in word_count dictionary</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> word <span class="kw">in</span> nltk.word_tokenize(sentence.lower()):</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> word <span class="kw">in</span> word_count.keys():</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            <span class="co"># only take sentence that has less than 30 words</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">len</span>(sentence.split(<span class="st">' '</span>)) <span class="op">&lt;</span> <span class="dv">30</span>:</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                <span class="co"># add word score to sentence score</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> sentence <span class="kw">not</span> <span class="kw">in</span> sentence_score.keys():</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                    sentence_score[sentence] <span class="op">=</span> word_count[word]</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                    sentence_score[sentence] <span class="op">+=</span> word_count[word]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df_sentence_score <span class="op">=</span> pd.DataFrame.from_dict(sentence_score, orient <span class="op">=</span> <span class="st">'index'</span>).rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">'score'</span>})</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df_sentence_score.sort_values(by<span class="op">=</span><span class="st">'score'</span>, ascending <span class="op">=</span> <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Kết quả xét nghiệm ngày 31/12 tại Viện Pasteur TP HCM dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Bình Dương.</td>
+<td>198</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1472", nam, 29 tuổi, ở huyện Kim Thành, và "bệnh nhân 1473", nam, 37 tuổi, ở huyện Thanh Hà, tỉnh Hải Dương.</td>
+<td>177</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1470", nữ, 40 tuổi, ở huyện Ba Vì, và "bệnh nhân 1471", nam, 37 tuổi, ở huyện Chương Mỹ, TP Hà Nội.</td>
+<td>155</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Ba người này từ Nga nhập cảnh sân bay Cam Ranh trên chuyến bay VN5062 ngày 25/12, cách ly tại tỉnh Khánh Hòa.</td>
+<td>130</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Họ từ Đức nhập cảnh sân bay Tân Sơn Nhất trên chuyến bay VN30 ngày 30/12 được cách ly tại tỉnh Bình Dương.</td>
+<td>127</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Trong đó, cách ly tập trung tại bệnh viện 150; cách ly tập trung hơn 15.000, còn lại ở nhà hoặc nơi lưu trú.</td>
+<td>109</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1467" nam, 38, tuổi, ở huyện Thanh Hà, tỉnh Hải Dương.</td>
+<td>99</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1468", nam, 51 tuổi, ở huyện Thanh Chương, tỉnh Nghệ An.</td>
+<td>91</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Số người tử vong do Covid-19 là 35, bốn người tử vong sau ba đến bốn lần xét nghiệm âm tính.</td>
+<td>89</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1466", nam, 35 tuổi, ở TP Hưng Yên, tỉnh Hưng Yên.</td>
+<td>88</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Tổng số người tiếp xúc gần và nhập cảnh từ vùng dịch đang được cách ly hơn 17.000.</td>
+<td>87</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1469", nam, 32 tuổi, ở quận Hải Châu, TP Đà Nẵng.</td>
+<td>76</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Nhà chức trách luôn cảnh báo nguy cơ dịch xâm nhập từ người nhập cảnh trái phép.</td>
+<td>74</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">"Bệnh nhân 1474", nam, 50 tuổi, ở Quận 7, TP HCM.</td>
+<td>73</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Song, nguy cơ dịch xâm nhập luôn thường trực, đặc biệt khi tăng số lượng chuyến bay đưa công dân Việt Nam, chuyên gia về nước.</td>
+<td>70</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Trước đó trên chuyến bay này đã ghi nhận 9 trường hợp dương tính với nCoV.</td>
+<td>69</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Thế giới ghi nhận hơn 1,7 triệu người chết vì nCoV trong hơn 83 triệu người nhiễm.</td>
+<td>68</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Việt Nam đã 30 ngày không ghi nhận ca nhiễm mới trong cộng đồng.</td>
+<td>48</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Mỹ là quốc gia chịu ảnh hưởng nghiêm trọng nhất của dịch, tiếp theo là Ấn Độ và Brazil.</td>
+<td>46</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Như vậy, tổng ca nhiễm lên 1.474, tổng số khỏi 1.325.</td>
+<td>27</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Tổng ca nhiễm lên 1.474.</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the best 3 sentences for summary             </span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>best_sentences <span class="op">=</span> heapq.nlargest(<span class="dv">3</span>, sentence_score, key<span class="op">=</span>sentence_score.get)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'SUMMARY'</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'------------------------'</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># display top sentences based on their sentence sequence in the original text</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sentence <span class="kw">in</span> sentences:</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sentence <span class="kw">in</span> best_sentences:</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span> (sentence)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SUMMARY
+------------------------
+"Bệnh nhân 1470", nữ, 40 tuổi, ở huyện Ba Vì, và "bệnh nhân 1471", nam, 37 tuổi, ở huyện Chương Mỹ, TP Hà Nội.
+"Bệnh nhân 1472", nam, 29 tuổi, ở huyện Kim Thành, và "bệnh nhân 1473", nam, 37 tuổi, ở huyện Thanh Hà, tỉnh Hải Dương.
+Kết quả xét nghiệm ngày 31/12 tại Viện Pasteur TP HCM dương tính với nCoV, các bệnh nhân điều trị tại Bệnh viện Đa khoa tỉnh Bình Dương.</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wordcloud</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Wordcloud of training set</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>cloud <span class="op">=</span> np.array(file_data).flatten()</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">10</span>))</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>word_cloud <span class="op">=</span> wordcloud.WordCloud(</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    max_words<span class="op">=</span><span class="dv">200</span>,background_color <span class="op">=</span><span class="st">"black"</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="dv">2000</span>,height<span class="op">=</span><span class="dv">1000</span>,mode<span class="op">=</span><span class="st">"RGB"</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>).generate(<span class="bu">str</span>(cloud))</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>plt.imshow(word_cloud)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>&lt;matplotlib.image.AxesImage at 0x7f3cc9e372b0&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-12-30-TextSummarizer-tieng-viet_files/figure-html/cell-17-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wordcloud</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Wordcloud of training set</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>cloud <span class="op">=</span> np.array(best_sentences).flatten()</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">10</span>))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>word_cloud <span class="op">=</span> wordcloud.WordCloud(</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    max_words<span class="op">=</span><span class="dv">200</span>,background_color <span class="op">=</span><span class="st">"black"</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="dv">2000</span>,height<span class="op">=</span><span class="dv">1000</span>,mode<span class="op">=</span><span class="st">"RGB"</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>).generate(<span class="bu">str</span>(cloud))</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">"off"</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>plt.imshow(word_cloud)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>&lt;matplotlib.image.AxesImage at 0x7f3d09c0b190&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2020-12-30-TextSummarizer-tieng-viet_files/figure-html/cell-18-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

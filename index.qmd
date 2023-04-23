@@ -1,5 +1,5 @@
 ---
-title: "tech_blog"
+title: "Kearney Data Science"
 listing:
   contents: posts
   sort: "date desc"
