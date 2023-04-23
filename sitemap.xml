@@ -2,18 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://davidrkearney.github.io/tech_blog/posts/post-with-code/index.html</loc>
-    <lastmod>2023-04-23T16:38:29.951Z</lastmod>
+    <lastmod>2023-04-23T16:39:44.991Z</lastmod>
+  </url>
+  <url>
+    <loc>https://davidrkearney.github.io/tech_blog/posts/2022-10-02-Prophet-Time-Series.html</loc>
+    <lastmod>2023-04-23T16:39:45.546Z</lastmod>
   </url>
   <url>
     <loc>https://davidrkearney.github.io/tech_blog/posts/welcome/index.html</loc>
-    <lastmod>2023-04-23T16:38:30.182Z</lastmod>
+    <lastmod>2023-04-23T16:39:45.760Z</lastmod>
   </url>
   <url>
     <loc>https://davidrkearney.github.io/tech_blog/index.html</loc>
-    <lastmod>2023-04-23T16:38:30.740Z</lastmod>
+    <lastmod>2023-04-23T16:39:46.283Z</lastmod>
   </url>
   <url>
     <loc>https://davidrkearney.github.io/tech_blog/about.html</loc>
-    <lastmod>2023-04-23T16:38:30.934Z</lastmod>
+    <lastmod>2023-04-23T16:39:46.481Z</lastmod>
   </url>
 </urlset>
