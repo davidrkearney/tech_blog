@@ -2265,7 +2265,7 @@
     "href": "posts/index.html",
     "title": "Kearney Data Science",
     "section": "",
-    "text": "---\ntitle: \"Hello World\"\nauthor: \"DRK\"\ndate: \"2022-01-01\"\n---\n\n\n#quarto publish gh-pages"
+    "text": "---\ntitle: \"Hello World\"\nauthor: \"DRK\"\ndate: \"2022-01-01\"\n---\n\n\n#quarto publish gh-pages\n#posts/2020-10-22-stock-market-returns.ipynb"
   },
   {
     "objectID": "posts/2020-12-30-TextSummarizer-tieng-viet.html",
