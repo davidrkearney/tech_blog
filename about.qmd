@@ -13,13 +13,15 @@ about:
 
 ---
 
+# David Kearney
+
 ## Tinder:
 
-+ Core data science contributor of high-performing revenue team delivering over a billion dollars in revenue annually for a top-grossing global app.
++ Core data science contributor to high-performing revenue team delivering **>$1B** in revenue annually.
 
-+ Conducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over $30 million.
++ Conducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over **$30M**.
 
-+ Implemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over $1 million in fees and mitigating more than $100 million in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.
++ Implemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over **$1M** in fees and mitigating more than **$100M** in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.
 
 + Designed and implemented automated dashboards, KPI tracking and reporting features, and experiment and company-level revenue metrics, streamlining data analysis and providing crucial insights for business decision-making.
 

@@ -716,7 +716,7 @@
   {
     "objectID": "posts/2021-01-23-voila-datasette-blog-post.html",
     "href": "posts/2021-01-23-voila-datasette-blog-post.html",
-    "title": "Data Science",
+    "title": "Kearney Data Science",
     "section": "",
     "text": "# Set up \n\n\nimport pandas as pd\nimport numpy as np\nimport pandas_datareader.data as web\nimport sqlalchemy as db\nfrom sqlalchemy import create_engine\nimport datetime\nimport sqlite3\nimport pandas as pd\nfrom sqlalchemy.sql.schema import Column\n\n\nstart = pd.to_datetime('2018-01-01')\nend = pd.to_datetime('today')\n\nFXAIX_stock = web.DataReader('FXAIX', 'yahoo', start, end)\nFXAIX_stock.head()\n\nSP500_stock = web.DataReader('^GSPC', 'yahoo', start, end)\nSP500_stock.head()\n\nRussell_2000_stock = web.DataReader('^RUT', 'yahoo', start, end)\nRussell_2000_stock.head()\n\n\nstocks = pd.concat([SP500_stock['Open'], Russell_2000_stock['Open'], FXAIX_stock['Open']], axis = 1)\n\nstocks.columns = ['SP500_stock','Russell_2000_stock', 'FXAIX_stock']\n\nstocks.reset_index(level=0, inplace=True)\nstocks\n\nengine = db.create_engine('sqlite:///stocks.db')\nconnection = engine.connect()\nmetadata = db.MetaData()\n\n\nstocks_table = db.Table('index_stocks_table', metadata, \n    db.Column('Date',db.Date, nullable=True, index=False),\n    db.Column('SP500_stock',db.Integer, nullable=True),\n    db.Column('Russell_2000_stock',db.Integer, nullable=True),\n    db.Column('FXAIX_stock', db.Numeric, nullable=True)\n)\n\nmetadata.create_all(engine) \n\nstocks.to_sql('index_stocks_table', con=engine, if_exists='replace', index=False)\n\nsql = \"SELECT * FROM index_stocks_table LIMIT 10\"\ncnxn = connection\ndf = pd.read_sql(sql, cnxn)\nprint(df.head(10))\n\n                         Date  SP500_stock  Russell_2000_stock  FXAIX_stock\n0  2018-01-02 00:00:00.000000  2683.729980         1536.119995    94.230003\n1  2018-01-03 00:00:00.000000  2697.850098         1550.280029    94.830002\n2  2018-01-04 00:00:00.000000  2719.310059         1552.979980    95.230003\n3  2018-01-05 00:00:00.000000  2731.330078         1555.869995    95.900002\n4  2018-01-08 00:00:00.000000  2742.669922         1559.800049    96.059998\n5  2018-01-09 00:00:00.000000  2751.149902         1562.219971    96.220001\n6  2018-01-10 00:00:00.000000  2745.550049         1559.010010    96.110001\n7  2018-01-11 00:00:00.000000  2752.969971         1560.219971    96.790001\n8  2018-01-12 00:00:00.000000  2770.179932         1587.119995    97.449997\n9  2018-01-16 00:00:00.000000  2798.959961         1592.910034    97.110001\n\n\n\n#!/bin/bash\nsource ~/anaconda3/etc/profile.d/conda.sh\nconda activate base\npython stocks_fiax.py\ndatasette publish heroku -n stocks-snp-500 stocks.db --install=datasette-vega\n\n\n#snp_list_tables.columns = ['Symbol','Security', 'SEC filings', 'GICS Sector', 'GICS Sub-Industry', ' Headquarters Location', 'Date first added', 'CIK', 'Founded']\n#snp_list_tables.head(10)\n#\n#\n#snp_list_table = db.Table('snp_list_tables', metadata, \n#    db.Column('Symbol',db.String, nullable=True, index=False),\n#    db.Column('Security',db.String, nullable=True),\n#    db.Column('SEC filings',db.String, nullable=True),\n#    db.Column('GICS Sub-Industry',db.String, nullable=True),\n#    db.Column('Headquarters Location',db.String, nullable=True)\n#    , db.Column('Date first added', db.Date, nullable=True)\n#    , db.Column('CIK', db.String, nullable=True)\n#    , db.Column('Founded', db.Date, nullable=True)\n#)\n#\n#snp_list_table.to_sql('snp_list', con=engine, if_exists='replace', index=False)\n#\n#sql = \"SELECT * FROM snp_list LIMIT 10\"\n#cnxn = connection\n#df = pd.read_sql(sql, cnxn)\n#print(df.head(30))"
   },
@@ -2263,9 +2263,9 @@
   {
     "objectID": "posts/index.html",
     "href": "posts/index.html",
-    "title": "Data Science",
+    "title": "Kearney Data Science",
     "section": "",
-    "text": "---\ntitle: \"Hello World\"\nauthor: \"DRK\"\ndate: \"2022-01-01\"\n---\n\n\n#quarto publish gh-pages"
+    "text": "---\ntitle: \"Hello World\"\nauthor: \"DRK\"\ndate: \"2022-01-01\"\n---\n\n\n#quarto publish gh-pages\n#posts/2020-10-22-stock-market-returns.ipynb"
   },
   {
     "objectID": "posts/2020-12-30-TextSummarizer-tieng-viet.html",
@@ -2307,34 +2307,27 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "Core data science contributor of high-performing revenue team delivering over a billion dollars in revenue annually for a top-grossing global app.\nConducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over $30 million.\nImplemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over $1 million in fees and mitigating more than $100 million in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.\nDesigned and implemented automated dashboards, KPI tracking and reporting features, and experiment and company-level revenue metrics, streamlining data analysis and providing crucial insights for business decision-making."
-  },
-  {
-    "objectID": "about.html#at-cvs-health",
-    "href": "about.html#at-cvs-health",
-    "title": "About",
-    "section": "At CVS Health:",
-    "text": "At CVS Health:\n\nCreated automated member and provider engagement campaigns that leverage e-mail, IVR, SMS and live calls to increase medication adherence.\nDesigned experiments and employ randomized control trials to improve campaigns by identifying the most effective campaign variants, and productionlize machine learning models to identify members at risk of behaving in a way that contributes to poor health outcomes and most likely to benefit from campaigns.\n\nAt Duke University: + Recieved Ph.D. where research focused on applying econometric and statistical techniques to explain and predict the allocation of fiscal transfers."
+    "text": "Core data science contributor to high-performing revenue team delivering &gt;$1B in revenue annually.\nConducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over $30M.\nImplemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over $1M in fees and mitigating more than $100M in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.\nDesigned and implemented automated dashboards, KPI tracking and reporting features, and experiment and company-level revenue metrics, streamlining data analysis and providing crucial insights for business decision-making.\n\n\n\n\n\nCreated automated member and provider engagement campaigns that leverage e-mail, IVR, SMS and live calls to increase medication adherence.\nDesigned experiments and employ randomized control trials to improve campaigns by identifying the most effective campaign variants, and productionlize machine learning models to identify members at risk of behaving in a way that contributes to poor health outcomes and most likely to benefit from campaigns.\n\n\n\n\n\nRecieved Ph.D. where research focused on applying econometric and statistical techniques to explain and predict the allocation of fiscal transfers."
   },
   {
     "objectID": "about.html#tinder",
     "href": "about.html#tinder",
     "title": "About",
     "section": "",
-    "text": "Core data science contributor of high-performing revenue team delivering over a billion dollars in revenue annually for a top-grossing global app.\nConducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over $30 million.\nImplemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over $1 million in fees and mitigating more than $100 million in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.\nDesigned and implemented automated dashboards, KPI tracking and reporting features, and experiment and company-level revenue metrics, streamlining data analysis and providing crucial insights for business decision-making."
+    "text": "Core data science contributor to high-performing revenue team delivering &gt;$1B in revenue annually.\nConducted pricing, payment, and revenue growth experiments across multiple markets, including the USA, EU, Japan, UK, Canada, and Australia, resulting in annual revenue growth of over $30M.\nImplemented machine learning-based fraud detection and prevention experiments, leading to the elimination of over $1M in fees and mitigating more than $100M in business risk. Deployed ML models to identify high-propensity subscribers and ALC product purchasers.\nDesigned and implemented automated dashboards, KPI tracking and reporting features, and experiment and company-level revenue metrics, streamlining data analysis and providing crucial insights for business decision-making."
   },
   {
     "objectID": "about.html#cvs-health",
     "href": "about.html#cvs-health",
     "title": "About",
-    "section": "CVS Health:",
-    "text": "CVS Health:\n\nCreated automated member and provider engagement campaigns that leverage e-mail, IVR, SMS and live calls to increase medication adherence.\nDesigned experiments and employ randomized control trials to improve campaigns by identifying the most effective campaign variants, and productionlize machine learning models to identify members at risk of behaving in a way that contributes to poor health outcomes and most likely to benefit from campaigns."
+    "section": "",
+    "text": "Created automated member and provider engagement campaigns that leverage e-mail, IVR, SMS and live calls to increase medication adherence.\nDesigned experiments and employ randomized control trials to improve campaigns by identifying the most effective campaign variants, and productionlize machine learning models to identify members at risk of behaving in a way that contributes to poor health outcomes and most likely to benefit from campaigns."
   },
   {
     "objectID": "about.html#duke-university",
     "href": "about.html#duke-university",
     "title": "About",
-    "section": "Duke University:",
-    "text": "Duke University:\n\nRecieved Ph.D. where research focused on applying econometric and statistical techniques to explain and predict the allocation of fiscal transfers."
+    "section": "",
+    "text": "Recieved Ph.D. where research focused on applying econometric and statistical techniques to explain and predict the allocation of fiscal transfers."
   }
 ]
